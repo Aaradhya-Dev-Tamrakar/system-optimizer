@@ -82,6 +82,12 @@ namespace NovaOptimizer
                         TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentCyan");
                         BadgeMode.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#16283D")!;
                     }
+                    else if (profile == BoostProfile.StudyMode)
+                    {
+                        TxtBadgeMode.Text = "📚 STUDY MODE";
+                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentBlue");
+                        BadgeMode.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#16253D")!;
+                    }
                     else
                     {
                         TxtBadgeMode.Text = "🚀 Standard";

@@ -23,7 +23,7 @@ Standard task managers can only kill processes. NovaOptimizer interfaces with th
 - **System Working Set Purge**: Flushes system-level cache using `MemoryEmptyWorkingSets (2)`.
 - **Intelligent Auto-RAM Watchdog**: Runs silently in the background every 15 seconds. If In-Use RAM exceeds 85% or Standby cache exceeds 3.0 GB, it triggers a silent purge without interrupting your workflow.
 
-### 2. 🎮 Turbo Boost Engine (Game & Work Profiles)
+### 2. 🎮 Turbo Boost Engine (Game, Work & Study Profiles)
 - **🎮 Game Mode**:
   - **Background Service Suppressor**: Temporarily pauses services known to cause micro-stuttering, disk thrashing, or background telemetry:
     - `DiagTrack` (Connected User Experiences and Telemetry)
@@ -38,6 +38,12 @@ Standard task managers can only kill processes. NovaOptimizer interfaces with th
   - **One-Click Restoration**: Restores all original services and previous power scheme upon deactivating boost.
 - **💼 Work / Dev Mode**:
   - Trims memory on idle apps and dev tools, devotes maximum physical RAM to IDEs (Visual Studio, VS Code, JetBrains, Docker) and viewport suites (Blender, Premiere, Unreal).
+  - Pauses unnecessary background telemetry and Xbox subsystems.
+- **📚 Study Mode (Sustained Focus & Battery Quiet Profile)**:
+  - **Distraction Killer**: Terminating intrusive entertainment, streaming, and chatting apps (`Discord`, `Spotify`, `Steam`, `EpicGamesLauncher`, `Teams`).
+  - **Cool & Quiet Operation**: Switches Windows power scheme to **Balanced**, keeping CPU temperatures low and reducing fan noise during long library and desk study sessions.
+  - **Telemetry & SuperFetch Suppressed**: Disables background indexing and reporting churn.
+  - **Built-in Pomodoro Focus Timer**: Integrated directly into the card with configurable Focus and Break lengths (e.g. 25m/5m), audio cue notifications, session iteration tracking, and one-click play/pause/reset.
 
 ### 3. 📋 Real-Time Task Manager
 - Live process table with PID, Process Name, Working Set (RAM in MB), CPU %, Status, Priority Class, and Description.
@@ -61,6 +67,11 @@ Standard task managers can only kill processes. NovaOptimizer interfaces with th
   - **Disable Network Throttling Index**: Sets `NetworkThrottlingIndex = 0xFFFFFFFF` to eliminate network latency packet caps.
   - **Foreground Task Responsiveness**: Allocates 100% processing priority to foreground tasks instead of Windows reserving 20% for background apps.
   - **Disable Telemetry**: Disables Microsoft diagnostic data uploads.
+
+### 6. 🔍 Hung Process Watchdog & Event Log
+- Background monitor tracking non-responsive (frozen / "Not Responding") desktop applications using Win32 `IsHungAppWindow`.
+- Logs timestamped hung events, recovery durations, and crash/force-kill actions.
+- Real-time toast notifications alerting users when processes freeze or recover.
 
 ---
 
@@ -96,20 +107,23 @@ system-optimizer/
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
 ├── NovaOptimizer.csproj       # Project configuration (.NET 10 WPF Windows)
 ├── Native/
-│   └── NativeMethods.cs       # P/Invoke kernel32, ntdll, psapi, advapi32, token privileges
+│   └── NativeMethods.cs       # P/Invoke kernel32, ntdll, psapi, advapi32, user32, token privileges
 ├── Models/
+│   ├── HungProcessRecord.cs   # Data model for frozen application events & durations
 │   ├── MemoryMetrics.cs       # Physical RAM, Standby, Free, Commit metrics
 │   ├── ProcessItem.cs         # Data model for Task Manager process table
 │   ├── StartupItem.cs         # Startup app registry & folder model
 │   └── TweakItem.cs           # System debloat & performance tweak model
 ├── Services/
+│   ├── HungProcessWatchdogService.cs # IsHungAppWindow polling watchdog & event dispatch
 │   ├── RamOptimizerService.cs # Working Set trimmer, NT Standby cleaner, Watchdog
 │   ├── ProcessMonitorService.cs # Process enumerator, CPU% calculator, tree killer
-│   ├── TurboBoostService.cs   # Game/Work boost manager, service suspension, power plan
+│   ├── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, power plan
 │   ├── StartupManagerService.cs # Startup items inspector & remover
 │   └── SystemTweakService.cs  # Windows Registry latency & debloat tweaks
 └── Views/
-    ├── TurboBoostView.xaml    # Boost profile cards, RAM breakdown bar, Watchdog log
+    ├── HungLogView.xaml       # Real-time event log for hung/frozen process incidents
+    ├── TurboBoostView.xaml    # Boost profiles (Game, Work, Study + Pomodoro), RAM breakdown bar
     ├── ProcessesView.xaml     # Task Manager process grid with search & context menu
     ├── PerformanceView.xaml   # Real-time resource meters & kernel pool specs
     └── StartupAndTweaksView.xaml # Startup manager & performance tweak switches
@@ -117,13 +131,6 @@ system-optimizer/
 
 ---
 
-## 🔮 Future Scope & Suggested Upgrades
+## 📄 License
 
-1. **Auto-Detect Game/Work Application Launcher**:
-   - A background hook that detects when a specific `.exe` (e.g. `Cyberpunk2077.exe`, `devenv.exe`, `Blender.exe`) launches and automatically engages Turbo Boost and sets process CPU/I/O priority to High.
-2. **Foreground Window Dynamic Prioritizer**:
-   - Continuously boosts the CPU priority and GPU scheduling priority of whichever window is currently in the active foreground, lowering background tasks to Idle.
-3. **Tray Minimization Mode**:
-   - Allow minimizing to the Windows System Tray with a right-click quick menu ("Quick Clean RAM", "Toggle Game Boost", "Exit").
-4. **Hardware Temperature & Fan Profiling**:
-   - Reading CPU/GPU junction temperatures via LibreHardwareMonitor library to alert if thermal throttling is occurring.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

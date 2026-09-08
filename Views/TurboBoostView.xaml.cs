@@ -82,6 +82,141 @@ namespace NovaOptimizer.Views
             }
         }
 
+        private async void BtnStudyMode_Click(object sender, RoutedEventArgs e)
+        {
+            if (_turboBoost.ActiveProfile == BoostProfile.StudyMode)
+            {
+                await _turboBoost.DeactivateBoostAsync();
+            }
+            else
+            {
+                await _turboBoost.ActivateBoostAsync(BoostProfile.StudyMode);
+                OnStatusNotification?.Invoke("📚 Study Mode Activated! Distractions blocked & silent sustained profile enabled.");
+            }
+        }
+
+        #region Pomodoro Focus Timer
+        private DispatcherTimer? _pomodoroTimer;
+        private int _remainingSeconds = 25 * 60;
+        private bool _isBreakPhase = false;
+        private bool _isTimerRunning = false;
+        private int _sessionCount = 1;
+
+        private void InitPomodoroTimer()
+        {
+            _pomodoroTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
+            _pomodoroTimer.Tick += PomodoroTimer_Tick;
+            UpdatePomodoroDisplay();
+        }
+
+        private void PomodoroTimer_Tick(object? sender, EventArgs e)
+        {
+            if (_remainingSeconds > 0)
+            {
+                _remainingSeconds--;
+                UpdatePomodoroDisplay();
+            }
+            else
+            {
+                // Switch phase
+                _isBreakPhase = !_isBreakPhase;
+                if (!_isBreakPhase)
+                {
+                    _sessionCount++;
+                }
+
+                int nextMins = _isBreakPhase ? GetBreakMinutes() : GetFocusMinutes();
+                _remainingSeconds = nextMins * 60;
+                UpdatePomodoroDisplay();
+
+                string alertMsg = _isBreakPhase 
+                    ? "☕ Focus session complete! Time for a short break." 
+                    : $"📖 Break over! Starting Focus Session #{_sessionCount}.";
+
+                LogMessage($"[Pomodoro] {alertMsg}");
+                OnStatusNotification?.Invoke(alertMsg);
+
+                try
+                {
+                    System.Media.SystemSounds.Exclamation.Play();
+                }
+                catch { }
+            }
+        }
+
+        private void BtnPomodoroToggle_Click(object sender, RoutedEventArgs e)
+        {
+            if (_pomodoroTimer == null)
+            {
+                InitPomodoroTimer();
+            }
+
+            if (_isTimerRunning)
+            {
+                _pomodoroTimer?.Stop();
+                _isTimerRunning = false;
+                BtnPomodoroToggle.Content = "▶ Resume Timer";
+                BtnPomodoroToggle.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#1E3A5F")!;
+            }
+            else
+            {
+                // Check if remaining seconds is 0 or needs reset
+                if (_remainingSeconds <= 0)
+                {
+                    int mins = _isBreakPhase ? GetBreakMinutes() : GetFocusMinutes();
+                    _remainingSeconds = mins * 60;
+                }
+
+                _pomodoroTimer?.Start();
+                _isTimerRunning = true;
+                BtnPomodoroToggle.Content = "⏸ Pause Timer";
+                BtnPomodoroToggle.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#4A2810")!;
+            }
+        }
+
+        private void BtnPomodoroReset_Click(object sender, RoutedEventArgs e)
+        {
+            _pomodoroTimer?.Stop();
+            _isTimerRunning = false;
+            _isBreakPhase = false;
+            _remainingSeconds = GetFocusMinutes() * 60;
+            BtnPomodoroToggle.Content = "▶ Start Timer";
+            BtnPomodoroToggle.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#1E3A5F")!;
+            UpdatePomodoroDisplay();
+            LogMessage("[Pomodoro] Timer reset to Focus Session.");
+        }
+
+        private int GetFocusMinutes()
+        {
+            return int.TryParse(TxtFocusMins.Text.Trim(), out int val) && val > 0 ? val : 25;
+        }
+
+        private int GetBreakMinutes()
+        {
+            return int.TryParse(TxtBreakMins.Text.Trim(), out int val) && val > 0 ? val : 5;
+        }
+
+        private void UpdatePomodoroDisplay()
+        {
+            int mins = _remainingSeconds / 60;
+            int secs = _remainingSeconds % 60;
+            TxtPomodoroCountdown.Text = $"{mins:D2}:{secs:D2}";
+
+            if (_isBreakPhase)
+            {
+                TxtPomodoroPhase.Text = "☕ Break Time";
+                TxtPomodoroPhase.Foreground = (System.Windows.Media.Brush)FindResource("AccentGreen");
+            }
+            else
+            {
+                TxtPomodoroPhase.Text = "📖 Focus Session";
+                TxtPomodoroPhase.Foreground = (System.Windows.Media.Brush)FindResource("AccentBlue");
+            }
+
+            TxtPomodoroCounter.Text = $"Session #{_sessionCount}";
+        }
+        #endregion
+
         private void BtnDeepClean_Click(object sender, RoutedEventArgs e)
         {
             long freed = _ramOptimizer.DeepCleanRam();
@@ -103,26 +238,54 @@ namespace NovaOptimizer.Views
         {
             Dispatcher.Invoke(() =>
             {
+                var purpleBrush = (System.Windows.Media.Brush)FindResource("AccentPurple");
+                var cyanBrush = (System.Windows.Media.Brush)FindResource("AccentCyan");
+                var blueBrush = (System.Windows.Media.Brush)FindResource("AccentBlue");
+                var darkRed = System.Windows.Media.Brushes.DarkRed;
+
                 if (profile == BoostProfile.GameMode)
                 {
                     BtnGameBoost.Content = "Deactivate Game Boost";
-                    BtnGameBoost.Background = System.Windows.Media.Brushes.DarkRed;
+                    BtnGameBoost.Background = darkRed;
+
                     BtnWorkBoost.Content = "Activate Work Boost";
-                    BtnWorkBoost.Background = (System.Windows.Media.Brush)FindResource("AccentCyan");
+                    BtnWorkBoost.Background = cyanBrush;
+
+                    BtnStudyMode.Content = "Activate Study Mode";
+                    BtnStudyMode.Background = blueBrush;
                 }
                 else if (profile == BoostProfile.WorkMode)
                 {
                     BtnWorkBoost.Content = "Deactivate Work Boost";
-                    BtnWorkBoost.Background = System.Windows.Media.Brushes.DarkRed;
+                    BtnWorkBoost.Background = darkRed;
+
                     BtnGameBoost.Content = "Activate Game Boost";
-                    BtnGameBoost.Background = (System.Windows.Media.Brush)FindResource("AccentPurple");
+                    BtnGameBoost.Background = purpleBrush;
+
+                    BtnStudyMode.Content = "Activate Study Mode";
+                    BtnStudyMode.Background = blueBrush;
+                }
+                else if (profile == BoostProfile.StudyMode)
+                {
+                    BtnStudyMode.Content = "Deactivate Study Mode";
+                    BtnStudyMode.Background = darkRed;
+
+                    BtnGameBoost.Content = "Activate Game Boost";
+                    BtnGameBoost.Background = purpleBrush;
+
+                    BtnWorkBoost.Content = "Activate Work Boost";
+                    BtnWorkBoost.Background = cyanBrush;
                 }
                 else
                 {
                     BtnGameBoost.Content = "Activate Game Boost";
-                    BtnGameBoost.Background = (System.Windows.Media.Brush)FindResource("AccentPurple");
+                    BtnGameBoost.Background = purpleBrush;
+
                     BtnWorkBoost.Content = "Activate Work Boost";
-                    BtnWorkBoost.Background = (System.Windows.Media.Brush)FindResource("AccentCyan");
+                    BtnWorkBoost.Background = cyanBrush;
+
+                    BtnStudyMode.Content = "Activate Study Mode";
+                    BtnStudyMode.Background = blueBrush;
                 }
             });
         }

@@ -16,7 +16,9 @@
             <Grid Margin="0,0,0,24">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="14"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="14"/>
                     <ColumnDefinition Width="*"/>
                 </Grid.ColumnDefinitions>
 
@@ -31,23 +33,23 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <Border Width="40" Height="40" CornerRadius="8" Background="#2B1A3A" Margin="0,0,12,0">
-                                <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="38" Height="38" CornerRadius="8" Background="#2B1A3A" Margin="0,0,10,0">
+                                <TextBlock Text="🎮" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Game Boost" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                                <TextBlock Text="Maximum FPS &amp; Zero Stutter" FontSize="12" Foreground="{StaticResource AccentPurple}"/>
+                                <TextBlock Text="Game Boost" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                                <TextBlock Text="Maximum FPS &amp; Zero Stutter" FontSize="11" Foreground="{StaticResource AccentPurple}"/>
                             </StackPanel>
                         </StackPanel>
 
                         <TextBlock Grid.Row="1" Text="Suspends Windows Search indexer, telemetry (DiagTrack), and SysMain. Unconstrains CPU power plan to High Performance, and clears Standby RAM cache." 
-                                   TextWrapping="Wrap" FontSize="12.5" LineHeight="18" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,16"/>
+                                   TextWrapping="Wrap" FontSize="12" LineHeight="17" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14"/>
 
-                        <StackPanel Grid.Row="2" Margin="0,0,0,16">
-                            <TextBlock Text="• Telemetry &amp; Error Reporting paused" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• SuperFetch &amp; Search Indexing suspended" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• Standby memory purged" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• Ultimate/High Power Plan engaged" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                        <StackPanel Grid.Row="2" Margin="0,0,0,14">
+                            <TextBlock Text="• Telemetry &amp; Error Reporting paused" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• SuperFetch &amp; Search Indexing suspended" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Standby memory purged" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Ultimate/High Power Plan engaged" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
                         </StackPanel>
 
                         <Button x:Name="BtnGameBoost" Grid.Row="3" Content="Activate Game Boost" Style="{StaticResource PrimaryButton}" 
@@ -66,27 +68,113 @@
                         </Grid.RowDefinitions>
 
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
-                            <Border Width="40" Height="40" CornerRadius="8" Background="#142B38" Margin="0,0,12,0">
-                                <TextBlock Text="💼" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            <Border Width="38" Height="38" CornerRadius="8" Background="#142B38" Margin="0,0,10,0">
+                                <TextBlock Text="💼" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                             </Border>
                             <StackPanel VerticalAlignment="Center">
-                                <TextBlock Text="Work / Dev Boost" FontSize="18" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                                <TextBlock Text="Optimized for IDEs &amp; Creativity" FontSize="12" Foreground="{StaticResource AccentCyan}"/>
+                                <TextBlock Text="Work / Dev Boost" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                                <TextBlock Text="Optimized for IDEs &amp; Creativity" FontSize="11" Foreground="{StaticResource AccentCyan}"/>
                             </StackPanel>
                         </StackPanel>
 
                         <TextBlock Grid.Row="1" Text="Trims dormant background applications, suppresses gaming Xbox background hooks, cleans Standby Cache, and devotes maximum physical RAM to development and creative suites." 
-                                   TextWrapping="Wrap" FontSize="12.5" LineHeight="18" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,16"/>
+                                   TextWrapping="Wrap" FontSize="12" LineHeight="17" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14"/>
 
-                        <StackPanel Grid.Row="2" Margin="0,0,0,16">
-                            <TextBlock Text="• Working sets trimmed across idle apps" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• Xbox background services suppressed" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• File cache &amp; Standby list cleared" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• Prioritizes foreground workspace windows" FontSize="12" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                        <StackPanel Grid.Row="2" Margin="0,0,0,14">
+                            <TextBlock Text="• Working sets trimmed across idle apps" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Xbox background services suppressed" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• File cache &amp; Standby list cleared" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Prioritizes foreground workspace windows" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
                         </StackPanel>
 
                         <Button x:Name="BtnWorkBoost" Grid.Row="3" Content="Activate Work Boost" Style="{StaticResource PrimaryButton}" 
                                 Background="{StaticResource AccentCyan}" Foreground="#0D0E12" Click="BtnWorkBoost_Click"/>
+                    </Grid>
+                </Border>
+
+                <!-- Study Mode Card -->
+                <Border Grid.Column="4" Style="{StaticResource CardPanel}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <!-- Header -->
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,12">
+                            <Border Width="38" Height="38" CornerRadius="8" Background="#152744" Margin="0,0,10,0">
+                                <TextBlock Text="📚" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="Study Mode" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                                <TextBlock Text="Deep Focus &amp; Distraction Free" FontSize="11" Foreground="{StaticResource AccentBlue}"/>
+                            </StackPanel>
+                        </StackPanel>
+
+                        <!-- Description -->
+                        <TextBlock Grid.Row="1" Text="Kills distracting entertainment processes (Discord, Spotify, Steam), silences background telemetry &amp; indexing, sets Balanced power for quiet fans, and features an integrated Pomodoro timer." 
+                                   TextWrapping="Wrap" FontSize="12" LineHeight="17" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14"/>
+
+                        <!-- Bullet points -->
+                        <StackPanel Grid.Row="2" Margin="0,0,0,14">
+                            <TextBlock Text="• Distraction apps terminated (Discord, Spotify, Steam)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Balanced power plan (cool, quiet sustained session)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Telemetry, SuperFetch &amp; Xbox paused" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                            <TextBlock Text="• Standby cache purged for maximum free RAM" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                        </StackPanel>
+
+                        <!-- Activate Button -->
+                        <Button x:Name="BtnStudyMode" Grid.Row="3" Content="Activate Study Mode" Style="{StaticResource PrimaryButton}" 
+                                Background="{StaticResource AccentBlue}" Foreground="White" Margin="0,0,0,14" Click="BtnStudyMode_Click"/>
+
+                        <!-- Built-in Pomodoro Focus Box -->
+                        <Border Grid.Row="4" Background="#101422" BorderBrush="#1F2A45" BorderThickness="1" CornerRadius="8" Padding="10">
+                            <StackPanel>
+                                <Grid Margin="0,0,0,6">
+                                    <TextBlock x:Name="TxtPomodoroPhase" Text="📖 Focus Session" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
+                                    <TextBlock x:Name="TxtPomodoroCounter" Text="Session #1" FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right"/>
+                                </Grid>
+
+                                <!-- Countdown Display -->
+                                <TextBlock x:Name="TxtPomodoroCountdown" Text="25:00" FontSize="26" FontWeight="ExtraBold" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" Margin="0,2,0,8"/>
+
+                                <!-- Duration Inputs (Focus & Break) -->
+                                <Grid Margin="0,0,0,8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="6"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <StackPanel Grid.Column="0">
+                                        <TextBlock Text="Focus (m)" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
+                                        <TextBox x:Name="TxtFocusMins" Text="25" Style="{StaticResource DarkTextBox}" FontSize="11" Padding="6,3" HorizontalContentAlignment="Center"/>
+                                    </StackPanel>
+
+                                    <StackPanel Grid.Column="2">
+                                        <TextBlock Text="Break (m)" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
+                                        <TextBox x:Name="TxtBreakMins" Text="5" Style="{StaticResource DarkTextBox}" FontSize="11" Padding="6,3" HorizontalContentAlignment="Center"/>
+                                    </StackPanel>
+                                </Grid>
+
+                                <!-- Controls -->
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="2*"/>
+                                        <ColumnDefinition Width="6"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button x:Name="BtnPomodoroToggle" Grid.Column="0" Content="▶ Start Timer" Style="{StaticResource PrimaryButton}" 
+                                            Background="#1E3A5F" Foreground="{StaticResource AccentBlue}" FontSize="11" Padding="8,4" Click="BtnPomodoroToggle_Click"/>
+                                    <Button x:Name="BtnPomodoroReset" Grid.Column="2" Content="↺ Reset" Style="{StaticResource SecondaryButton}" 
+                                            FontSize="11" Padding="6,4" Click="BtnPomodoroReset_Click"/>
+                                </Grid>
+                            </StackPanel>
+                        </Border>
                     </Grid>
                 </Border>
             </Grid>

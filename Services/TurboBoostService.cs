@@ -10,7 +10,8 @@ namespace NovaOptimizer.Services
     {
         None,
         GameMode,
-        WorkMode
+        WorkMode,
+        StudyMode
     }
 
     public class TurboBoostService
@@ -40,11 +41,30 @@ namespace NovaOptimizer.Services
             "XboxNetApiSvc"
         };
 
+        // Services to suppress in Study / Sustained Focus Mode
+        private static readonly string[] StudyModeServices = new[]
+        {
+            "DiagTrack",
+            "WerSvc",
+            "MapsBroker",
+            "XblAuthManager",
+            "XboxGipSvc",
+            "XboxNetApiSvc",
+            "SysMain"
+        };
+
         // Idle background updater workers to terminate
         private static readonly string[] BloatProcessNames = new[]
         {
             "AdobeUpdateService", "GoogleUpdate", "MicrosoftEdgeUpdate",
             "OneDrive", "GameBarFTServer", "Cortana"
+        };
+
+        // Distractions to terminate during Study / Focus mode
+        private static readonly string[] DistractionProcessNames = new[]
+        {
+            "Discord", "Spotify", "Steam", "steamwebhelper",
+            "EpicGamesLauncher", "GameBarFTServer", "Teams", "ms-teams"
         };
 
         public BoostProfile ActiveProfile { get; private set; } = BoostProfile.None;
@@ -72,13 +92,22 @@ namespace NovaOptimizer.Services
 
             await Task.Run(() =>
             {
-                // 1. Record and switch power scheme to High Performance
+                // 1. Record and switch power scheme
                 try
                 {
                     _previousPowerPlanGuid = GetActivePowerPlan();
-                    // 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c is High Performance
-                    SetPowerPlan("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
-                    OnLogMessage?.Invoke("⚡ Windows Power Plan set to High Performance");
+                    if (profile == BoostProfile.StudyMode)
+                    {
+                        // 381b4222-f694-41f0-9685-ff5bb260df2e is Balanced scheme (cool, quiet, energy-saving)
+                        SetPowerPlan("381b4222-f694-41f0-9685-ff5bb260df2e");
+                        OnLogMessage?.Invoke("⚡ Windows Power Plan set to Balanced (Quiet & Efficient)");
+                    }
+                    else
+                    {
+                        // 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c is High Performance
+                        SetPowerPlan("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
+                        OnLogMessage?.Invoke("⚡ Windows Power Plan set to High Performance");
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -86,7 +115,14 @@ namespace NovaOptimizer.Services
                 }
 
                 // 2. Suspend non-critical background services
-                string[] targetServices = profile == BoostProfile.GameMode ? GameModeServices : WorkModeServices;
+                string[] targetServices = profile switch
+                {
+                    BoostProfile.GameMode => GameModeServices,
+                    BoostProfile.WorkMode => WorkModeServices,
+                    BoostProfile.StudyMode => StudyModeServices,
+                    _ => Array.Empty<string>()
+                };
+
                 _temporarilyStoppedServices.Clear();
 
                 foreach (var svcName in targetServices)
@@ -108,9 +144,15 @@ namespace NovaOptimizer.Services
                     }
                 }
 
-                // 3. Terminate idle background updater bloatware
+                // 3. Terminate idle background updater bloatware and distractions
                 int killedCount = 0;
-                foreach (var procName in BloatProcessNames)
+                var targetsToKill = new List<string>(BloatProcessNames);
+                if (profile == BoostProfile.StudyMode)
+                {
+                    targetsToKill.AddRange(DistractionProcessNames);
+                }
+
+                foreach (var procName in targetsToKill)
                 {
                     try
                     {
@@ -126,7 +168,10 @@ namespace NovaOptimizer.Services
                 }
                 if (killedCount > 0)
                 {
-                    OnLogMessage?.Invoke($"🧹 Terminated {killedCount} idle background updater workers");
+                    string label = profile == BoostProfile.StudyMode 
+                        ? "idle updaters & distraction processes" 
+                        : "idle background updater workers";
+                    OnLogMessage?.Invoke($"🧹 Terminated {killedCount} {label}");
                 }
 
                 // 4. Heavy RAM Deep Clean

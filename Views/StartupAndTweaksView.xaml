@@ -1,0 +1,91 @@
+<UserControl x:Class="NovaOptimizer.Views.StartupAndTweaksView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             mc:Ignorable="d" 
+             d:DesignHeight="600" d:DesignWidth="850">
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel Margin="24" MaxWidth="900">
+            <!-- Header -->
+            <TextBlock Text="OPTIMIZATION &amp; DEBLOAT" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" Margin="0,0,0,4"/>
+            <TextBlock Text="Startup Apps &amp; System Tweaks" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16"/>
+
+            <!-- System Latency & Debloat Tweaks Section -->
+            <TextBlock Text="WINDOWS PERFORMANCE TWEAKS" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" Margin="0,8,0,12"/>
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,24">
+                <ItemsControl x:Name="IcTweaks">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,12">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Margin="0,0,16,0">
+                                        <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                                        <TextBlock Text="{Binding Description}" FontSize="12" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                                    </StackPanel>
+                                    <CheckBox Grid.Column="1" VerticalAlignment="Center" IsChecked="{Binding IsApplied}" 
+                                              Click="ChkApplyTweak_Click" Tag="{Binding Id}"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </Border>
+
+            <!-- Startup Apps Manager Section -->
+            <Grid Margin="0,8,0,12">
+                <TextBlock Text="STARTUP APPLICATION AUDITOR" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
+                <Button Content="Refresh List" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}" Click="BtnRefreshStartup_Click"/>
+            </Grid>
+
+            <Border Style="{StaticResource CardPanel}" Padding="0">
+                <DataGrid x:Name="DgStartup" AutoGenerateColumns="False" IsReadOnly="True"
+                          Background="Transparent" BorderThickness="0" RowBackground="#1A1D27" AlternatingRowBackground="#161822"
+                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
+                          Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single">
+                    
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style TargetType="DataGridColumnHeader">
+                            <Setter Property="Background" Value="#14161F"/>
+                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                            <Setter Property="FontWeight" Value="SemiBold"/>
+                            <Setter Property="FontSize" Value="12"/>
+                            <Setter Property="Padding" Value="12,10"/>
+                            <Setter Property="BorderBrush" Value="{StaticResource BorderCard}"/>
+                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+
+                    <DataGrid.RowStyle>
+                        <Style TargetType="DataGridRow">
+                            <Setter Property="Height" Value="34"/>
+                            <Setter Property="FontSize" Value="12.5"/>
+                            <Style.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
+                                </Trigger>
+                            </Style.Triggers>
+                        </Style>
+                    </DataGrid.RowStyle>
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Program Name" Binding="{Binding Name}" Width="200"/>
+                        <DataGridTextColumn Header="Location" Binding="{Binding Location}" Width="160"/>
+                        <DataGridTextColumn Header="Executable Command" Binding="{Binding Command}" Width="*"/>
+                        <DataGridTemplateColumn Header="Action" Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="Remove" Style="{StaticResource DangerButton}" Click="BtnRemoveStartup_Click" Tag="{Binding}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</UserControl>

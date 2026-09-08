@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
+using NovaOptimizer.Controls;
 using NovaOptimizer.Models;
 using NovaOptimizer.Services;
 
@@ -10,6 +12,7 @@ namespace NovaOptimizer.Views
     {
         private readonly StartupManagerService _startupManager;
         private readonly SystemTweakService _systemTweaks;
+        private List<TweakItem> _tweaks = new();
 
         public event Action<string>? OnStatusNotification;
 
@@ -24,16 +27,19 @@ namespace NovaOptimizer.Views
 
         private void LoadData()
         {
-            IcTweaks.ItemsSource = _systemTweaks.GetTweaks();
-            DgStartup.ItemsSource = _startupManager.GetStartupItems();
+            _tweaks = _systemTweaks.GetTweaks();
+            IcTweaks.ItemsSource = _tweaks;
+
+            var startupItems = _startupManager.GetStartupItems();
+            DgStartup.ItemsSource = startupItems;
+            TxtStartupCount.Text = $"{startupItems.Count} Items Found";
         }
 
-        private void ChkApplyTweak_Click(object sender, RoutedEventArgs e)
+        private void TweakToggle_CheckedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
         {
-            if (sender is CheckBox chk && chk.Tag is string tweakId)
+            if (sender is ToggleSwitch ts && ts.Tag is string tweakId)
             {
-                bool isChecked = chk.IsChecked == true;
-                if (isChecked)
+                if (e.NewValue)
                 {
                     _systemTweaks.ApplyTweak(tweakId);
                     OnStatusNotification?.Invoke($"Applied performance tweak: {tweakId}");
@@ -46,9 +52,45 @@ namespace NovaOptimizer.Views
             }
         }
 
+        private void BtnApplyAll_Click(object sender, RoutedEventArgs e)
+        {
+            int applied = 0;
+            foreach (var tweak in _tweaks)
+            {
+                if (!tweak.IsApplied)
+                {
+                    _systemTweaks.ApplyTweak(tweak.Id);
+                    tweak.IsApplied = true;
+                    applied++;
+                }
+            }
+            IcTweaks.ItemsSource = null;
+            IcTweaks.ItemsSource = _tweaks;
+            OnStatusNotification?.Invoke($"✨ Applied all {applied} recommended performance tweaks!");
+        }
+
+        private void BtnRevertAll_Click(object sender, RoutedEventArgs e)
+        {
+            int reverted = 0;
+            foreach (var tweak in _tweaks)
+            {
+                if (tweak.IsApplied)
+                {
+                    _systemTweaks.RevertTweak(tweak.Id);
+                    tweak.IsApplied = false;
+                    reverted++;
+                }
+            }
+            IcTweaks.ItemsSource = null;
+            IcTweaks.ItemsSource = _tweaks;
+            OnStatusNotification?.Invoke($"↺ Reverted {reverted} tweaks back to Windows defaults.");
+        }
+
         private void BtnRefreshStartup_Click(object sender, RoutedEventArgs e)
         {
-            DgStartup.ItemsSource = _startupManager.GetStartupItems();
+            var items = _startupManager.GetStartupItems();
+            DgStartup.ItemsSource = items;
+            TxtStartupCount.Text = $"{items.Count} Items Found";
             OnStatusNotification?.Invoke("Startup items list refreshed.");
         }
 
@@ -56,11 +98,18 @@ namespace NovaOptimizer.Views
         {
             if (sender is Button btn && btn.Tag is StartupItem item)
             {
-                var result = MessageBox.Show($"Remove '{item.Name}' from starting automatically with Windows?", "Confirm Removal", MessageBoxButton.YesNo, MessageBoxImage.Question);
+                var result = MessageBox.Show(
+                    $"Remove '{item.Name}' from starting automatically with Windows?",
+                    "Confirm Removal",
+                    MessageBoxButton.YesNo,
+                    MessageBoxImage.Question);
+
                 if (result == MessageBoxResult.Yes)
                 {
                     _startupManager.RemoveStartupItem(item);
-                    DgStartup.ItemsSource = _startupManager.GetStartupItems();
+                    var items = _startupManager.GetStartupItems();
+                    DgStartup.ItemsSource = items;
+                    TxtStartupCount.Text = $"{items.Count} Items Found";
                     OnStatusNotification?.Invoke($"Removed {item.Name} from Windows startup.");
                 }
             }

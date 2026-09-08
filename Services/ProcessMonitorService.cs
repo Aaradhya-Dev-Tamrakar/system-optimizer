@@ -16,11 +16,19 @@ namespace NovaOptimizer.Services
             "lsass", "svchost", "fontdrvhost", "dwm", "registry", "memcompression"
         };
 
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (string Description, string FilePath)> _metadataByNameCache = new(StringComparer.OrdinalIgnoreCase);
+        private readonly Dictionary<int, (string Description, string FilePath)> _pidMetadataCache = new();
+
         private readonly Dictionary<int, (TimeSpan CpuTime, DateTime SnapshotTime)> _processHistory = new();
         private ulong _lastSystemIdle;
         private ulong _lastSystemKernel;
         private ulong _lastSystemUser;
         private DateTime _lastSystemSample = DateTime.UtcNow;
+
+        public Task<List<ProcessItem>> GetProcessesAsync()
+        {
+            return Task.Run(() => GetProcesses());
+        }
 
         public List<ProcessItem> GetProcesses()
         {
@@ -48,10 +56,8 @@ namespace NovaOptimizer.Services
             _lastSystemUser = currentUser;
             _lastSystemSample = now;
 
-            int processorCount = Environment.ProcessorCount;
             Process[] processes = Process.GetProcesses();
-
-            var currentPids = new HashSet<int>();
+            var currentPids = new HashSet<int>(processes.Length);
 
             foreach (var p in processes)
             {
@@ -99,38 +105,78 @@ namespace NovaOptimizer.Services
                     string status = "Running";
                     try
                     {
-                        if (!p.Responding) status = "Not Responding";
-                    }
-                    catch { }
-
-                    string description = name;
-                    string filePath = string.Empty;
-                    try
-                    {
-                        if (!isCritical)
+                        // Ultra-fast non-blocking hang check via native IsHungAppWindow
+                        IntPtr hWnd = p.MainWindowHandle;
+                        if (hWnd != IntPtr.Zero && NativeMethods.IsHungAppWindow(hWnd))
                         {
-                            var module = p.MainModule;
-                            if (module != null)
-                            {
-                                filePath = module.FileName ?? string.Empty;
-                                description = module.FileVersionInfo.FileDescription ?? name;
-                            }
+                            status = "Not Responding";
                         }
                     }
                     catch { }
+
+                    // Resolve description & filepath with caching to avoid constant disk I/O & Win32 exceptions
+                    string description = name;
+                    string filePath = string.Empty;
+
+                    if (!isCritical)
+                    {
+                        if (_pidMetadataCache.TryGetValue(pid, out var cached))
+                        {
+                            description = cached.Description;
+                            filePath = cached.FilePath;
+                        }
+                        else if (_metadataByNameCache.TryGetValue(name, out var nameCached))
+                        {
+                            description = nameCached.Description;
+                            filePath = nameCached.FilePath;
+                            _pidMetadataCache[pid] = nameCached;
+                        }
+                        else
+                        {
+                            try
+                            {
+                                string? path = NativeMethods.GetProcessFilePath(pid);
+                                if (!string.IsNullOrEmpty(path))
+                                {
+                                    filePath = path;
+                                    try
+                                    {
+                                        if (File.Exists(path))
+                                        {
+                                            var vi = FileVersionInfo.GetVersionInfo(path);
+                                            description = vi.FileDescription ?? name;
+                                        }
+                                    }
+                                    catch { }
+                                }
+                            }
+                            catch { }
+
+                            if (string.IsNullOrWhiteSpace(description)) description = name;
+                            var info = (description, filePath);
+                            _pidMetadataCache[pid] = info;
+                            _metadataByNameCache[name] = info;
+                        }
+                    }
+
+                    bool hasWindow = false;
+                    try { hasWindow = p.MainWindowHandle != IntPtr.Zero; } catch { }
+                    var icon = IconHelper.GetIcon(filePath, name);
 
                     result.Add(new ProcessItem
                     {
                         Id = pid,
                         Name = name,
-                        Description = string.IsNullOrWhiteSpace(description) ? name : description,
+                        Description = description,
                         WorkingSetMB = workingSetMB,
                         PrivateMemoryMB = privateMB,
                         CpuPercent = Math.Round(cpuPercent, 1),
                         Priority = priority,
                         Status = status,
                         FilePath = filePath,
-                        IsSystemCritical = isCritical
+                        IsSystemCritical = isCritical,
+                        HasWindow = hasWindow,
+                        Icon = icon
                     });
                 }
                 catch
@@ -143,11 +189,12 @@ namespace NovaOptimizer.Services
                 }
             }
 
-            // Cleanup dead processes from history
+            // Cleanup dead processes from history & cache
             var deadPids = _processHistory.Keys.Where(k => !currentPids.Contains(k)).ToList();
             foreach (var dead in deadPids)
             {
                 _processHistory.Remove(dead);
+                _pidMetadataCache.Remove(dead);
             }
 
             return result;

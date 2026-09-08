@@ -6,16 +6,22 @@
         mc:Ignorable="d"
         Title="NovaOptimizer — System Optimizer &amp; Task Manager" 
         Icon="Assets/icon.png"
-        Height="740" Width="1160" MinHeight="620" MinWidth="960"
-        Background="{StaticResource BgDark}" WindowStartupLocation="CenterScreen">
+        Height="760" Width="1180" MinHeight="640" MinWidth="980"
+        Background="{StaticResource BgDark}" WindowStartupLocation="CenterScreen"
+        BorderBrush="{StaticResource BorderCard}" BorderThickness="1">
+
+    <WindowChrome.WindowChrome>
+        <WindowChrome CaptionHeight="52" CornerRadius="0" GlassFrameThickness="0" ResizeBorderThickness="6" UseAeroCaptionButtons="False"/>
+    </WindowChrome.WindowChrome>
+
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="56"/>
+            <RowDefinition Height="52"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Top Header Bar -->
-        <Border Grid.Row="0" Background="#14161F" BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="20,0">
+        <!-- Top Header & Custom Titlebar -->
+        <Border Grid.Row="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="16,0,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -25,45 +31,56 @@
 
                 <!-- App Branding -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Image Source="Assets/icon.png" Width="26" Height="26" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock Text="NOVA OPTIMIZER" FontSize="15" FontWeight="ExtraBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                    <Border CornerRadius="4" Background="#1F2433" Margin="8,0,0,0" Padding="6,2" VerticalAlignment="Center">
-                        <TextBlock Text="v1.0 HIGH-PERF" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                    <Image Source="Assets/icon.png" Width="24" Height="24" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
+                    <TextBlock Text="NOVA OPTIMIZER" FontSize="14" FontWeight="Black" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                    <Border CornerRadius="4" Background="#1B2236" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
+                        <TextBlock Text="PRO v1.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
                     </Border>
                 </StackPanel>
 
-                <!-- Status Toast Notification Message -->
-                <TextBlock x:Name="TxtNotification" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                           FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource AccentGreen}" Text=""/>
+                <!-- Central Floating Toast Notification Banner -->
+                <Border x:Name="ToastBanner" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        Background="#192238" BorderBrush="{StaticResource AccentCyan}" BorderThickness="1"
+                        CornerRadius="20" Padding="14,5" Opacity="0" IsHitTestVisible="False">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock x:Name="TxtToastIcon" Text="⚡" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtNotification" Text="System Ready" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
 
-                <!-- Action Controls -->
-                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-                    <!-- Live RAM Indicator -->
-                    <Border CornerRadius="6" Background="#1B1E29" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10,5" Margin="0,0,12,0">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Text="💾 " FontSize="12"/>
-                            <TextBlock x:Name="TxtHeaderRam" Text="RAM: 45%" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                <!-- Header Actions & Window Controls -->
+                <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
+                    <!-- Live RAM Indicator Badge -->
+                    <Border CornerRadius="6" Background="#151926" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
+                        <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                            <TextBlock Text="💾 " FontSize="11" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtHeaderRam" Text="RAM: 45%" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
                     <!-- Instant Quick Clean Button -->
                     <Button x:Name="BtnQuickClean" Content="⚡ Quick Clean" Style="{StaticResource PrimaryButton}" 
-                            Padding="12,6" FontSize="12" Margin="0,0,12,0" Click="BtnQuickClean_Click"/>
+                            Padding="12,5" FontSize="11.5" Margin="0,0,10,0" Click="BtnQuickClean_Click"/>
 
-                    <!-- Mode Badge -->
-                    <Border x:Name="BadgeMode" CornerRadius="6" Background="#241B33" Padding="10,5" Margin="0,0,12,0">
-                        <TextBlock x:Name="TxtBadgeMode" Text="🚀 Standard" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource AccentPurple}"/>
+                    <!-- Active Mode Badge -->
+                    <Border x:Name="BadgeMode" CornerRadius="6" Background="#241B33" Padding="8,5" Margin="0,0,10,0">
+                        <TextBlock x:Name="TxtBadgeMode" Text="🚀 Standard" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource AccentPurple}"/>
                     </Border>
 
-                    <!-- Administrator Badge -->
-                    <Border CornerRadius="6" Background="#142B28" Padding="8,5">
-                        <TextBlock Text="🛡️ Administrator" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource AccentGreen}"/>
+                    <!-- Admin Badge -->
+                    <Border CornerRadius="6" Background="#122622" BorderBrush="#1B4239" BorderThickness="1" Padding="7,4" Margin="0,0,14,0">
+                        <TextBlock Text="🛡️ Admin" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentGreen}"/>
                     </Border>
+
+                    <!-- Window Control Buttons (Min, Max, Close) -->
+                    <Button Content="—" Style="{StaticResource WindowControlBtn}" Click="BtnMinimize_Click" ToolTip="Minimize"/>
+                    <Button x:Name="BtnMaximize" Content="□" Style="{StaticResource WindowControlBtn}" Click="BtnMaximize_Click" ToolTip="Maximize"/>
+                    <Button Content="✕" Style="{StaticResource WindowCloseBtn}" Click="BtnClose_Click" ToolTip="Close"/>
                 </StackPanel>
             </Grid>
         </Border>
 
-        <!-- Main Body: Sidebar Navigation + Content Area -->
+        <!-- Main Workspace: Sidebar Navigation + Content Area -->
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="220"/>
@@ -71,38 +88,54 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
-            <Border Grid.Column="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,1,0" Padding="12,16">
-                <StackPanel>
-                    <TextBlock Text="NAVIGATION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="12,0,0,10"/>
+            <Border Grid.Column="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,1,0">
+                <Grid Margin="12,16">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
 
-                    <RadioButton x:Name="NavBoost" Content="⚡ Turbo Boost" IsChecked="True" Style="{x:Null}" 
-                                 Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
-                                 Cursor="Hand" Click="Nav_Click" Tag="Boost"/>
+                    <TextBlock Grid.Row="0" Text="NAVIGATION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="8,0,0,10"/>
 
-                    <RadioButton x:Name="NavProcesses" Content="📋 Processes" Style="{x:Null}" 
-                                 Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
-                                 Cursor="Hand" Click="Nav_Click" Tag="Processes"/>
+                    <!-- Navigation Items -->
+                    <StackPanel Grid.Row="1">
+                        <RadioButton x:Name="NavBoost" Content="⚡ Turbo Boost" IsChecked="True" Style="{StaticResource NavRadioButton}" 
+                                     Click="Nav_Click" Tag="Boost"/>
 
-                    <RadioButton x:Name="NavPerformance" Content="📊 Performance" Style="{x:Null}" 
-                                 Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
-                                 Cursor="Hand" Click="Nav_Click" Tag="Performance"/>
+                        <RadioButton x:Name="NavProcesses" Content="📋 Task Manager" Style="{StaticResource NavRadioButton}" 
+                                     Click="Nav_Click" Tag="Processes"/>
 
-                    <RadioButton x:Name="NavTweaks" Content="⚙️ Startup &amp; Tweaks" Style="{x:Null}" 
-                                 Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
-                                 Cursor="Hand" Click="Nav_Click" Tag="Tweaks"/>
+                        <RadioButton x:Name="NavPerformance" Content="📊 Performance" Style="{StaticResource NavRadioButton}" 
+                                     Click="Nav_Click" Tag="Performance"/>
 
-                    <RadioButton x:Name="NavHungLog" Content="🔍 Hung Log" Style="{x:Null}" 
-                                 Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
-                                 Cursor="Hand" Click="Nav_Click" Tag="HungLog"/>
+                        <RadioButton x:Name="NavTweaks" Content="⚙️ Startup &amp; Tweaks" Style="{StaticResource NavRadioButton}" 
+                                     Click="Nav_Click" Tag="Tweaks"/>
 
-                    <!-- Footer Info in Sidebar -->
-                    <Border Margin="4,220,4,0" Background="#10121A" CornerRadius="8" Padding="12">
+                        <RadioButton x:Name="NavHungLog" Style="{StaticResource NavRadioButton}" Click="Nav_Click" Tag="HungLog">
+                            <Grid HorizontalAlignment="Stretch">
+                                <TextBlock Text="🔍 Hung Log" VerticalAlignment="Center"/>
+                                <Border x:Name="BadgeHungCount" CornerRadius="8" Background="{StaticResource AccentRed}" Padding="5,1" 
+                                        HorizontalAlignment="Right" Margin="0,0,4,0" Visibility="Collapsed">
+                                    <TextBlock x:Name="TxtHungBadge" Text="0" FontSize="10" FontWeight="Bold" Foreground="White"/>
+                                </Border>
+                            </Grid>
+                        </RadioButton>
+                    </StackPanel>
+
+                    <!-- Bottom Pinned Telemetry & Tray Card -->
+                    <Border Grid.Row="2" Background="#0F121C" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
                         <StackPanel>
-                            <TextBlock Text="Zero Latency Mode" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
-                            <TextBlock Text="Kernel Standby Cleaner &amp; Service Throttler active." FontSize="11" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="0,4,0,0"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <Border Width="6" Height="6" CornerRadius="3" Background="{StaticResource AccentGreen}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="Zero Latency Active" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                            </StackPanel>
+                            <TextBlock Text="Kernel Standby Cleaner &amp; Watchdog actively protecting framerates." FontSize="10.5" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                            <CheckBox x:Name="ChkMinimizeToTray" Content="Minimize to tray" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                                      IsChecked="True"/>
                         </StackPanel>
                     </Border>
-                </StackPanel>
+                </Grid>
             </Border>
 
             <!-- Main Content Area -->

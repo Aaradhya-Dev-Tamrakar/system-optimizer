@@ -1,0 +1,30 @@
+<UserControl x:Class="NovaOptimizer.Controls.HistoryGraph"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             mc:Ignorable="d" 
+             d:DesignHeight="140" d:DesignWidth="400"
+             SizeChanged="UserControl_SizeChanged">
+    <Border Background="#10131D" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+        <Grid>
+            <!-- Background Grid Lines -->
+            <Canvas x:Name="GridCanvas" IsHitTestVisible="False"/>
+
+            <!-- Area Fill under curve -->
+            <Polygon x:Name="AreaPolygon" Opacity="0.25"/>
+
+            <!-- Foreground Curve Line -->
+            <Polyline x:Name="CurveLine" StrokeThickness="2" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+
+            <!-- Legend Overlay -->
+            <Grid VerticalAlignment="Top" HorizontalAlignment="Stretch" Margin="12,8,12,0">
+                <TextBlock x:Name="TxtTitle" Text="TELEMETRY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextSecondary}"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <TextBlock Text="60s" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,12,0" VerticalAlignment="Center"/>
+                    <TextBlock x:Name="TxtCurrentValue" Text="0%" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                </StackPanel>
+            </Grid>
+        </Grid>
+    </Border>
+</UserControl>

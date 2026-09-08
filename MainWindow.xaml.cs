@@ -1,7 +1,9 @@
 using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Animation;
 using System.Windows.Threading;
+using NovaOptimizer.Native;
 using NovaOptimizer.Services;
 using NovaOptimizer.Views;
 
@@ -24,6 +26,7 @@ namespace NovaOptimizer
 
         private readonly DispatcherTimer _headerTimer;
         private readonly DispatcherTimer _toastTimer;
+        private TrayIconManager? _trayManager;
 
         public MainWindow()
         {
@@ -45,24 +48,26 @@ namespace NovaOptimizer
             _hungLogView = new HungLogView(_hungWatchdog);
 
             // Connect notifications
-            _boostView.OnStatusNotification += ShowNotification;
-            _processesView.OnStatusNotification += ShowNotification;
-            _startupAndTweaksView.OnStatusNotification += ShowNotification;
-            _hungLogView.OnStatusNotification += ShowNotification;
+            _boostView.OnStatusNotification += (msg) => ShowNotification(msg, "⚡");
+            _processesView.OnStatusNotification += (msg) => ShowNotification(msg, "📋");
+            _startupAndTweaksView.OnStatusNotification += (msg) => ShowNotification(msg, "⚙️");
+            _hungLogView.OnStatusNotification += (msg) => ShowNotification(msg, "🔍");
 
-            // Watchdog live notifications
+            // Watchdog live notifications & badge
             _hungWatchdog.OnHungDetected += (record) =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    ShowNotification($"⚠️ Hung detected: {record.ProcessName} (PID {record.PID})");
+                    ShowNotification($"Hung detected: {record.ProcessName} (PID {record.PID})", "⚠️");
+                    UpdateHungBadge();
                 });
             };
             _hungWatchdog.OnHungRecovered += (record) =>
             {
                 Dispatcher.Invoke(() =>
                 {
-                    ShowNotification($"✅ Recovered: {record.ProcessName} after {record.DisplayDuration}");
+                    ShowNotification($"Recovered: {record.ProcessName} after {record.DisplayDuration}", "✅");
+                    UpdateHungBadge();
                 });
             };
 
@@ -97,66 +102,187 @@ namespace NovaOptimizer
                 });
             };
 
-            // Set default view
+            // Set default view and pause inactive views
             MainContent.Content = _boostView;
+            _boostView.ResumeMonitoring();
+            _processesView.PauseMonitoring();
+            _performanceView.PauseMonitoring();
+            _hungLogView.PauseMonitoring();
 
             // Timer for header RAM update
             _headerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _headerTimer.Tick += (s, e) =>
             {
                 var metrics = _ramOptimizer.GetMemoryMetrics();
-                TxtHeaderRam.Text = $"RAM: {metrics.InUsePercent:F0}% ({metrics.InUseGB:F1} / {metrics.TotalPhysicalGB:F1} GB)";
+                string ramStr = $"RAM: {metrics.InUsePercent:F0}% ({metrics.InUseGB:F1} / {metrics.TotalPhysicalGB:F1} GB)";
+                TxtHeaderRam.Text = ramStr;
+                _trayManager?.UpdateTooltip($"NovaOptimizer — {ramStr}");
             };
             _headerTimer.Start();
 
-            _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(4) };
+            _toastTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(3.5) };
             _toastTimer.Tick += (s, e) =>
             {
-                TxtNotification.Text = "";
+                var fadeOut = new DoubleAnimation(1, 0, TimeSpan.FromMilliseconds(300));
+                ToastBanner.BeginAnimation(OpacityProperty, fadeOut);
                 _toastTimer.Stop();
             };
+
+            Loaded += MainWindow_Loaded;
+            Closing += MainWindow_Closing;
+        }
+
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                _trayManager = new TrayIconManager(this);
+                _trayManager.Initialize();
+                _trayManager.OnQuickCleanRequested += () => BtnQuickClean_Click(this, new RoutedEventArgs());
+                _trayManager.OnToggleBoostRequested += () =>
+                {
+                    Dispatcher.Invoke(async () =>
+                    {
+                        if (_turboBoost.ActiveProfile == BoostProfile.None)
+                            await _turboBoost.ActivateBoostAsync(BoostProfile.GameMode);
+                        else
+                            await _turboBoost.DeactivateBoostAsync();
+                    });
+                };
+            }
+            catch { }
+            UpdateHungBadge();
+        }
+
+        private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
+        {
+            if (ChkMinimizeToTray.IsChecked == true)
+            {
+                e.Cancel = true;
+                Hide();
+                ShowNotification("NovaOptimizer is still running in background.", "ℹ️");
+            }
+            else
+            {
+                _trayManager?.Dispose();
+            }
+        }
+
+        private void UpdateHungBadge()
+        {
+            int count = _hungWatchdog.GetActiveHangCount();
+            if (count > 0)
+            {
+                TxtHungBadge.Text = count.ToString();
+                BadgeHungCount.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                BadgeHungCount.Visibility = Visibility.Collapsed;
+            }
         }
 
         private void Nav_Click(object sender, RoutedEventArgs e)
         {
             if (sender is RadioButton rb && rb.Tag is string tag)
             {
+                // Pause background monitoring on inactive views
+                _boostView.PauseMonitoring();
+                _processesView.PauseMonitoring();
+                _performanceView.PauseMonitoring();
+                _hungLogView.PauseMonitoring();
+
                 switch (tag)
                 {
                     case "Boost":
                         MainContent.Content = _boostView;
+                        _boostView.ResumeMonitoring();
                         break;
                     case "Processes":
                         MainContent.Content = _processesView;
+                        _processesView.ResumeMonitoring();
                         break;
                     case "Performance":
                         MainContent.Content = _performanceView;
+                        _performanceView.ResumeMonitoring();
                         break;
                     case "Tweaks":
                         MainContent.Content = _startupAndTweaksView;
                         break;
                     case "HungLog":
                         MainContent.Content = _hungLogView;
+                        _hungLogView.ResumeMonitoring();
                         break;
                 }
             }
         }
 
-        private void BtnQuickClean_Click(object sender, RoutedEventArgs e)
+        private async void BtnQuickClean_Click(object sender, RoutedEventArgs e)
         {
-            long freed = _ramOptimizer.DeepCleanRam();
-            double mb = freed / (1024.0 * 1024.0);
-            ShowNotification($"⚡ Quick RAM Clean: {mb:F0} MB physical memory liberated!");
+            BtnQuickClean.IsEnabled = false;
+            string originalContent = BtnQuickClean.Content?.ToString() ?? "⚡ Quick Clean";
+            BtnQuickClean.Content = "⚡ Cleaning...";
+
+            try
+            {
+                long freed = await _ramOptimizer.DeepCleanRamAsync();
+                double mb = freed / (1024.0 * 1024.0);
+                ShowNotification($"Quick Clean: {mb:F0} MB physical RAM liberated!", "✨");
+            }
+            catch { }
+            finally
+            {
+                BtnQuickClean.Content = originalContent;
+                BtnQuickClean.IsEnabled = true;
+            }
         }
 
-        private void ShowNotification(string message)
+        public void ShowNotification(string message, string icon = "⚡")
         {
             Dispatcher.Invoke(() =>
             {
+                TxtToastIcon.Text = icon;
                 TxtNotification.Text = message;
+
+                var fadeIn = new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(200));
+                ToastBanner.BeginAnimation(OpacityProperty, fadeIn);
+
                 _toastTimer.Stop();
                 _toastTimer.Start();
             });
         }
+
+        #region Window Controls
+        private void BtnMinimize_Click(object sender, RoutedEventArgs e)
+        {
+            if (ChkMinimizeToTray.IsChecked == true)
+            {
+                Hide();
+            }
+            else
+            {
+                WindowState = WindowState.Minimized;
+            }
+        }
+
+        private void BtnMaximize_Click(object sender, RoutedEventArgs e)
+        {
+            if (WindowState == WindowState.Maximized)
+            {
+                WindowState = WindowState.Normal;
+                BtnMaximize.Content = "□";
+            }
+            else
+            {
+                WindowState = WindowState.Maximized;
+                BtnMaximize.Content = "❐";
+            }
+        }
+
+        private void BtnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Close();
+        }
+        #endregion
     }
 }

@@ -1,3 +1,5 @@
+using System.Windows.Media;
+
 namespace NovaOptimizer.Models
 {
     public class StartupItem
@@ -7,5 +9,7 @@ namespace NovaOptimizer.Models
         public string Location { get; set; } = string.Empty;
         public string RegistryPath { get; set; } = string.Empty;
         public bool IsEnabled { get; set; } = true;
+        public ImageSource? Icon { get; set; }
+        public string Impact { get; set; } = "Medium";
     }
 }

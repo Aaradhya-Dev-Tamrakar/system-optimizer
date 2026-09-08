@@ -12,6 +12,9 @@ namespace NovaOptimizer.Models
         public ulong CommitLimitBytes { get; set; }
         public ulong PagedPoolBytes { get; set; }
         public ulong NonPagedPoolBytes { get; set; }
+        public uint ProcessCount { get; set; }
+        public uint ThreadCount { get; set; }
+        public uint HandleCount { get; set; }
 
         public double TotalPhysicalGB => (double)TotalPhysicalBytes / (1024.0 * 1024 * 1024);
         public double AvailableGB => (double)AvailableBytes / (1024.0 * 1024 * 1024);

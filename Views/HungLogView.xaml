@@ -4,8 +4,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="850">
-    <Grid Margin="24">
+             d:DesignHeight="650" d:DesignWidth="900">
+    <Grid Margin="28,24">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
@@ -16,85 +16,97 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Text="HUNG PROCESS DETECTOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentRed}" Margin="0,0,0,4"/>
-        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,16">
-            <TextBlock Text="Hung Log" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-            <TextBlock Text="  —  identifies repeat offenders" FontSize="14" Foreground="{StaticResource TextMuted}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
+        <TextBlock Grid.Row="0" Text="CRASH &amp; FREEZE FORENSICS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentRed}" Margin="0,0,0,4"/>
+        <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,18">
+            <TextBlock Text="Hung Process Detector" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}"/>
+            <TextBlock Text="  —  audits non-responsive apps and repeat freeze offenders" FontSize="13" Foreground="{StaticResource TextMuted}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
         </StackPanel>
 
         <!-- Summary Cards Row -->
-        <Grid Grid.Row="2" Margin="0,0,0,16">
+        <Grid Grid.Row="2" Margin="0,0,0,18">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="14"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="14"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="12"/>
+                <ColumnDefinition Width="14"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
 
             <!-- Total Events (24h) -->
-            <Border Grid.Column="0" Style="{StaticResource CardPanel}">
+            <Border Grid.Column="0" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
                     <TextBlock Text="HANGS (24h)" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtHangs24h" Text="0" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AccentOrange}" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="TxtHangs24h" Text="0" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentOrange}" Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
 
             <!-- Total Events (All Time) -->
-            <Border Grid.Column="2" Style="{StaticResource CardPanel}">
+            <Border Grid.Column="2" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
                     <TextBlock Text="TOTAL EVENTS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtTotalEvents" Text="0" FontSize="28" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="TxtTotalEvents" Text="0" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
 
             <!-- Top Offender -->
-            <Border Grid.Column="4" Style="{StaticResource CardPanel}">
+            <Border Grid.Column="4" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
                     <TextBlock Text="TOP OFFENDER" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtTopOffender" Text="—" FontSize="16" FontWeight="Bold" Foreground="{StaticResource AccentRed}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock x:Name="TxtTopOffenderCount" Text="" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock x:Name="TxtTopOffender" Text="—" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AccentRed}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="TxtTopOffenderCount" Text="None logged" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                 </StackPanel>
             </Border>
 
             <!-- Currently Hung -->
-            <Border Grid.Column="6" Style="{StaticResource CardPanel}">
+            <Border Grid.Column="6" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
                     <TextBlock Text="ACTIVE HANGS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtActiveHangs" Text="0" FontSize="28" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,4,0,0"/>
+                    <TextBlock x:Name="TxtActiveHangs" Text="0" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentGreen}" Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
         </Grid>
 
-        <!-- Section Toggle / Tab Strip -->
-        <Grid Grid.Row="3" Margin="0,0,0,10">
-            <StackPanel Orientation="Horizontal">
+        <!-- Section Toggle & Search / Action Strip -->
+        <Grid Grid.Row="3" Margin="0,0,0,12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Segmented Pill Tabs -->
+            <StackPanel Grid.Column="0" Orientation="Horizontal">
                 <RadioButton x:Name="TabOffenders" Content="🔁 Repeat Offenders" IsChecked="True"
-                             Style="{x:Null}" Foreground="{StaticResource TextPrimary}" FontSize="13" FontWeight="SemiBold"
-                             Margin="0,0,16,0" Padding="10,6" Cursor="Hand" Click="Tab_Click" Tag="Offenders"/>
-                <RadioButton x:Name="TabFullLog" Content="📜 Full Event Log"
-                             Style="{x:Null}" Foreground="{StaticResource TextPrimary}" FontSize="13" FontWeight="SemiBold"
-                             Margin="0,0,16,0" Padding="10,6" Cursor="Hand" Click="Tab_Click" Tag="FullLog"/>
+                             Style="{StaticResource FilterChip}" Click="Tab_Click" Tag="Offenders"/>
+                <RadioButton x:Name="TabFullLog" Content="📜 Full Incident Log"
+                             Style="{StaticResource FilterChip}" Click="Tab_Click" Tag="FullLog"/>
             </StackPanel>
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                <Button x:Name="BtnExportCsv" Content="📥 Export CSV" Style="{StaticResource SecondaryButton}" Click="BtnExportCsv_Click" Margin="0,0,8,0"/>
-                <Button x:Name="BtnClearLog" Content="🗑️ Clear Log" Style="{StaticResource DangerButton}" Click="BtnClearLog_Click"/>
+
+            <!-- Process Search -->
+            <TextBox x:Name="TxtSearchLog" Grid.Column="1" Width="200" HorizontalAlignment="Right" Margin="0,0,12,0"
+                     Style="{StaticResource DarkTextBox}" Padding="8,5" TextChanged="TxtSearchLog_TextChanged"
+                     Tag="Filter by process name..."/>
+
+            <!-- Action Buttons -->
+            <StackPanel Grid.Column="2" Orientation="Horizontal">
+                <Button x:Name="BtnExportCsv" Content="📥 Export CSV" Style="{StaticResource SecondaryButton}" Click="BtnExportCsv_Click" Margin="0,0,8,0" Padding="10,5"/>
+                <Button x:Name="BtnClearLog" Content="🗑️ Clear Log" Style="{StaticResource DangerButton}" Click="BtnClearLog_Click" Padding="10,5"/>
             </StackPanel>
         </Grid>
 
         <!-- Repeat Offenders Table -->
         <Border x:Name="PanelOffenders" Grid.Row="4" Style="{StaticResource CardPanel}" Padding="0">
             <DataGrid x:Name="DgOffenders" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="#1A1D27" AlternatingRowBackground="#161822"
+                      Background="Transparent" BorderThickness="0" RowBackground="#161926" AlternatingRowBackground="#121520"
                       GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
                       Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#14161F"/>
+                        <Setter Property="Background" Value="#0F121C"/>
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
@@ -106,21 +118,29 @@
 
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
-                        <Setter Property="Height" Value="34"/>
+                        <Setter Property="Height" Value="36"/>
                         <Setter Property="FontSize" Value="12.5"/>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#252F48"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
 
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Process Name" Binding="{Binding ProcessName}" Width="170"/>
+                    <!-- Process Name with Process Icon -->
+                    <DataGridTemplateColumn Header="Process Name" Width="180">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                                    <Image Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    <TextBlock Text="{Binding ProcessName}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <DataGridTextColumn Header="Hang Count" Binding="{Binding HangCount}" Width="100"/>
                     <DataGridTextColumn Header="Last Hung" Binding="{Binding DisplayLastHung}" Width="160"/>
                     <DataGridTextColumn Header="Avg Duration" Binding="{Binding DisplayAvgDuration}" Width="110"/>
@@ -134,14 +154,14 @@
         <!-- Full Event Log Table (hidden by default) -->
         <Border x:Name="PanelFullLog" Grid.Row="4" Style="{StaticResource CardPanel}" Padding="0" Visibility="Collapsed">
             <DataGrid x:Name="DgFullLog" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="#1A1D27" AlternatingRowBackground="#161822"
+                      Background="Transparent" BorderThickness="0" RowBackground="#161926" AlternatingRowBackground="#121520"
                       GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
                       Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#14161F"/>
+                        <Setter Property="Background" Value="#0F121C"/>
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
@@ -153,14 +173,11 @@
 
                 <DataGrid.RowStyle>
                     <Style TargetType="DataGridRow">
-                        <Setter Property="Height" Value="34"/>
+                        <Setter Property="Height" Value="36"/>
                         <Setter Property="FontSize" Value="12.5"/>
                         <Style.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
-                            </Trigger>
-                            <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#252F48"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -168,13 +185,57 @@
 
                 <DataGrid.Columns>
                     <DataGridTextColumn Header="Time" Binding="{Binding DisplayTimestamp}" Width="150"/>
-                    <DataGridTextColumn Header="Process" Binding="{Binding ProcessName}" Width="140"/>
+
+                    <!-- Process Name with Process Icon -->
+                    <DataGridTemplateColumn Header="Process" Width="160">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
+                                    <Image Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    <TextBlock Text="{Binding ProcessName}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <DataGridTextColumn Header="PID" Binding="{Binding PID}" Width="70"/>
                     <DataGridTextColumn Header="CPU%" Binding="{Binding DisplayCpu}" Width="70"/>
                     <DataGridTextColumn Header="RAM" Binding="{Binding DisplayRam}" Width="90"/>
                     <DataGridTextColumn Header="Parent" Binding="{Binding DisplayParent}" Width="160"/>
                     <DataGridTextColumn Header="Duration" Binding="{Binding DisplayDuration}" Width="90"/>
-                    <DataGridTextColumn Header="Status" Binding="{Binding DisplayStatus}" Width="110"/>
+                    
+                    <!-- Status Badge -->
+                    <DataGridTemplateColumn Header="Status" Width="110">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="6,0">
+                                    <Border.Style>
+                                        <Style TargetType="Border">
+                                            <Setter Property="Background" Value="#3D1822"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding Recovered}" Value="True">
+                                                    <Setter Property="Background" Value="#122E22"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Border.Style>
+                                    <TextBlock Text="{Binding DisplayStatus}" FontSize="11" FontWeight="Bold">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Setter Property="Foreground" Value="#FF6B6B"/>
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding Recovered}" Value="True">
+                                                        <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </Border>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+
                     <DataGridTextColumn Header="Path" Binding="{Binding FilePath}" Width="*"/>
                 </DataGrid.Columns>
             </DataGrid>

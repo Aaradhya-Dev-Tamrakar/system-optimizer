@@ -31,12 +31,30 @@ namespace NovaOptimizer.Views
                 "NovaOptimizer", "hung_process_log.jsonl");
             TxtLogPath.Text = $"Log: {logPath}";
 
-            // Refresh the UI every 5 seconds
+            // Refresh the UI every 5 seconds when active
             _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
             _refreshTimer.Tick += (s, e) => RefreshData();
             _refreshTimer.Start();
 
+            // Reactive update on detection or recovery
+            _watchdog.OnHungDetected += (r) => Dispatcher.Invoke(() => { if (_refreshTimer.IsEnabled) RefreshData(); });
+            _watchdog.OnHungRecovered += (r) => Dispatcher.Invoke(() => { if (_refreshTimer.IsEnabled) RefreshData(); });
+
             RefreshData();
+        }
+
+        public void PauseMonitoring()
+        {
+            _refreshTimer.Stop();
+        }
+
+        public void ResumeMonitoring()
+        {
+            if (!_refreshTimer.IsEnabled)
+            {
+                _refreshTimer.Start();
+                RefreshData();
+            }
         }
 
         private void RefreshData()
@@ -70,6 +88,19 @@ namespace NovaOptimizer.Views
                     TxtTopOffenderCount.Text = "No hangs detected yet";
                 }
 
+                // Apply search filter
+                string filter = TxtSearchLog.Text.Trim();
+                if (!string.IsNullOrEmpty(filter))
+                {
+                    offenders = offenders.Where(o => 
+                        o.ProcessName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
+                        o.FilePath.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                    allRecords = allRecords.Where(r => 
+                        r.ProcessName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
+                        r.FilePath.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+                }
+
                 // Update the active table
                 if (_activeTab == "Offenders")
                 {
@@ -88,6 +119,11 @@ namespace NovaOptimizer.Views
             {
                 // Silently handle refresh errors
             }
+        }
+
+        private void TxtSearchLog_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            RefreshData();
         }
 
         private void Tab_Click(object sender, RoutedEventArgs e)

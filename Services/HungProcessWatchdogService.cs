@@ -8,6 +8,7 @@ using System.Management;
 using System.Text.Json;
 using System.Threading;
 using NovaOptimizer.Models;
+using NovaOptimizer.Native;
 
 namespace NovaOptimizer.Services
 {
@@ -18,8 +19,8 @@ namespace NovaOptimizer.Services
         private static readonly string LogFilePath =
             Path.Combine(LogDirectory, "hung_process_log.jsonl");
 
-        // Tracks currently-hung PIDs → first detection time
         private readonly ConcurrentDictionary<int, HungProcessRecord> _activeHangs = new();
+        private readonly List<HungProcessRecord> _cachedRecords = new();
         private readonly Timer _watchTimer;
         private readonly object _fileLock = new();
         private bool _disposed;
@@ -37,8 +38,31 @@ namespace NovaOptimizer.Services
         public HungProcessWatchdogService()
         {
             Directory.CreateDirectory(LogDirectory);
+            LoadRecordsInitial();
             // Run every 3 seconds
             _watchTimer = new Timer(ScanCallback, null, TimeSpan.FromSeconds(2), TimeSpan.FromSeconds(3));
+        }
+
+        private void LoadRecordsInitial()
+        {
+            lock (_fileLock)
+            {
+                if (!File.Exists(LogFilePath)) return;
+                try
+                {
+                    foreach (var line in File.ReadAllLines(LogFilePath))
+                    {
+                        if (string.IsNullOrWhiteSpace(line)) continue;
+                        try
+                        {
+                            var record = JsonSerializer.Deserialize<HungProcessRecord>(line);
+                            if (record != null) _cachedRecords.Add(record);
+                        }
+                        catch { }
+                    }
+                }
+                catch { }
+            }
         }
 
         private void ScanCallback(object? state)
@@ -56,128 +80,111 @@ namespace NovaOptimizer.Services
         private void Scan()
         {
             var currentlyHungPids = new HashSet<int>();
-            Process[] processes;
 
-            try
-            {
-                processes = Process.GetProcesses();
-            }
-            catch
-            {
-                return;
-            }
-
-            foreach (var p in processes)
+            // Ultra-fast top-level window check via EnumWindows & IsHungAppWindow (< 1ms, non-blocking)
+            NativeMethods.EnumWindows((hWnd, lParam) =>
             {
                 try
                 {
-                    bool responding = true;
+                    if (NativeMethods.IsHungAppWindow(hWnd))
+                    {
+                        NativeMethods.GetWindowThreadProcessId(hWnd, out uint pid);
+                        if (pid > 4)
+                        {
+                            currentlyHungPids.Add((int)pid);
+                        }
+                    }
+                }
+                catch { }
+                return true;
+            }, IntPtr.Zero);
+
+            foreach (int pid in currentlyHungPids)
+            {
+                try
+                {
+                    // Already tracking this hang episode?
+                    if (_activeHangs.TryGetValue(pid, out var existing))
+                    {
+                        existing.HangDurationSeconds = (DateTime.Now - existing.Timestamp).TotalSeconds;
+                        continue;
+                    }
+
+                    // --- New hang detected! Build the forensic record ---
+                    string procName = $"PID {pid}";
+                    string filePath = string.Empty;
+                    string description = procName;
+                    double workingSetMB = 0;
+                    double cpuPercent = 0;
+
                     try
                     {
-                        // .Responding only works for processes with a window/message loop
-                        responding = p.Responding;
-                    }
-                    catch
-                    {
-                        continue; // Can't check — skip
-                    }
+                        using var p = Process.GetProcessById(pid);
+                        procName = p.ProcessName;
+                        description = procName;
 
-                    if (!responding)
-                    {
-                        int pid = p.Id;
-                        currentlyHungPids.Add(pid);
-
-                        // Already tracking this hang episode?
-                        if (_activeHangs.ContainsKey(pid))
-                        {
-                            // Update duration on the active record
-                            if (_activeHangs.TryGetValue(pid, out var existing))
-                            {
-                                existing.HangDurationSeconds = (DateTime.Now - existing.Timestamp).TotalSeconds;
-                            }
-                            continue;
-                        }
-
-                        // --- New hang detected! Build the forensic record ---
-                        var record = new HungProcessRecord
-                        {
-                            Timestamp = DateTime.Now,
-                            ProcessName = p.ProcessName,
-                            PID = pid,
-                            Recovered = false
-                        };
-
-                        // Capture memory
+                        try { workingSetMB = p.WorkingSet64 / (1024.0 * 1024.0); } catch { }
                         try
                         {
-                            record.WorkingSetMB = p.WorkingSet64 / (1024.0 * 1024.0);
+                            cpuPercent = Math.Round(p.TotalProcessorTime.TotalMilliseconds /
+                                (Environment.ProcessorCount * (DateTime.Now - p.StartTime).TotalMilliseconds) * 100.0, 1);
+                            if (double.IsNaN(cpuPercent) || double.IsInfinity(cpuPercent)) cpuPercent = 0;
                         }
                         catch { }
-
-                        // Capture CPU (snapshot — won't be a delta, but gives a rough idea)
-                        try
-                        {
-                            record.CpuPercent = Math.Round(p.TotalProcessorTime.TotalMilliseconds /
-                                (Environment.ProcessorCount * (DateTime.Now - p.StartTime).TotalMilliseconds) * 100.0, 1);
-                            if (double.IsNaN(record.CpuPercent) || double.IsInfinity(record.CpuPercent))
-                                record.CpuPercent = 0;
-                        }
-                        catch { record.CpuPercent = 0; }
-
-                        // Capture executable path & description
-                        try
-                        {
-                            var module = p.MainModule;
-                            if (module != null)
-                            {
-                                record.FilePath = module.FileName ?? string.Empty;
-                                record.Description = module.FileVersionInfo.FileDescription ?? p.ProcessName;
-                            }
-                        }
-                        catch
-                        {
-                            record.FilePath = string.Empty;
-                            record.Description = p.ProcessName;
-                        }
-
-                        // Capture parent process via WMI
-                        try
-                        {
-                            using var searcher = new ManagementObjectSearcher(
-                                $"SELECT ParentProcessId FROM Win32_Process WHERE ProcessId = {pid}");
-                            foreach (ManagementObject obj in searcher.Get())
-                            {
-                                int parentPid = Convert.ToInt32(obj["ParentProcessId"]);
-                                record.ParentPID = parentPid;
-                                try
-                                {
-                                    using var parentProc = Process.GetProcessById(parentPid);
-                                    record.ParentProcessName = parentProc.ProcessName;
-                                }
-                                catch
-                                {
-                                    record.ParentProcessName = "(exited)";
-                                }
-                                break;
-                            }
-                        }
-                        catch
-                        {
-                            record.ParentProcessName = "(unknown)";
-                        }
-
-                        _activeHangs[pid] = record;
-                        AppendRecord(record);
-                        OnHungDetected?.Invoke(record);
                     }
+                    catch { }
+
+                    try
+                    {
+                        string? path = NativeMethods.GetProcessFilePath(pid);
+                        if (!string.IsNullOrEmpty(path))
+                        {
+                            filePath = path;
+                            if (File.Exists(path))
+                            {
+                                var vi = FileVersionInfo.GetVersionInfo(path);
+                                description = vi.FileDescription ?? procName;
+                            }
+                        }
+                    }
+                    catch { }
+
+                    int parentPid = NativeMethods.GetParentProcessId(pid);
+                    string parentProcessName = "(unknown)";
+                    if (parentPid > 0)
+                    {
+                        try
+                        {
+                            using var parentProc = Process.GetProcessById(parentPid);
+                            parentProcessName = parentProc.ProcessName;
+                        }
+                        catch
+                        {
+                            parentProcessName = "(exited)";
+                        }
+                    }
+
+                    var record = new HungProcessRecord
+                    {
+                        Timestamp = DateTime.Now,
+                        ProcessName = procName,
+                        PID = pid,
+                        FilePath = filePath,
+                        Description = string.IsNullOrWhiteSpace(description) ? procName : description,
+                        WorkingSetMB = workingSetMB,
+                        CpuPercent = cpuPercent,
+                        ParentPID = parentPid,
+                        ParentProcessName = parentProcessName,
+                        Recovered = false
+                    };
+
+                    _activeHangs[pid] = record;
+                    AppendRecord(record);
+                    OnHungDetected?.Invoke(record);
                 }
                 catch
                 {
                     // Ignore per-process errors
-                }
-                finally
-                {
-                    p.Dispose();
                 }
             }
 
@@ -211,6 +218,7 @@ namespace NovaOptimizer.Services
 
                 lock (_fileLock)
                 {
+                    _cachedRecords.Add(record);
                     File.AppendAllText(LogFilePath, json + Environment.NewLine);
                 }
             }
@@ -221,33 +229,14 @@ namespace NovaOptimizer.Services
         }
 
         /// <summary>
-        /// Returns all records from the log file.
+        /// Returns all records from the log file (cached in memory for high speed).
         /// </summary>
         public List<HungProcessRecord> GetAllRecords()
         {
-            var records = new List<HungProcessRecord>();
-
             lock (_fileLock)
             {
-                if (!File.Exists(LogFilePath)) return records;
-
-                try
-                {
-                    foreach (var line in File.ReadAllLines(LogFilePath))
-                    {
-                        if (string.IsNullOrWhiteSpace(line)) continue;
-                        try
-                        {
-                            var record = JsonSerializer.Deserialize<HungProcessRecord>(line);
-                            if (record != null) records.Add(record);
-                        }
-                        catch { }
-                    }
-                }
-                catch { }
+                return new List<HungProcessRecord>(_cachedRecords);
             }
-
-            return records;
         }
 
         /// <summary>
@@ -301,6 +290,7 @@ namespace NovaOptimizer.Services
             {
                 try
                 {
+                    _cachedRecords.Clear();
                     File.WriteAllText(LogFilePath, string.Empty);
                 }
                 catch { }

@@ -85,6 +85,9 @@ namespace NovaOptimizer.Services
                 metrics.CommitLimitBytes = (ulong)perfInfo.CommitLimit * pageSize;
                 metrics.PagedPoolBytes = (ulong)perfInfo.KernelPaged * pageSize;
                 metrics.NonPagedPoolBytes = (ulong)perfInfo.KernelNonpaged * pageSize;
+                metrics.ProcessCount = perfInfo.ProcessCount;
+                metrics.ThreadCount = perfInfo.ThreadCount;
+                metrics.HandleCount = perfInfo.HandleCount;
             }
 
             return metrics;
@@ -139,12 +142,12 @@ namespace NovaOptimizer.Services
             int trimmedCount = 0;
 
             Process[] processes = Process.GetProcesses();
-            foreach (var proc in processes)
+            Parallel.ForEach(processes, new ParallelOptions { MaxDegreeOfParallelism = Math.Min(Environment.ProcessorCount, 8) }, proc =>
             {
                 try
                 {
-                    if (proc.Id <= 4 || proc.Id == currentPid) continue;
-                    if (CriticalProcesses.Contains(proc.ProcessName)) continue;
+                    if (proc.Id <= 4 || proc.Id == currentPid) return;
+                    if (CriticalProcesses.Contains(proc.ProcessName)) return;
 
                     IntPtr hProc = NativeMethods.OpenProcess(
                         NativeMethods.PROCESS_SET_QUOTA | NativeMethods.PROCESS_QUERY_INFORMATION, 
@@ -157,7 +160,7 @@ namespace NovaOptimizer.Services
                         {
                             NativeMethods.EmptyWorkingSet(hProc);
                             NativeMethods.SetProcessWorkingSetSize(hProc, (IntPtr)(-1), (IntPtr)(-1));
-                            trimmedCount++;
+                            Interlocked.Increment(ref trimmedCount);
                         }
                         finally
                         {
@@ -173,9 +176,14 @@ namespace NovaOptimizer.Services
                 {
                     proc.Dispose();
                 }
-            }
+            });
 
             return trimmedCount;
+        }
+
+        public Task<long> DeepCleanRamAsync()
+        {
+            return Task.Run(() => DeepCleanRam());
         }
 
         public long DeepCleanRam()

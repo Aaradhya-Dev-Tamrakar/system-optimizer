@@ -64,6 +64,9 @@ namespace NovaOptimizer.Models
             : "⚪ Logged";
 
         [JsonIgnore]
+        public System.Windows.Media.ImageSource? Icon => Native.IconHelper.GetIcon(FilePath, ProcessName);
+
+        [JsonIgnore]
         public string DisplayParent =>
             string.IsNullOrEmpty(ParentProcessName) ? $"PID {ParentPID}" : $"{ParentProcessName} ({ParentPID})";
     }
@@ -82,6 +85,7 @@ namespace NovaOptimizer.Models
         public int RecoveryCount { get; set; }
 
         // Display helpers
+        public System.Windows.Media.ImageSource? Icon => Native.IconHelper.GetIcon(FilePath, ProcessName);
         public string DisplayLastHung => LastHung.ToString("yyyy-MM-dd HH:mm:ss");
         public string DisplayAvgDuration =>
             AvgDurationSeconds < 60 ? $"{AvgDurationSeconds:F0}s"

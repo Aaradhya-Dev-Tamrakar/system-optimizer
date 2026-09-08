@@ -3,16 +3,24 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="clr-namespace:NovaOptimizer.Controls"
              mc:Ignorable="d" 
-             d:DesignHeight="600" d:DesignWidth="850">
-    <ScrollViewer VerticalScrollBarVisibility="Auto">
-        <StackPanel Margin="24" MaxWidth="900">
+             d:DesignHeight="700" d:DesignWidth="900">
+    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+        <StackPanel Margin="28,24" MaxWidth="960">
             <!-- Header -->
-            <TextBlock Text="PERFORMANCE MONITOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" Margin="0,0,0,4"/>
-            <TextBlock Text="System Resources &amp; Hardware" FontSize="24" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,24"/>
+            <StackPanel Margin="0,0,0,24">
+                <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                    <TextBlock Text="HARDWARE TELEMETRY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                    <TextBlock Text=" • REAL-TIME NT KERNEL MONITOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                </StackPanel>
+                <TextBlock Text="System Performance &amp; Resources" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"/>
+                <TextBlock Text="Live utilization metrics, rolling history charts, and Windows NT memory architecture telemetry." 
+                           FontSize="13" Foreground="{StaticResource TextSecondary}"/>
+            </StackPanel>
 
             <!-- Main Resource Cards -->
-            <Grid Margin="0,0,0,24">
+            <Grid Margin="0,0,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="16"/>
@@ -22,14 +30,18 @@
                 <!-- CPU Card -->
                 <Border Grid.Column="0" Style="{StaticResource CardPanel}">
                     <StackPanel>
-                        <Grid Margin="0,0,0,12">
-                            <TextBlock Text="CPU Utilization" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                            <TextBlock x:Name="TxtCpuOverall" Text="12%" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Right"/>
+                        <Grid Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="⚡ " FontSize="16"/>
+                                <TextBlock Text="CPU Utilization" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Name="TxtCpuOverall" Text="12%" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Right"/>
                         </Grid>
-                        <ProgressBar x:Name="PbCpu" Height="8" Background="#14161F" Foreground="{StaticResource AccentCyan}" BorderThickness="0" Value="12" Margin="0,0,0,16"/>
+                        
+                        <ProgressBar x:Name="PbCpu" Height="8" Background="#10131D" Foreground="{StaticResource AccentCyan}" BorderThickness="0" Value="12" Margin="0,0,0,14"/>
 
-                        <StackPanel Margin="0,0,0,8">
-                            <TextBlock x:Name="TxtProcessorName" Text="Intel / AMD Processor" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
+                        <StackPanel Margin="0,0,0,4">
+                            <TextBlock x:Name="TxtProcessorName" Text="Intel / AMD Processor" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" TextTrimming="CharacterEllipsis"/>
                             <TextBlock x:Name="TxtCores" Text="Logical Cores: 8" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
                         </StackPanel>
                     </StackPanel>
@@ -38,13 +50,17 @@
                 <!-- RAM Card -->
                 <Border Grid.Column="2" Style="{StaticResource CardPanel}">
                     <StackPanel>
-                        <Grid Margin="0,0,0,12">
-                            <TextBlock Text="Memory Usage" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                            <TextBlock x:Name="TxtRamOverall" Text="45%" FontSize="24" FontWeight="Bold" Foreground="{StaticResource AccentPurple}" HorizontalAlignment="Right"/>
+                        <Grid Margin="0,0,0,8">
+                            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                <TextBlock Text="💾 " FontSize="16"/>
+                                <TextBlock Text="Memory Usage" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock x:Name="TxtRamOverall" Text="45%" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentPurple}" HorizontalAlignment="Right"/>
                         </Grid>
-                        <ProgressBar x:Name="PbRam" Height="8" Background="#14161F" Foreground="{StaticResource AccentPurple}" BorderThickness="0" Value="45" Margin="0,0,0,16"/>
+                        
+                        <ProgressBar x:Name="PbRam" Height="8" Background="#10131D" Foreground="{StaticResource AccentPurple}" BorderThickness="0" Value="45" Margin="0,0,0,14"/>
 
-                        <StackPanel Margin="0,0,0,8">
+                        <StackPanel Margin="0,0,0,4">
                             <TextBlock x:Name="TxtRamTotals" Text="7.2 / 16.0 GB Installed" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
                             <TextBlock x:Name="TxtRamAvailable" Text="Available: 8.8 GB" FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,2,0,0"/>
                         </StackPanel>
@@ -52,61 +68,88 @@
                 </Border>
             </Grid>
 
-            <!-- Detailed Specifications Card -->
+            <!-- Real-Time Scrolling Telemetry Charts -->
+            <Grid Margin="0,0,0,24">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="16"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+
+                <controls:HistoryGraph x:Name="GraphCpu" Grid.Column="0" Height="140" Title="CPU UTILIZATION (60s)" 
+                                       LineBrush="{StaticResource AccentCyan}" Unit="%" MaxValue="100"/>
+
+                <controls:HistoryGraph x:Name="GraphRam" Grid.Column="2" Height="140" Title="MEMORY UTILIZATION (60s)" 
+                                       LineBrush="{StaticResource AccentPurple}" Unit="%" MaxValue="100"/>
+            </Grid>
+
+            <!-- Detailed Architecture Specifications Card -->
             <Border Style="{StaticResource CardPanel}">
                 <StackPanel>
-                    <TextBlock Text="KERNEL &amp; MEMORY ARCHITECTURE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,0,0,8"/>
-                    <TextBlock Text="Windows Performance Metrics" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16"/>
+                    <TextBlock Text="KERNEL &amp; MEMORY ARCHITECTURE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,0,0,6"/>
+                    <TextBlock Text="Windows Performance Subsystem" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16"/>
 
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="16"/>
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="12"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
 
-                        <!-- Left Column -->
-                        <StackPanel Grid.Column="0" Margin="0,0,16,0">
-                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,6">
-                                <Grid>
-                                    <TextBlock Text="Committed Memory" Foreground="{StaticResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtCommitted" Text="8.5 / 19.2 GB" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,6">
-                                <Grid>
-                                    <TextBlock Text="Cached Standby Memory" Foreground="{StaticResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtCached" Text="4.1 GB" Foreground="{StaticResource AccentPurple}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,6">
-                                <Grid>
-                                    <TextBlock Text="Paged Pool" Foreground="{StaticResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtPagedPool" Text="512 MB" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                        </StackPanel>
+                        <!-- Committed Memory -->
+                        <Border Grid.Row="0" Grid.Column="0" Background="#121522" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="Committed Limit" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="TxtCommitted" Text="8.5 / 19.2 GB" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
 
-                        <!-- Right Column -->
-                        <StackPanel Grid.Column="1">
-                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,6">
-                                <Grid>
-                                    <TextBlock Text="Non-Paged Pool (Hardware)" Foreground="{StaticResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtNonPagedPool" Text="420 MB" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,6">
-                                <Grid>
-                                    <TextBlock Text="Active Processes" Foreground="{StaticResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtProcessCount" Text="185" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                            <Border BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="0,6">
-                                <Grid>
-                                    <TextBlock Text="System Uptime" Foreground="{StaticResource TextSecondary}"/>
-                                    <TextBlock x:Name="TxtUptime" Text="0d 05h 22m" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Right"/>
-                                </Grid>
-                            </Border>
-                        </StackPanel>
+                        <!-- Cached Standby -->
+                        <Border Grid.Row="0" Grid.Column="2" Background="#1A1526" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="Cached Standby" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="TxtCached" Text="4.1 GB" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentPurple}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Paged Pool -->
+                        <Border Grid.Row="0" Grid.Column="4" Background="#121522" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="Paged Pool" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="TxtPagedPool" Text="512 MB" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Non-Paged Driver Pool -->
+                        <Border Grid.Row="2" Grid.Column="0" Background="#121522" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="Non-Paged Pool (Drivers)" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="TxtNonPagedPool" Text="420 MB" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- Active Processes -->
+                        <Border Grid.Row="2" Grid.Column="2" Background="#121522" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="Active Processes" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="TxtProcessCount" Text="185" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+
+                        <!-- System Uptime -->
+                        <Border Grid.Row="2" Grid.Column="4" Background="#12241E" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                            <StackPanel>
+                                <TextBlock Text="System Uptime" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                                <TextBlock x:Name="TxtUptime" Text="0d 05h 22m 14s" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
                     </Grid>
                 </StackPanel>
             </Border>

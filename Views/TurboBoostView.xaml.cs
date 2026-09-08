@@ -36,7 +36,22 @@ namespace NovaOptimizer.Views
             _timer.Tick += (s, e) => UpdateMemoryUi();
             _timer.Start();
 
+            ToggleAutoClean.IsChecked = _ramOptimizer.AutoCleanEnabled;
             UpdateMemoryUi();
+        }
+
+        public void PauseMonitoring()
+        {
+            _timer.Stop();
+        }
+
+        public void ResumeMonitoring()
+        {
+            if (!_timer.IsEnabled)
+            {
+                _timer.Start();
+                UpdateMemoryUi();
+            }
         }
 
         private void UpdateMemoryUi()
@@ -217,18 +232,51 @@ namespace NovaOptimizer.Views
         }
         #endregion
 
-        private void BtnDeepClean_Click(object sender, RoutedEventArgs e)
+        private async void BtnDeepClean_Click(object sender, RoutedEventArgs e)
         {
-            long freed = _ramOptimizer.DeepCleanRam();
-            double mb = freed / (1024.0 * 1024.0);
-            LogMessage($"🧹 Manual Deep Purge: Liberated {mb:F0} MB of physical memory.");
-            OnStatusNotification?.Invoke($"✨ Memory Optimized! {mb:F0} MB physical RAM liberated.");
-            UpdateMemoryUi();
+            BtnDeepClean.IsEnabled = false;
+            string origContent = BtnDeepClean.Content?.ToString() ?? "🧹 Clean RAM Now";
+            BtnDeepClean.Content = "⚡ Purging RAM...";
+
+            try
+            {
+                long freed = await _ramOptimizer.DeepCleanRamAsync();
+                double mb = freed / (1024.0 * 1024.0);
+                LogMessage($"🧹 Manual Deep Purge: Liberated {mb:F0} MB of physical memory.");
+                OnStatusNotification?.Invoke($"✨ Memory Optimized! {mb:F0} MB physical RAM liberated.");
+                UpdateMemoryUi();
+            }
+            finally
+            {
+                BtnDeepClean.Content = origContent;
+                BtnDeepClean.IsEnabled = true;
+            }
         }
 
-        private void ChkAutoClean_Changed(object sender, RoutedEventArgs e)
+        private void Preset25_Click(object sender, RoutedEventArgs e)
         {
-            _ramOptimizer.AutoCleanEnabled = ChkAutoClean.IsChecked == true;
+            TxtFocusMins.Text = "25";
+            TxtBreakMins.Text = "5";
+            BtnPomodoroReset_Click(sender, e);
+        }
+
+        private void Preset50_Click(object sender, RoutedEventArgs e)
+        {
+            TxtFocusMins.Text = "50";
+            TxtBreakMins.Text = "10";
+            BtnPomodoroReset_Click(sender, e);
+        }
+
+        private void Preset90_Click(object sender, RoutedEventArgs e)
+        {
+            TxtFocusMins.Text = "90";
+            TxtBreakMins.Text = "15";
+            BtnPomodoroReset_Click(sender, e);
+        }
+
+        private void ToggleAutoClean_CheckedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
+        {
+            _ramOptimizer.AutoCleanEnabled = e.NewValue;
             LogMessage(_ramOptimizer.AutoCleanEnabled 
                 ? "Intelligent Auto-RAM Watchdog enabled (silent background cleaning)." 
                 : "Intelligent Auto-RAM Watchdog disabled.");
@@ -241,12 +289,29 @@ namespace NovaOptimizer.Views
                 var purpleBrush = (System.Windows.Media.Brush)FindResource("AccentPurple");
                 var cyanBrush = (System.Windows.Media.Brush)FindResource("AccentCyan");
                 var blueBrush = (System.Windows.Media.Brush)FindResource("AccentBlue");
+                var redBrush = (System.Windows.Media.Brush)FindResource("AccentRed");
+                var borderCard = (System.Windows.Media.Brush)FindResource("BorderCard");
+                var bgCard = (System.Windows.Media.Brush)FindResource("BgCard");
                 var darkRed = System.Windows.Media.Brushes.DarkRed;
+
+                // Reset badges and borders
+                BadgeGameActive.Visibility = Visibility.Collapsed;
+                BadgeWorkActive.Visibility = Visibility.Collapsed;
+                BadgeStudyActive.Visibility = Visibility.Collapsed;
+                CardGame.BorderBrush = borderCard;
+                CardWork.BorderBrush = borderCard;
+                CardStudy.BorderBrush = borderCard;
+                CardGame.Background = bgCard;
+                CardWork.Background = bgCard;
+                CardStudy.Background = bgCard;
 
                 if (profile == BoostProfile.GameMode)
                 {
                     BtnGameBoost.Content = "Deactivate Game Boost";
                     BtnGameBoost.Background = darkRed;
+                    BadgeGameActive.Visibility = Visibility.Visible;
+                    CardGame.BorderBrush = redBrush;
+                    CardGame.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#221520")!;
 
                     BtnWorkBoost.Content = "Activate Work Boost";
                     BtnWorkBoost.Background = cyanBrush;
@@ -258,6 +323,9 @@ namespace NovaOptimizer.Views
                 {
                     BtnWorkBoost.Content = "Deactivate Work Boost";
                     BtnWorkBoost.Background = darkRed;
+                    BadgeWorkActive.Visibility = Visibility.Visible;
+                    CardWork.BorderBrush = cyanBrush;
+                    CardWork.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#141D2B")!;
 
                     BtnGameBoost.Content = "Activate Game Boost";
                     BtnGameBoost.Background = purpleBrush;
@@ -269,6 +337,9 @@ namespace NovaOptimizer.Views
                 {
                     BtnStudyMode.Content = "Deactivate Study Mode";
                     BtnStudyMode.Background = darkRed;
+                    BadgeStudyActive.Visibility = Visibility.Visible;
+                    CardStudy.BorderBrush = blueBrush;
+                    CardStudy.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#131C30")!;
 
                     BtnGameBoost.Content = "Activate Game Boost";
                     BtnGameBoost.Background = purpleBrush;
@@ -295,7 +366,20 @@ namespace NovaOptimizer.Views
             Dispatcher.Invoke(() =>
             {
                 string timestamp = DateTime.Now.ToString("HH:mm:ss");
-                TxtActivityLog.Text = $"[{timestamp}] {message}\n" + TxtActivityLog.Text;
+                string newEntry = $"[{timestamp}] {message}\n";
+                string current = TxtActivityLog.Text;
+
+                // Keep log size bounded to avoid UI render degradation and excessive memory allocations
+                if (current.Length > 8000)
+                {
+                    int newlineIdx = current.IndexOf('\n', 4000);
+                    if (newlineIdx > 0)
+                    {
+                        current = current.Substring(0, newlineIdx + 1);
+                    }
+                }
+
+                TxtActivityLog.Text = newEntry + current;
             });
         }
     }

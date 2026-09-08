@@ -31,6 +31,20 @@ namespace NovaOptimizer.Views
             UpdateMetrics();
         }
 
+        public void PauseMonitoring()
+        {
+            _timer.Stop();
+        }
+
+        public void ResumeMonitoring()
+        {
+            if (!_timer.IsEnabled)
+            {
+                _timer.Start();
+                UpdateMetrics();
+            }
+        }
+
         private void UpdateMetrics()
         {
             // Update CPU
@@ -54,6 +68,7 @@ namespace NovaOptimizer.Views
 
                 TxtCpuOverall.Text = $"{cpuPercent:F0}%";
                 PbCpu.Value = cpuPercent;
+                GraphCpu.AddValue(cpuPercent);
             }
 
             _lastKernel = currentKernel;
@@ -64,6 +79,7 @@ namespace NovaOptimizer.Views
             var metrics = _ramOptimizer.GetMemoryMetrics();
             TxtRamOverall.Text = $"{metrics.InUsePercent:F0}%";
             PbRam.Value = metrics.InUsePercent;
+            GraphRam.AddValue(metrics.InUsePercent);
 
             TxtRamTotals.Text = $"{metrics.InUseGB:F1} / {metrics.TotalPhysicalGB:F1} GB";
             TxtRamAvailable.Text = $"Available: {metrics.AvailableGB:F1} GB";
@@ -72,7 +88,8 @@ namespace NovaOptimizer.Views
             TxtPagedPool.Text = $"{metrics.PagedPoolBytes / (1024.0 * 1024.0):F0} MB";
             TxtNonPagedPool.Text = $"{metrics.NonPagedPoolBytes / (1024.0 * 1024.0):F0} MB";
 
-            TxtProcessCount.Text = $"{Process.GetProcesses().Length}";
+            // Zero-allocation instantaneous process count from kernel performance info
+            TxtProcessCount.Text = $"{metrics.ProcessCount}";
 
             TimeSpan uptime = TimeSpan.FromMilliseconds(Environment.TickCount64);
             TxtUptime.Text = $"{uptime.Days}d {uptime.Hours:D2}h {uptime.Minutes:D2}m {uptime.Seconds:D2}s";

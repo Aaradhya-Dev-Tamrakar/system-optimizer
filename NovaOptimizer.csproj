@@ -10,11 +10,19 @@
     <AssemblyName>NovaOptimizer</AssemblyName>
     <RootNamespace>NovaOptimizer</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="System.ServiceProcess.ServiceController" Version="9.0.0" />
     <PackageReference Include="System.Management" Version="9.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Assets\icon.ico" />
+    <Resource Include="Assets\icon.png" />
+    <Resource Include="Assets\icon-256.png" />
+    <Resource Include="Assets\icon-32.png" />
   </ItemGroup>
 
 </Project>

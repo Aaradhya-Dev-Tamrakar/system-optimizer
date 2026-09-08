@@ -14,11 +14,13 @@ namespace NovaOptimizer
         private readonly TurboBoostService _turboBoost;
         private readonly StartupManagerService _startupManager;
         private readonly SystemTweakService _systemTweaks;
+        private readonly HungProcessWatchdogService _hungWatchdog;
 
         private readonly TurboBoostView _boostView;
         private readonly ProcessesView _processesView;
         private readonly PerformanceView _performanceView;
         private readonly StartupAndTweaksView _startupAndTweaksView;
+        private readonly HungLogView _hungLogView;
 
         private readonly DispatcherTimer _headerTimer;
         private readonly DispatcherTimer _toastTimer;
@@ -33,17 +35,36 @@ namespace NovaOptimizer
             _turboBoost = new TurboBoostService(_ramOptimizer);
             _startupManager = new StartupManagerService();
             _systemTweaks = new SystemTweakService();
+            _hungWatchdog = new HungProcessWatchdogService();
 
             // Initialize Views
             _boostView = new TurboBoostView(_ramOptimizer, _turboBoost);
             _processesView = new ProcessesView(_processMonitor);
             _performanceView = new PerformanceView(_ramOptimizer);
             _startupAndTweaksView = new StartupAndTweaksView(_startupManager, _systemTweaks);
+            _hungLogView = new HungLogView(_hungWatchdog);
 
             // Connect notifications
             _boostView.OnStatusNotification += ShowNotification;
             _processesView.OnStatusNotification += ShowNotification;
             _startupAndTweaksView.OnStatusNotification += ShowNotification;
+            _hungLogView.OnStatusNotification += ShowNotification;
+
+            // Watchdog live notifications
+            _hungWatchdog.OnHungDetected += (record) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ShowNotification($"⚠️ Hung detected: {record.ProcessName} (PID {record.PID})");
+                });
+            };
+            _hungWatchdog.OnHungRecovered += (record) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ShowNotification($"✅ Recovered: {record.ProcessName} after {record.DisplayDuration}");
+                });
+            };
 
             _turboBoost.OnProfileChanged += (profile) =>
             {
@@ -107,6 +128,9 @@ namespace NovaOptimizer
                         break;
                     case "Tweaks":
                         MainContent.Content = _startupAndTweaksView;
+                        break;
+                    case "HungLog":
+                        MainContent.Content = _hungLogView;
                         break;
                 }
             }

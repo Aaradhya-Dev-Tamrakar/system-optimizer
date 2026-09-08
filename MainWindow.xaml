@@ -5,6 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         Title="NovaOptimizer — System Optimizer &amp; Task Manager" 
+        Icon="Assets/icon.png"
         Height="740" Width="1160" MinHeight="620" MinWidth="960"
         Background="{StaticResource BgDark}" WindowStartupLocation="CenterScreen">
     <Grid>
@@ -24,7 +25,7 @@
 
                 <!-- App Branding -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
-                    <Ellipse Width="10" Height="10" Fill="{StaticResource AccentCyan}" Margin="0,0,10,0"/>
+                    <Image Source="Assets/icon.png" Width="26" Height="26" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <TextBlock Text="NOVA OPTIMIZER" FontSize="15" FontWeight="ExtraBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                     <Border CornerRadius="4" Background="#1F2433" Margin="8,0,0,0" Padding="6,2" VerticalAlignment="Center">
                         <TextBlock Text="v1.0 HIGH-PERF" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
@@ -89,6 +90,10 @@
                     <RadioButton x:Name="NavTweaks" Content="⚙️ Startup &amp; Tweaks" Style="{x:Null}" 
                                  Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
                                  Cursor="Hand" Click="Nav_Click" Tag="Tweaks"/>
+
+                    <RadioButton x:Name="NavHungLog" Content="🔍 Hung Log" Style="{x:Null}" 
+                                 Foreground="{StaticResource TextPrimary}" FontSize="13.5" FontWeight="SemiBold" Margin="0,2" Padding="14,10"
+                                 Cursor="Hand" Click="Nav_Click" Tag="HungLog"/>
 
                     <!-- Footer Info in Sidebar -->
                     <Border Margin="4,220,4,0" Background="#10121A" CornerRadius="8" Padding="12">

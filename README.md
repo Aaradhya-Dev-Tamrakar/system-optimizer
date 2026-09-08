@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="Assets/icon.png" width="128" height="128" alt="NovaOptimizer Logo" />
+</p>
+
 # 🌌 NovaOptimizer — High-Efficiency Windows Task Manager & System Optimizer
 
 > Built with **C# / .NET 10** and **WPF** for Windows 10 & 11. Engineered for zero overhead, instant response, and maximum system optimization before gaming or intensive work.

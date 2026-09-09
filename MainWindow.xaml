@@ -133,6 +133,8 @@
                             <TextBlock Text="Kernel Standby Cleaner &amp; Watchdog actively protecting framerates." FontSize="10.5" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
                             <CheckBox x:Name="ChkMinimizeToTray" Content="Minimize to tray" FontSize="11" Foreground="{StaticResource TextSecondary}"
                                       IsChecked="True"/>
+                            <CheckBox x:Name="ChkStartWithWindows" Content="Start with Windows" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                                      Margin="0,6,0,0" Checked="ChkStartWithWindows_Changed" Unchecked="ChkStartWithWindows_Changed"/>
                         </StackPanel>
                     </Border>
                 </Grid>

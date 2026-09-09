@@ -9,6 +9,131 @@ namespace NovaOptimizer.Services
 {
     public class StartupManagerService
     {
+        public event Action<bool>? OnNovaStartupChanged;
+
+        public bool IsNovaStartupEnabled()
+        {
+            try
+            {
+                using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", false);
+                if (key?.GetValue("NovaOptimizer") != null) return true;
+
+                // Also verify Task Scheduler
+                var psi = new System.Diagnostics.ProcessStartInfo
+                {
+                    FileName = "schtasks.exe",
+                    Arguments = "/query /tn \"NovaOptimizer_Autostart\"",
+                    CreateNoWindow = true,
+                    UseShellExecute = false,
+                    RedirectStandardOutput = true,
+                    RedirectStandardError = true
+                };
+                using var proc = System.Diagnostics.Process.Start(psi);
+                if (proc != null)
+                {
+                    proc.WaitForExit(2000);
+                    return proc.ExitCode == 0;
+                }
+            }
+            catch { }
+            return false;
+        }
+
+        public bool SetNovaStartup(bool enable)
+        {
+            const string taskName = "NovaOptimizer_Autostart";
+            try
+            {
+                if (enable)
+                {
+                    string? exePath = Environment.ProcessPath;
+                    if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
+                    {
+                        exePath = Environment.GetCommandLineArgs()[0];
+                    }
+                    if (exePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+                    {
+                        string exeCandidate = Path.ChangeExtension(exePath, ".exe");
+                        if (File.Exists(exeCandidate)) exePath = exeCandidate;
+                    }
+
+                    // 1. HKCU Run Key
+                    using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        key?.SetValue("NovaOptimizer", $"\"{exePath}\" --autostart");
+                    }
+
+                    // 2. Elevated Task Scheduler (for seamless elevated startup without UAC prompt)
+                    try
+                    {
+                        var psi = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "schtasks.exe",
+                            Arguments = $"/create /tn \"{taskName}\" /tr \"\\\"{exePath}\\\" --autostart\" /sc onlogon /rl highest /f",
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        };
+                        using var proc = System.Diagnostics.Process.Start(psi);
+                        proc?.WaitForExit(3000);
+                    }
+                    catch { }
+                }
+                else
+                {
+                    // 1. Remove HKCU Run Key
+                    using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    {
+                        key?.DeleteValue("NovaOptimizer", false);
+                    }
+
+                    // 2. Remove Task Scheduler
+                    try
+                    {
+                        var psi = new System.Diagnostics.ProcessStartInfo
+                        {
+                            FileName = "schtasks.exe",
+                            Arguments = $"/delete /tn \"{taskName}\" /f",
+                            CreateNoWindow = true,
+                            UseShellExecute = false
+                        };
+                        using var proc = System.Diagnostics.Process.Start(psi);
+                        proc?.WaitForExit(3000);
+                    }
+                    catch { }
+                }
+
+                OnNovaStartupChanged?.Invoke(enable);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool AddStartupItem(string name, string executablePath, string arguments = "")
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name) || string.IsNullOrWhiteSpace(executablePath))
+                    return false;
+
+                string cleanPath = executablePath.Trim('\"');
+                string command = string.IsNullOrWhiteSpace(arguments)
+                    ? $"\"{cleanPath}\""
+                    : $"\"{cleanPath}\" {arguments.Trim()}";
+
+                using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                if (key != null)
+                {
+                    key.SetValue(name, command);
+                    return true;
+                }
+            }
+            catch { }
+            return false;
+        }
+
         public List<StartupItem> GetStartupItems()
         {
             var items = new List<StartupItem>();
@@ -121,6 +246,11 @@ namespace NovaOptimizer.Services
         {
             try
             {
+                if (item.Name.Equals("NovaOptimizer", StringComparison.OrdinalIgnoreCase))
+                {
+                    return SetNovaStartup(false);
+                }
+
                 if (!string.IsNullOrEmpty(item.RegistryPath))
                 {
                     RegistryKey root = item.Location.Contains("User") ? Registry.CurrentUser : Registry.LocalMachine;

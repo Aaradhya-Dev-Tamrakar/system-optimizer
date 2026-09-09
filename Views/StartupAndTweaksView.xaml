@@ -68,6 +68,28 @@
             </Border>
 
             <!-- Startup Apps Manager Section -->
+            <!-- NovaOptimizer Startup Integration Card -->
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,16" Padding="16,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                            <Border CornerRadius="4" Background="#16283D" BorderBrush="#1F3D5C" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <TextBlock Text="NOVA AUTO-START" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                            </Border>
+                            <TextBlock Text="Run NovaOptimizer on Windows Boot" FontSize="13.5" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Launches NovaOptimizer minimized to the system tray at startup to maintain sub-ms timer resolution and keep RAM clear." 
+                                   FontSize="11.5" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <controls:ToggleSwitch x:Name="ToggleNovaStartup" Grid.Column="1" VerticalAlignment="Center"
+                                           CheckedChanged="ToggleNovaStartup_CheckedChanged"/>
+                </Grid>
+            </Border>
+
             <Grid Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="STARTUP APPLICATION AUDITOR" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
@@ -75,7 +97,10 @@
                         <TextBlock x:Name="TxtStartupCount" Text="0 Items Found" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
                     </Border>
                 </StackPanel>
-                <Button Content="↺ Refresh List" HorizontalAlignment="Right" Style="{StaticResource SecondaryButton}" Padding="10,5" FontSize="11" Click="BtnRefreshStartup_Click"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                    <Button Content="➕ Add App" Style="{StaticResource PrimaryButton}" Padding="12,5" FontSize="11" Margin="0,0,8,0" Click="BtnAddStartup_Click"/>
+                    <Button Content="↺ Refresh List" Style="{StaticResource SecondaryButton}" Padding="10,5" FontSize="11" Click="BtnRefreshStartup_Click"/>
+                </StackPanel>
             </Grid>
 
             <Border Style="{StaticResource CardPanel}" Padding="0">

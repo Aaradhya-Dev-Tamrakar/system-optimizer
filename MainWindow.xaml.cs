@@ -27,6 +27,7 @@ namespace NovaOptimizer
         private readonly DispatcherTimer _headerTimer;
         private readonly DispatcherTimer _toastTimer;
         private TrayIconManager? _trayManager;
+        private bool _isSyncingStartupCheck;
 
         public MainWindow()
         {
@@ -152,6 +153,38 @@ namespace NovaOptimizer
             }
             catch { }
             UpdateHungBadge();
+
+            // Sync Start with Windows checkbox
+            _startupManager.OnNovaStartupChanged += (enabled) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    _isSyncingStartupCheck = true;
+                    ChkStartWithWindows.IsChecked = enabled;
+                    _isSyncingStartupCheck = false;
+                });
+            };
+
+            _isSyncingStartupCheck = true;
+            ChkStartWithWindows.IsChecked = _startupManager.IsNovaStartupEnabled();
+            _isSyncingStartupCheck = false;
+
+            // If launched at boot with --autostart, hide window into tray
+            if (System.Linq.Enumerable.Any(Environment.GetCommandLineArgs(), a => a.Equals("--autostart", StringComparison.OrdinalIgnoreCase)))
+            {
+                Hide();
+                _trayManager?.UpdateTooltip("NovaOptimizer — Running in background");
+            }
+        }
+
+        private void ChkStartWithWindows_Changed(object sender, RoutedEventArgs e)
+        {
+            if (_isSyncingStartupCheck) return;
+            bool enable = ChkStartWithWindows.IsChecked == true;
+            _startupManager.SetNovaStartup(enable);
+            ShowNotification(enable 
+                ? "NovaOptimizer registered to start with Windows." 
+                : "NovaOptimizer removed from Windows startup.", "🚀");
         }
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)

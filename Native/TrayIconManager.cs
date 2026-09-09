@@ -52,6 +52,21 @@ namespace NovaOptimizer.Native
         [DllImport("user32.dll", SetLastError = true)]
         private static extern bool DestroyIcon(IntPtr hIcon);
 
+        [DllImport("user32.dll")]
+        private static extern int GetSystemMetrics(int nIndex);
+
+        [DllImport("user32.dll")]
+        private static extern bool SetForegroundWindow(IntPtr hWnd);
+
+        [DllImport("shell32.dll", CharSet = CharSet.Auto)]
+        private static extern int ExtractIconEx(string lpszFile, int nIconIndex, out IntPtr phiconLarge, out IntPtr phiconSmall, int nIcons);
+
+        [DllImport("user32.dll", EntryPoint = "LoadIconW")]
+        private static extern IntPtr Win32LoadIcon(IntPtr hInstance, IntPtr lpIconName);
+
+        private const int SM_CXSMICON = 49;
+        private const int SM_CYSMICON = 50;
+
         private readonly Window _window;
         private IntPtr _hWnd;
         private IntPtr _hIcon;
@@ -81,10 +96,70 @@ namespace NovaOptimizer.Native
         {
             try
             {
+                int cx = GetSystemMetrics(SM_CXSMICON);
+                int cy = GetSystemMetrics(SM_CYSMICON);
+                if (cx <= 0) cx = 16;
+                if (cy <= 0) cy = 16;
+
+                // 1. Primary: Assets folder in BaseDirectory
                 string iconPath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Assets", "icon.ico");
                 if (File.Exists(iconPath))
                 {
-                    _hIcon = LoadImage(IntPtr.Zero, iconPath, 1 /*IMAGE_ICON*/, 16, 16, 0x00000010 /*LR_LOADFROMFILE*/);
+                    _hIcon = LoadImage(IntPtr.Zero, iconPath, 1 /*IMAGE_ICON*/, cx, cy, 0x00000010 /*LR_LOADFROMFILE*/);
+                    if (_hIcon != IntPtr.Zero) return;
+                }
+
+                // 2. Fallback: Search parent directories (useful during dev / test runs)
+                string? dir = AppDomain.CurrentDomain.BaseDirectory;
+                for (int i = 0; i < 4 && dir != null; i++)
+                {
+                    string candidate = Path.Combine(dir, "Assets", "icon.ico");
+                    if (File.Exists(candidate))
+                    {
+                        _hIcon = LoadImage(IntPtr.Zero, candidate, 1, cx, cy, 0x00000010);
+                        if (_hIcon != IntPtr.Zero) return;
+                    }
+                    dir = Directory.GetParent(dir)?.FullName;
+                }
+
+                // 3. Fallback: Extract from embedded WPF resource
+                try
+                {
+                    var sri = Application.GetResourceStream(new Uri("pack://application:,,,/Assets/icon.ico"));
+                    if (sri != null)
+                    {
+                        string tempPath = Path.Combine(Path.GetTempPath(), "NovaOptimizer_tray_icon.ico");
+                        using (var src = sri.Stream)
+                        using (var dst = File.Create(tempPath))
+                        {
+                            src.CopyTo(dst);
+                        }
+                        if (File.Exists(tempPath))
+                        {
+                            _hIcon = LoadImage(IntPtr.Zero, tempPath, 1, cx, cy, 0x00000010);
+                            if (_hIcon != IntPtr.Zero) return;
+                        }
+                    }
+                }
+                catch { }
+
+                // 4. Fallback: Extract embedded icon from executable PE resource
+                string? procPath = Environment.ProcessPath;
+                if (!string.IsNullOrEmpty(procPath) && File.Exists(procPath))
+                {
+                    ExtractIconEx(procPath, 0, out IntPtr hLarge, out IntPtr hSmall, 1);
+                    _hIcon = hSmall != IntPtr.Zero ? hSmall : hLarge;
+                    if (hLarge != IntPtr.Zero && hLarge != _hIcon)
+                    {
+                        DestroyIcon(hLarge);
+                    }
+                    if (_hIcon != IntPtr.Zero) return;
+                }
+
+                // 5. Ultimate fallback: System application icon
+                if (_hIcon == IntPtr.Zero)
+                {
+                    _hIcon = Win32LoadIcon(IntPtr.Zero, (IntPtr)32512 /* IDI_APPLICATION */);
                 }
             }
             catch { }
@@ -92,12 +167,18 @@ namespace NovaOptimizer.Native
 
         private void AddTrayIcon()
         {
+            uint flags = NIF_MESSAGE | NIF_TIP;
+            if (_hIcon != IntPtr.Zero)
+            {
+                flags |= NIF_ICON;
+            }
+
             var data = new NOTIFYICONDATA
             {
                 cbSize = (uint)Marshal.SizeOf(typeof(NOTIFYICONDATA)),
                 hWnd = _hWnd,
                 uID = 1001,
-                uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP,
+                uFlags = flags,
                 uCallbackMessage = WM_TRAYICON,
                 hIcon = _hIcon,
                 szTip = "NovaOptimizer — High-Perf System Optimizer"
@@ -174,6 +255,7 @@ namespace NovaOptimizer.Native
                 }
                 else if (mouseMsg == WM_RBUTTONUP)
                 {
+                    SetForegroundWindow(_hWnd);
                     _contextMenu.IsOpen = true;
                     handled = true;
                 }

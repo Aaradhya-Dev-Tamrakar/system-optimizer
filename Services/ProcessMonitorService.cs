@@ -249,6 +249,11 @@ namespace NovaOptimizer.Services
             }
         }
 
+        public bool TameProcess(int pid)
+        {
+            return NativeMethods.TameProcess(pid);
+        }
+
         public bool TrimProcessRam(int pid)
         {
             try

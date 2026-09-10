@@ -113,6 +113,20 @@ namespace NovaOptimizer.Models
         public bool HasWindow { get; set; }
         public System.Windows.Media.ImageSource? Icon { get; set; }
 
+        private bool _isThrottled;
+        public bool IsThrottled
+        {
+            get => _isThrottled || string.Equals(Priority, "Idle", StringComparison.OrdinalIgnoreCase);
+            set
+            {
+                if (_isThrottled != value)
+                {
+                    _isThrottled = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public bool IsHighRam => WorkingSetMB >= 500;
         public bool IsHighCpu => CpuPercent >= 5.0;
         public bool IsHung => Status == "Not Responding";
@@ -128,6 +142,7 @@ namespace NovaOptimizer.Models
             Priority = other.Priority;
             Status = other.Status;
             HasWindow = other.HasWindow;
+            IsThrottled = other.IsThrottled;
             if (Icon == null && other.Icon != null)
                 Icon = other.Icon;
             if (string.IsNullOrEmpty(Description) && !string.IsNullOrEmpty(other.Description))

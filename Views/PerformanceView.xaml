@@ -11,8 +11,8 @@
             <!-- Header -->
             <StackPanel Margin="0,0,0,24">
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                    <TextBlock Text="HARDWARE TELEMETRY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
-                    <TextBlock Text=" • REAL-TIME NT KERNEL MONITOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text="HARDWARE TELEMETRY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text=" • REAL-TIME NT KERNEL MONITOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDisabled}"/>
                 </StackPanel>
                 <TextBlock Text="System Performance &amp; Resources" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"/>
                 <TextBlock Text="Live utilization metrics, rolling history charts, and Windows NT memory architecture telemetry." 
@@ -35,7 +35,7 @@
                                 <TextBlock Text="⚡ " FontSize="16"/>
                                 <TextBlock Text="CPU Utilization" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <TextBlock x:Name="TxtCpuOverall" Text="12%" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentCyan}" HorizontalAlignment="Right"/>
+                            <TextBlock x:Name="TxtCpuOverall" Text="12%" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentPrimary}" HorizontalAlignment="Right"/>
                         </Grid>
                         
                         <ProgressBar x:Name="PbCpu" Height="8" Background="{StaticResource BgCardSubtle}" Foreground="{StaticResource AccentPrimary}" BorderThickness="0" Value="12" Margin="0,0,0,14"/>
@@ -55,10 +55,10 @@
                                 <TextBlock Text="💾 " FontSize="16"/>
                                 <TextBlock Text="Memory Usage" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                             </StackPanel>
-                            <TextBlock x:Name="TxtRamOverall" Text="45%" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentPurple}" HorizontalAlignment="Right"/>
+                            <TextBlock x:Name="TxtRamOverall" Text="45%" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentIndigo}" HorizontalAlignment="Right"/>
                         </Grid>
                         
-                        <ProgressBar x:Name="PbRam" Height="8" Background="{StaticResource BgCardSubtle}" Foreground="{StaticResource AccentPurple}" BorderThickness="0" Value="45" Margin="0,0,0,14"/>
+                        <ProgressBar x:Name="PbRam" Height="8" Background="{StaticResource BgCardSubtle}" Foreground="{StaticResource AccentIndigo}" BorderThickness="0" Value="45" Margin="0,0,0,14"/>
 
                         <StackPanel Margin="0,0,0,4">
                             <TextBlock x:Name="TxtRamTotals" Text="7.2 / 16.0 GB Installed" FontSize="13" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}"/>
@@ -80,13 +80,13 @@
                                        LineBrush="{StaticResource AccentPrimary}" Unit="%" MaxValue="100"/>
 
                 <controls:HistoryGraph x:Name="GraphRam" Grid.Column="2" Height="140" Title="MEMORY UTILIZATION (60s)" 
-                                       LineBrush="{StaticResource AccentPurple}" Unit="%" MaxValue="100"/>
+                                       LineBrush="{StaticResource AccentIndigo}" Unit="%" MaxValue="100"/>
             </Grid>
 
             <!-- Detailed Architecture Specifications Card -->
             <Border Style="{StaticResource CardPanel}">
                 <StackPanel>
-                    <TextBlock Text="KERNEL &amp; MEMORY ARCHITECTURE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,0,0,6"/>
+                    <TextBlock Text="KERNEL &amp; MEMORY ARCHITECTURE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,6"/>
                     <TextBlock Text="Windows Performance Subsystem" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,16"/>
 
                     <Grid>
@@ -115,7 +115,7 @@
                         <Border Grid.Row="0" Grid.Column="2" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
                             <StackPanel>
                                 <TextBlock Text="Cached Standby" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock x:Name="TxtCached" Text="4.1 GB" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentPurple}" Margin="0,4,0,0"/>
+                                <TextBlock x:Name="TxtCached" Text="4.1 GB" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentIndigo}" Margin="0,4,0,0"/>
                             </StackPanel>
                         </Border>
 
@@ -147,7 +147,7 @@
                         <Border Grid.Row="2" Grid.Column="4" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
                             <StackPanel>
                                 <TextBlock Text="System Uptime" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
-                                <TextBlock x:Name="TxtUptime" Text="0d 05h 22m 14s" FontSize="14" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,4,0,0"/>
+                                <TextBlock x:Name="TxtUptime" Text="0d 05h 22m 14s" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
                             </StackPanel>
                         </Border>
                     </Grid>

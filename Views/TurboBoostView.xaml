@@ -6,13 +6,14 @@
              xmlns:controls="clr-namespace:NovaOptimizer.Controls"
              mc:Ignorable="d" 
              d:DesignHeight="700" d:DesignWidth="900">
-    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+    <ScrollViewer x:Name="RootScrollViewer" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled"
+                  RequestBringIntoView="ScrollViewer_RequestBringIntoView">
         <StackPanel Margin="28,24" MaxWidth="960">
             <!-- Header section -->
             <StackPanel Margin="0,0,0,24">
                 <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                    <TextBlock Text="TURBO BOOST &amp; RAM PURGE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
-                    <TextBlock Text=" • KERNEL-LEVEL ACCELERATION" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text="TURBO BOOST &amp; RAM PURGE" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text=" • KERNEL-LEVEL ACCELERATION" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDisabled}"/>
                 </StackPanel>
                 <TextBlock Text="System Acceleration Profiles" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"/>
                 <TextBlock Text="Select a mode to suppress unnecessary background telemetry, pause latency-inducing services, and optimize physical memory allocation." 
@@ -20,7 +21,7 @@
             </StackPanel>
 
             <!-- Main Profiles Grid -->
-            <Grid Margin="0,0,0,24">
+            <Grid Margin="0,0,0,20">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="14"/>
@@ -42,12 +43,12 @@
                         <!-- Header with Active Badge -->
                         <Grid Grid.Row="0" Margin="0,0,0,12">
                             <StackPanel Orientation="Horizontal">
-                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource BadgeBgInfo}" BorderBrush="{StaticResource BadgeBorderInfo}" BorderThickness="1" Margin="0,0,10,0">
+                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Margin="0,0,10,0">
                                     <TextBlock Text="🎮" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Game Boost" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                                    <TextBlock Text="Zero Stutter &amp; Max FPS" FontSize="11" Foreground="{StaticResource AccentIndigo}"/>
+                                    <TextBlock Text="Zero Stutter &amp; Max FPS" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                                 </StackPanel>
                             </StackPanel>
 
@@ -68,7 +69,7 @@
                         </StackPanel>
 
                         <Button x:Name="BtnGameBoost" Grid.Row="3" Content="Activate Game Boost" Style="{StaticResource PrimaryButton}" 
-                                Background="{StaticResource AccentIndigo}" Foreground="White" Click="BtnGameBoost_Click"/>
+                                Background="{StaticResource AccentPrimary}" Foreground="White" Click="BtnGameBoost_Click"/>
                     </Grid>
                 </Border>
 
@@ -85,12 +86,12 @@
                         <!-- Header with Active Badge -->
                         <Grid Grid.Row="0" Margin="0,0,0,12">
                             <StackPanel Orientation="Horizontal">
-                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Margin="0,0,10,0">
+                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Margin="0,0,10,0">
                                     <TextBlock Text="💼" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Work / Dev Boost" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                                    <TextBlock Text="IDEs &amp; Productivity" FontSize="11" Foreground="{StaticResource AccentPrimary}"/>
+                                    <TextBlock Text="IDEs &amp; Productivity" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                                 </StackPanel>
                             </StackPanel>
 
@@ -111,7 +112,7 @@
                         </StackPanel>
 
                         <Button x:Name="BtnWorkBoost" Grid.Row="3" Content="Activate Work Boost" Style="{StaticResource PrimaryButton}" 
-                                Background="{StaticResource AccentPrimary}" Foreground="#090C10" Click="BtnWorkBoost_Click"/>
+                                Background="{StaticResource AccentPrimary}" Foreground="White" Click="BtnWorkBoost_Click"/>
                     </Grid>
                 </Border>
 
@@ -121,26 +122,25 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
                             <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
                         <!-- Header -->
                         <Grid Grid.Row="0" Margin="0,0,0,12">
                             <StackPanel Orientation="Horizontal">
-                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Margin="0,0,10,0">
+                                <Border Width="40" Height="40" CornerRadius="10" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Margin="0,0,10,0">
                                     <TextBlock Text="📚" FontSize="20" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                                 </Border>
                                 <StackPanel VerticalAlignment="Center">
                                     <TextBlock Text="Study Mode" FontSize="16" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
-                                    <TextBlock Text="Distraction Free &amp; Quiet" FontSize="11" Foreground="{StaticResource AccentBlue}"/>
+                                    <TextBlock Text="Distraction Free &amp; Quiet" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                                 </StackPanel>
                             </StackPanel>
 
                             <Border x:Name="BadgeStudyActive" CornerRadius="6" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1"
                                     HorizontalAlignment="Right" VerticalAlignment="Top" Padding="6,2" Visibility="Collapsed">
-                                <TextBlock Text="● ACTIVE" FontSize="9.5" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
+                                <TextBlock Text="● ACTIVE" FontSize="9.5" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                             </Border>
                         </Grid>
 
@@ -149,86 +149,162 @@
                                    TextWrapping="Wrap" FontSize="12" LineHeight="17" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14"/>
 
                         <!-- Bullet points -->
-                        <StackPanel Grid.Row="2" Margin="0,0,0,14">
-                            <TextBlock Text="• Distraction apps terminated (Discord, Spotify)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• Balanced power plan (cool, quiet fans)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
-                            <TextBlock Text="• Telemetry &amp; SuperFetch paused" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2"/>
+                        <StackPanel Grid.Row="2" Margin="0,0,0,16">
+                            <TextBlock Text="• Distraction apps terminated (Discord, Spotify)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
+                            <TextBlock Text="• Balanced power plan (cool, quiet fans)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
+                            <TextBlock Text="• Telemetry &amp; SuperFetch paused" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
+                            <TextBlock Text="• Ideal companion for Focus / Pomodoro" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                         </StackPanel>
 
                         <!-- Activate Button -->
                         <Button x:Name="BtnStudyMode" Grid.Row="3" Content="Activate Study Mode" Style="{StaticResource PrimaryButton}" 
-                                Background="{StaticResource AccentBlue}" Foreground="White" Margin="0,0,0,14" Click="BtnStudyMode_Click"/>
-
-                        <!-- Built-in Pomodoro Focus Box -->
-                        <Border Grid.Row="4" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
-                            <StackPanel>
-                                <Grid Margin="0,0,0,4">
-                                    <TextBlock x:Name="TxtPomodoroPhase" Text="📖 Focus Session" FontSize="12" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
-                                    <TextBlock x:Name="TxtPomodoroCounter" Text="Session #1" FontSize="11" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right"/>
-                                </Grid>
-
-                                <!-- Countdown Display -->
-                                <TextBlock x:Name="TxtPomodoroCountdown" Text="25:00" FontSize="28" FontWeight="Black" Foreground="{StaticResource TextPrimary}" HorizontalAlignment="Center" Margin="0,2,0,8"/>
-
-                                <!-- Quick Presets Row -->
-                                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
-                                    <Button Content="25/5" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10" Margin="0,0,4,0" Click="Preset25_Click" ToolTip="Standard Pomodoro"/>
-                                    <Button Content="50/10" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10" Margin="0,0,4,0" Click="Preset50_Click" ToolTip="Deep Work Block"/>
-                                    <Button Content="90/15" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10" Click="Preset90_Click" ToolTip="Ultradian Rhythm"/>
-                                </StackPanel>
-
-                                <!-- Duration Inputs (Focus & Break) -->
-                                <Grid Margin="0,0,0,8">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="6"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <StackPanel Grid.Column="0">
-                                        <TextBlock Text="Focus (m)" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
-                                        <TextBox x:Name="TxtFocusMins" Text="25" Style="{StaticResource DarkTextBox}" FontSize="11" Padding="6,3" HorizontalContentAlignment="Center"/>
-                                    </StackPanel>
-
-                                    <StackPanel Grid.Column="2">
-                                        <TextBlock Text="Break (m)" FontSize="10" Foreground="{StaticResource TextMuted}" Margin="0,0,0,2"/>
-                                        <TextBox x:Name="TxtBreakMins" Text="5" Style="{StaticResource DarkTextBox}" FontSize="11" Padding="6,3" HorizontalContentAlignment="Center"/>
-                                    </StackPanel>
-                                </Grid>
-
-                                <!-- Controls -->
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="2*"/>
-                                        <ColumnDefinition Width="6"/>
-                                        <ColumnDefinition Width="*"/>
-                                    </Grid.ColumnDefinitions>
-
-                                    <Button x:Name="BtnPomodoroToggle" Grid.Column="0" Content="▶ Start Timer" Style="{StaticResource PrimaryButton}" 
-                                            Background="{StaticResource BadgeBgPrimary}" Foreground="{StaticResource AccentPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" FontSize="11" Padding="8,5" Click="BtnPomodoroToggle_Click"/>
-                                    <Button x:Name="BtnPomodoroReset" Grid.Column="2" Content="↺ Reset" Style="{StaticResource SecondaryButton}" 
-                                            FontSize="11" Padding="6,5" Click="BtnPomodoroReset_Click"/>
-                                </Grid>
-                            </StackPanel>
-                        </Border>
+                                Background="{StaticResource AccentPrimary}" Foreground="White" Click="BtnStudyMode_Click"/>
                     </Grid>
                 </Border>
             </Grid>
 
-            <!-- Memory Breakdown & Deep Purge Card -->
-            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,24">
+            <!-- Acer Hardware Cooling & Fan Profiles Card -->
+            <Border x:Name="CardAcerCooling" Style="{StaticResource CardPanel}" Margin="0,0,0,20">
                 <StackPanel>
                     <Grid Margin="0,0,0,16">
                         <StackPanel>
-                            <TextBlock Text="PHYSICAL MEMORY ALLOCATION" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentGreen}" Margin="0,0,0,4"/>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
+                                <TextBlock Text="ACER HARDWARE COOLING &amp; FAN PROFILES" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                                <TextBlock Text=" • FIRMWARE ACPI LINK" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDisabled}"/>
+                            </StackPanel>
+                            <TextBlock Text="Hardware Fan Speed &amp; Thermal Modes" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                        </StackPanel>
+                        
+                        <!-- Real-time Status Badge & Telemetry -->
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Border x:Name="BadgeAcerProfile" CornerRadius="6" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Padding="10,3" Margin="0,0,10,0">
+                                <TextBlock x:Name="TxtAcerActiveProfile" Text="● Balanced (Factory Curve)" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                            </Border>
+                            <Border CornerRadius="6" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10,3">
+                                <StackPanel Orientation="Horizontal">
+                                    <TextBlock Text="Fan 1: " FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock x:Name="TxtCpuFanRpm" Text="Auto" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,0,8,0"/>
+                                    <TextBlock Text="Fan 2: " FontSize="11" Foreground="{StaticResource TextMuted}"/>
+                                    <TextBlock x:Name="TxtGpuFanRpm" Text="Auto" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <TextBlock Text="Direct hardware link to Acer Embedded Controller. Hardware thermal watchdog remains active at all times. Automatically synchronizes with Game Boost, Work Boost, and Study Mode." 
+                               FontSize="12" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14" TextWrapping="Wrap"/>
+
+                    <!-- Profile Selection Buttons Grid -->
+                    <Grid Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="10"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <!-- Quiet Button -->
+                        <Button x:Name="BtnCoolingQuiet" Grid.Column="0" Style="{StaticResource SecondaryButton}" Padding="10,12" Click="BtnCoolingQuiet_Click">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="🌙 Quiet" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                <TextBlock Text="Whisper-silent fans" FontSize="10.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Balanced Button -->
+                        <Button x:Name="BtnCoolingBalanced" Grid.Column="2" Style="{StaticResource SecondaryButton}" Padding="10,12" Click="BtnCoolingBalanced_Click">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="⚖️ Balanced" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                <TextBlock Text="Factory standard curve" FontSize="10.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Performance Button -->
+                        <Button x:Name="BtnCoolingPerformance" Grid.Column="4" Style="{StaticResource SecondaryButton}" Padding="10,12" Click="BtnCoolingPerformance_Click">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="⚡ Performance" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                <TextBlock Text="Aggressive cooling" FontSize="10.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+
+                        <!-- Turbo Button -->
+                        <Button x:Name="BtnCoolingTurbo" Grid.Column="6" Style="{StaticResource SecondaryButton}" Padding="10,12" Click="BtnCoolingTurbo_Click">
+                            <StackPanel HorizontalAlignment="Center">
+                                <TextBlock Text="🔥 Turbo / Max" FontSize="13" FontWeight="Bold" HorizontalAlignment="Center" Margin="0,0,0,2"/>
+                                <TextBlock Text="Maximum RPM dissipation" FontSize="10.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <TextBlock x:Name="TxtHardwareLinkNote" Text="Firmware Link: Acer Swift Go 16 (SFG16-72) • Hardware Safety Watchdog Active" 
+                               FontSize="10.5" Foreground="{StaticResource TextMuted}" Margin="2,4,0,0"/>
+                </StackPanel>
+            </Border>
+
+            <!-- Dedicated Pomodoro Focus Session Strip -->
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,20" Padding="18,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="210"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="16"/>
+                        <ColumnDefinition Width="190"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Left: Countdown & Phase -->
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,2">
+                            <TextBlock x:Name="TxtPomodoroPhase" Text="📖 Focus Session" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                            <TextBlock x:Name="TxtPomodoroCounter" Text="Session #1" FontSize="11" Foreground="{StaticResource TextMuted}" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock x:Name="TxtPomodoroCountdown" Text="25:00" FontSize="30" FontWeight="Black" Foreground="{StaticResource TextPrimary}"/>
+                    </StackPanel>
+
+                    <!-- Center: Quick Presets & Duration Inputs -->
+                    <StackPanel Grid.Column="2" VerticalAlignment="Center">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+                            <TextBlock Text="Quick Presets:" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Button Content="25/5 Standard" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10.5" Margin="0,0,6,0" Click="Preset25_Click" ToolTip="Standard Pomodoro"/>
+                            <Button Content="50/10 Deep" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10.5" Margin="0,0,6,0" Click="Preset50_Click" ToolTip="Deep Work Block"/>
+                            <Button Content="90/15 Rhythm" Style="{StaticResource SecondaryButton}" Padding="8,3" FontSize="10.5" Click="Preset90_Click" ToolTip="Ultradian Rhythm"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Focus (m):" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox x:Name="TxtFocusMins" Text="25" Style="{StaticResource DarkTextBox}" FontSize="11" Padding="8,3" Width="44" HorizontalContentAlignment="Center" Margin="0,0,14,0"/>
+                            <TextBlock Text="Break (m):" FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                            <TextBox x:Name="TxtBreakMins" Text="5" Style="{StaticResource DarkTextBox}" FontSize="11" Padding="8,3" Width="44" HorizontalContentAlignment="Center"/>
+                        </StackPanel>
+                    </StackPanel>
+
+                    <!-- Right: Action Buttons -->
+                    <StackPanel Grid.Column="4" VerticalAlignment="Center">
+                        <Button x:Name="BtnPomodoroToggle" Content="▶ Start Timer" Style="{StaticResource PrimaryButton}" 
+                                Background="{StaticResource BadgeBgPrimary}" Foreground="{StaticResource AccentPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" FontSize="11.5" Padding="12,6" Margin="0,0,0,6" Click="BtnPomodoroToggle_Click"/>
+                        <Button x:Name="BtnPomodoroReset" Content="↺ Reset Timer" Style="{StaticResource SecondaryButton}" 
+                                FontSize="11" Padding="10,4" Click="BtnPomodoroReset_Click"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Memory Breakdown & Deep Purge Card -->
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="PHYSICAL MEMORY ALLOCATION" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                             <TextBlock Text="Real-Time RAM Architecture" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                         </StackPanel>
                         <Button x:Name="BtnDeepClean" Content="🧹 Deep RAM Purge Now" HorizontalAlignment="Right" Style="{StaticResource PrimaryButton}" 
-                                Background="{StaticResource AccentGreen}" Foreground="#090C10" Padding="14,8" Click="BtnDeepClean_Click"/>
+                                Padding="14,7" Click="BtnDeepClean_Click"/>
                     </Grid>
 
                     <!-- Multi-Segment Visual Progress Bar with Rounded Corners -->
-                    <Border Height="24" CornerRadius="8" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Margin="0,0,0,14" ClipToBounds="True">
+                    <Border Height="20" CornerRadius="6" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Margin="0,0,0,14" ClipToBounds="True">
                         <Grid x:Name="RamBarContainer">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition x:Name="ColInUse" Width="45*"/>
@@ -237,8 +313,8 @@
                             </Grid.ColumnDefinitions>
 
                             <Border Grid.Column="0" Background="{StaticResource AccentPrimary}" ToolTip="Active In-Use Memory"/>
-                            <Border Grid.Column="1" Background="{StaticResource AccentPurple}" ToolTip="Cached Standby Memory"/>
-                            <Border Grid.Column="2" Background="{StaticResource AccentGreen}" ToolTip="Free Unallocated Memory"/>
+                            <Border Grid.Column="1" Background="{StaticResource AccentIndigo}" ToolTip="Cached Standby Memory"/>
+                            <Border Grid.Column="2" Background="{StaticResource BorderCardHover}" ToolTip="Free Unallocated Memory"/>
                         </Grid>
                     </Border>
 
@@ -266,7 +342,7 @@
                         <!-- Standby -->
                         <Border Grid.Column="2" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12,10">
                             <StackPanel Orientation="Horizontal">
-                                <Border Width="10" Height="10" CornerRadius="3" Background="{StaticResource AccentPurple}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <Border Width="10" Height="10" CornerRadius="3" Background="{StaticResource AccentIndigo}" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <StackPanel>
                                     <TextBlock Text="Standby Cache" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                                     <TextBlock x:Name="TxtStandby" Text="4.1 GB (25%)" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,2,0,0"/>
@@ -277,7 +353,7 @@
                         <!-- Free -->
                         <Border Grid.Column="4" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12,10">
                             <StackPanel Orientation="Horizontal">
-                                <Border Width="10" Height="10" CornerRadius="3" Background="{StaticResource AccentGreen}" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                                <Border Width="10" Height="10" CornerRadius="3" Background="{StaticResource BorderCardHover}" Margin="0,0,10,0" VerticalAlignment="Center"/>
                                 <StackPanel>
                                     <TextBlock Text="Free Unallocated" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
                                     <TextBlock x:Name="TxtFree" Text="4.7 GB (30%)" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" Margin="0,2,0,0"/>
@@ -288,18 +364,91 @@
                 </StackPanel>
             </Border>
 
+            <!-- CPU Busy Cleaner & Hog Tamer Card -->
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,20">
+                <StackPanel>
+                    <Grid Margin="0,0,0,16">
+                        <StackPanel>
+                            <TextBlock Text="CPU COOLDOWN &amp; BUSY PROCESS CLEANER" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" Margin="0,0,0,4"/>
+                            <TextBlock Text="Real-Time CPU Load &amp; Background Hog Tamer" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                        </StackPanel>
+                        
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <Button x:Name="BtnTameCpuHogs" Content="⚡ Tame CPU Hogs Now" Style="{StaticResource PrimaryButton}"
+                                    Padding="14,7" Click="BtnTameCpuHogs_Click" Margin="0,0,12,0"/>
+                            <Border CornerRadius="6" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="8,4">
+                                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                    <TextBlock Text="Auto-Tame:" FontSize="11.5" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                    <controls:ToggleSwitch x:Name="ToggleAutoTameCpu" AccentBrush="{StaticResource AccentCyan}" CheckedChanged="ToggleAutoTameCpu_CheckedChanged"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- CPU Utilization Bar with Status Badge -->
+                    <Grid Margin="0,0,0,14">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
+                        <Border Height="18" CornerRadius="6" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" ClipToBounds="True">
+                            <Grid>
+                                <ProgressBar x:Name="PbCpuUsage" Height="18" Minimum="0" Maximum="100" Value="15" 
+                                             Background="Transparent" Foreground="{StaticResource AccentCyan}" BorderThickness="0"/>
+                            </Grid>
+                        </Border>
+                        <Border Grid.Column="1" x:Name="BadgeCpuLoad" CornerRadius="6" Background="{StaticResource BadgeBgSuccess}" BorderBrush="{StaticResource BadgeBorderSuccess}" BorderThickness="1" Padding="10,2" Margin="12,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="TxtCpuLoadStatus" Text="Optimal (12%)" FontSize="11.5" FontWeight="Bold" Foreground="{StaticResource AccentGreen}"/>
+                        </Border>
+                    </Grid>
+
+                    <!-- Top CPU Consumers Row -->
+                    <Grid Margin="0,0,0,6">
+                        <TextBlock Text="Top Background CPU Consumers" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                        <TextBlock Text="Shielded: Foreground Active App + Protected OS Processes" FontSize="10.5" Foreground="{StaticResource TextMuted}" HorizontalAlignment="Right"/>
+                    </Grid>
+
+                    <Border Background="{StaticResource BgCardSubtle}" CornerRadius="8" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10" Margin="0,0,0,4">
+                        <ItemsControl x:Name="IcTopCpuHogs">
+                            <ItemsControl.ItemsPanel>
+                                <ItemsPanelTemplate>
+                                    <WrapPanel Orientation="Horizontal"/>
+                                </ItemsPanelTemplate>
+                            </ItemsControl.ItemsPanel>
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{StaticResource BgCard}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="6" Padding="8,4" Margin="0,0,8,6">
+                                        <StackPanel Orientation="Horizontal">
+                                            <TextBlock Text="⚡" FontSize="11" Foreground="{StaticResource AccentCyan}" Margin="0,0,5,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding Name}" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                                            <Border Background="{StaticResource BadgeBgPrimary}" CornerRadius="4" Padding="5,1" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding CpuPercent, StringFormat={}{0:F1}%}" FontSize="10.5" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                                            </Border>
+                                            <Button Content="Tame" Style="{StaticResource SecondaryButton}" FontSize="10" Padding="6,1" Margin="6,0,0,0" Tag="{Binding Pid}" Click="BtnTameSingleHog_Click"/>
+                                        </StackPanel>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </Border>
+                    
+                    <TextBlock Text="Taming engages Windows EcoQoS (Efficiency Mode) and sets process priority to Idle, dropping CPU contention and cooling down fans instantly." 
+                               FontSize="11" Foreground="{StaticResource TextMuted}" Margin="2,4,0,0"/>
+                </StackPanel>
+            </Border>
+
             <!-- Auto-RAM Watchdog & Activity Log Card -->
             <Border Style="{StaticResource CardPanel}">
                 <StackPanel>
                     <Grid Margin="0,0,0,12">
                         <StackPanel>
-                            <TextBlock Text="INTELLIGENT WATCHDOG" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentOrange}" Margin="0,0,0,4"/>
+                            <TextBlock Text="INTELLIGENT WATCHDOG" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
                             <TextBlock Text="Silent Background Memory Cleaner" FontSize="17" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
                         </StackPanel>
                         
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                             <TextBlock Text="Auto-Purge:" FontSize="12" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center" Margin="0,0,8,0"/>
-                            <controls:ToggleSwitch x:Name="ToggleAutoClean" AccentBrush="{StaticResource AccentOrange}" CheckedChanged="ToggleAutoClean_CheckedChanged"/>
+                            <controls:ToggleSwitch x:Name="ToggleAutoClean" AccentBrush="{StaticResource AccentPrimary}" CheckedChanged="ToggleAutoClean_CheckedChanged"/>
                         </StackPanel>
                     </Grid>
 
@@ -309,7 +458,7 @@
                     <!-- Activity Log -->
                     <Grid Margin="0,0,0,6">
                         <TextBlock Text="Recent Optimization Activity" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
-                        <TextBlock Text="Real-Time" FontSize="10.5" Foreground="{StaticResource AccentGreen}" HorizontalAlignment="Right"/>
+                        <TextBlock Text="Real-Time" FontSize="10.5" Foreground="{StaticResource TextSecondary}" HorizontalAlignment="Right"/>
                     </Grid>
                     
                     <Border Background="{StaticResource BgCardSubtle}" CornerRadius="8" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Height="110" Padding="10">

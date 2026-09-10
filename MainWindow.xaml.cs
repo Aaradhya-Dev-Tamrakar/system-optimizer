@@ -12,11 +12,13 @@ namespace NovaOptimizer
     public partial class MainWindow : Window
     {
         private readonly RamOptimizerService _ramOptimizer;
+        private readonly CpuOptimizerService _cpuOptimizer;
         private readonly ProcessMonitorService _processMonitor;
         private readonly TurboBoostService _turboBoost;
         private readonly StartupManagerService _startupManager;
         private readonly SystemTweakService _systemTweaks;
         private readonly HungProcessWatchdogService _hungWatchdog;
+        private readonly AcerHardwareCoolingService _acerCooling;
 
         private readonly TurboBoostView _boostView;
         private readonly ProcessesView _processesView;
@@ -35,14 +37,16 @@ namespace NovaOptimizer
 
             // Initialize Services
             _ramOptimizer = new RamOptimizerService();
+            _cpuOptimizer = new CpuOptimizerService();
             _processMonitor = new ProcessMonitorService();
-            _turboBoost = new TurboBoostService(_ramOptimizer);
+            _acerCooling = new AcerHardwareCoolingService();
+            _turboBoost = new TurboBoostService(_ramOptimizer, _acerCooling);
             _startupManager = new StartupManagerService();
             _systemTweaks = new SystemTweakService();
             _hungWatchdog = new HungProcessWatchdogService();
 
             // Initialize Views
-            _boostView = new TurboBoostView(_ramOptimizer, _turboBoost);
+            _boostView = new TurboBoostView(_ramOptimizer, _turboBoost, _cpuOptimizer, _acerCooling);
             _processesView = new ProcessesView(_processMonitor);
             _performanceView = new PerformanceView(_ramOptimizer);
             _startupAndTweaksView = new StartupAndTweaksView(_startupManager, _systemTweaks);
@@ -69,6 +73,14 @@ namespace NovaOptimizer
                 {
                     ShowNotification($"Recovered: {record.ProcessName} after {record.DisplayDuration}", "✅");
                     UpdateHungBadge();
+                });
+            };
+
+            _cpuOptimizer.OnCpuAutoTamed += (res) =>
+            {
+                Dispatcher.Invoke(() =>
+                {
+                    ShowNotification($"❄️ Auto-Tamed: {res.TamedCount} background CPU hogs to Eco Mode!", "⚡");
                 });
             };
 
@@ -100,9 +112,9 @@ namespace NovaOptimizer
                     else
                     {
                         TxtBadgeMode.Text = "🚀 Standard";
-                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentPurple");
+                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("TextSecondary");
                         BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDefault");
-                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderDefault");
+                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BorderCard");
                     }
                 });
             };
@@ -114,14 +126,15 @@ namespace NovaOptimizer
             _performanceView.PauseMonitoring();
             _hungLogView.PauseMonitoring();
 
-            // Timer for header RAM update
+            // Timer for header CPU and RAM updates
             _headerTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
             _headerTimer.Tick += (s, e) =>
             {
+                double cpu = _cpuOptimizer.GetSystemCpuUsage();
                 var metrics = _ramOptimizer.GetMemoryMetrics();
-                string ramStr = $"RAM: {metrics.InUsePercent:F0}% ({metrics.InUseGB:F1} / {metrics.TotalPhysicalGB:F1} GB)";
-                TxtHeaderRam.Text = ramStr;
-                _trayManager?.UpdateTooltip($"NovaOptimizer — {ramStr}");
+                TxtHeaderCpu.Text = $"CPU: {cpu:F0}%";
+                TxtHeaderRam.Text = $"RAM: {metrics.InUsePercent:F0}%";
+                _trayManager?.UpdateTooltip($"NovaOptimizer — CPU: {cpu:F0}% | RAM: {metrics.InUsePercent:F0}%");
             };
             _headerTimer.Start();
 
@@ -262,9 +275,23 @@ namespace NovaOptimizer
 
             try
             {
-                long freed = await _ramOptimizer.DeepCleanRamAsync();
+                var ramTask = _ramOptimizer.DeepCleanRamAsync();
+                var cpuTask = _cpuOptimizer.CleanCpuBusyProcessesAsync(minCpuThreshold: 4.0);
+
+                await Task.WhenAll(ramTask, cpuTask);
+
+                long freed = await ramTask;
+                var cpuResult = await cpuTask;
+
                 double mb = freed / (1024.0 * 1024.0);
-                ShowNotification($"Quick Clean: {mb:F0} MB physical RAM liberated!", "✨");
+                if (cpuResult.TamedCount > 0)
+                {
+                    ShowNotification($"Quick Clean: {mb:F0} MB RAM freed & {cpuResult.TamedCount} CPU hogs tamed to Eco Mode!", "✨");
+                }
+                else
+                {
+                    ShowNotification($"Quick Clean: {mb:F0} MB RAM liberated! CPU is calm.", "✨");
+                }
             }
             catch { }
             finally

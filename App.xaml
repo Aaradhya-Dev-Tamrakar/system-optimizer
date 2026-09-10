@@ -4,48 +4,49 @@
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <!-- ============================================================ -->
-        <!-- Deep Obsidian & Precision Electric Azure Palette             -->
+        <!-- Deep Obsidian Slate & Precision Modern Azure Palette         -->
+        <!-- Professional Grade / Eye-Pleasing Balanced Contrast          -->
         <!-- ============================================================ -->
-        <SolidColorBrush x:Key="BgDark" Color="#090C10"/>
-        <SolidColorBrush x:Key="BgSidebar" Color="#0D1117"/>
-        <SolidColorBrush x:Key="BgCard" Color="#131822"/>
-        <SolidColorBrush x:Key="BgCardHover" Color="#1A2230"/>
-        <SolidColorBrush x:Key="BgCardSubtle" Color="#0E131C"/>
-        <SolidColorBrush x:Key="BgSurface" Color="#111620"/>
+        <SolidColorBrush x:Key="BgDark" Color="#0A0D14"/>
+        <SolidColorBrush x:Key="BgSidebar" Color="#0E131D"/>
+        <SolidColorBrush x:Key="BgCard" Color="#131926"/>
+        <SolidColorBrush x:Key="BgCardHover" Color="#1A2234"/>
+        <SolidColorBrush x:Key="BgCardSubtle" Color="#0D121B"/>
+        <SolidColorBrush x:Key="BgSurface" Color="#161E2D"/>
         
-        <!-- Calibrated Specular Borders -->
-        <SolidColorBrush x:Key="BorderSubtle" Color="#1B2230"/>
-        <SolidColorBrush x:Key="BorderCard" Color="#222B3D"/>
-        <SolidColorBrush x:Key="BorderCardHover" Color="#3B4A68"/>
-        <SolidColorBrush x:Key="BorderCardActive" Color="#4C6188"/>
+        <!-- Precision Specular Borders -->
+        <SolidColorBrush x:Key="BorderSubtle" Color="#172030"/>
+        <SolidColorBrush x:Key="BorderCard" Color="#1E293B"/>
+        <SolidColorBrush x:Key="BorderCardHover" Color="#334155"/>
+        <SolidColorBrush x:Key="BorderCardActive" Color="#475569"/>
 
-        <!-- Precision Accents -->
-        <SolidColorBrush x:Key="AccentPrimary" Color="#38BDF8"/>
-        <SolidColorBrush x:Key="AccentPrimaryHover" Color="#0EA5E9"/>
-        <SolidColorBrush x:Key="AccentPrimaryDark" Color="#0284C7"/>
-        <SolidColorBrush x:Key="AccentCyan" Color="#38BDF8"/>
+        <!-- Professional Grade Balanced Accents -->
+        <SolidColorBrush x:Key="AccentPrimary" Color="#3B82F6"/>
+        <SolidColorBrush x:Key="AccentPrimaryHover" Color="#2563EB"/>
+        <SolidColorBrush x:Key="AccentPrimaryDark" Color="#1D4ED8"/>
+        <SolidColorBrush x:Key="AccentCyan" Color="#06B6D4"/>
         <SolidColorBrush x:Key="AccentBlue" Color="#60A5FA"/>
         <SolidColorBrush x:Key="AccentIndigo" Color="#6366F1"/>
-        <SolidColorBrush x:Key="AccentPurple" Color="#818CF8"/>
+        <SolidColorBrush x:Key="AccentPurple" Color="#8B5CF6"/>
         <SolidColorBrush x:Key="AccentGreen" Color="#10B981"/>
         <SolidColorBrush x:Key="AccentOrange" Color="#F59E0B"/>
         <SolidColorBrush x:Key="AccentRed" Color="#F43F5E"/>
 
-        <!-- Tinted Well & Badge Backgrounds -->
-        <SolidColorBrush x:Key="BadgeBgPrimary" Color="#132B45"/>
-        <SolidColorBrush x:Key="BadgeBorderPrimary" Color="#1E4770"/>
-        <SolidColorBrush x:Key="BadgeBgSuccess" Color="#102B24"/>
-        <SolidColorBrush x:Key="BadgeBorderSuccess" Color="#1A523E"/>
-        <SolidColorBrush x:Key="BadgeBgWarning" Color="#332512"/>
-        <SolidColorBrush x:Key="BadgeBorderWarning" Color="#66491C"/>
-        <SolidColorBrush x:Key="BadgeBgDanger" Color="#35151D"/>
-        <SolidColorBrush x:Key="BadgeBorderDanger" Color="#63202E"/>
-        <SolidColorBrush x:Key="BadgeBgInfo" Color="#1F1E38"/>
-        <SolidColorBrush x:Key="BadgeBorderInfo" Color="#373566"/>
-        <SolidColorBrush x:Key="BadgeBgDefault" Color="#161D2B"/>
-        <SolidColorBrush x:Key="BadgeBorderDefault" Color="#26334A"/>
+        <!-- Harmonious Tinted Well & Badge Backgrounds -->
+        <SolidColorBrush x:Key="BadgeBgPrimary" Color="#0F2238"/>
+        <SolidColorBrush x:Key="BadgeBorderPrimary" Color="#1B3B60"/>
+        <SolidColorBrush x:Key="BadgeBgSuccess" Color="#0B271E"/>
+        <SolidColorBrush x:Key="BadgeBorderSuccess" Color="#144A37"/>
+        <SolidColorBrush x:Key="BadgeBgWarning" Color="#291E0E"/>
+        <SolidColorBrush x:Key="BadgeBorderWarning" Color="#4D3819"/>
+        <SolidColorBrush x:Key="BadgeBgDanger" Color="#2A1319"/>
+        <SolidColorBrush x:Key="BadgeBorderDanger" Color="#501E29"/>
+        <SolidColorBrush x:Key="BadgeBgInfo" Color="#171B38"/>
+        <SolidColorBrush x:Key="BadgeBorderInfo" Color="#2B3264"/>
+        <SolidColorBrush x:Key="BadgeBgDefault" Color="#131824"/>
+        <SolidColorBrush x:Key="BadgeBorderDefault" Color="#212C3E"/>
 
-        <!-- Typography Hierarchy -->
+        <!-- Typography Hierarchy (Anti-Glare, High-Legibility) -->
         <SolidColorBrush x:Key="TextPrimary" Color="#F8FAFC"/>
         <SolidColorBrush x:Key="TextSecondary" Color="#94A3B8"/>
         <SolidColorBrush x:Key="TextMuted" Color="#64748B"/>
@@ -60,10 +61,10 @@
             <Setter Property="Padding" Value="18"/>
         </Style>
 
-        <!-- Primary Button (Electric Azure with Obsidian Contrast) -->
+        <!-- Primary Button (Precision Electric Azure with Crisp White Text) -->
         <Style x:Key="PrimaryButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource AccentPrimary}"/>
-            <Setter Property="Foreground" Value="#090C10"/>
+            <Setter Property="Foreground" Value="White"/>
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="FontSize" Value="13"/>
             <Setter Property="Padding" Value="16,8"/>
@@ -77,11 +78,11 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.92"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.95"/>
                                 <Setter TargetName="border" Property="Background" Value="{StaticResource AccentPrimaryHover}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.80"/>
+                                <Setter TargetName="border" Property="Opacity" Value="0.85"/>
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
                                 <Setter TargetName="border" Property="Opacity" Value="0.35"/>
@@ -124,7 +125,7 @@
             </Setter>
         </Style>
 
-        <!-- Danger Button (Rose Tint Well with Specular Border) -->
+        <!-- Danger Button (Rose Tint Well with Calibrated Rose Border) -->
         <Style x:Key="DangerButton" TargetType="Button">
             <Setter Property="Background" Value="{StaticResource BadgeBgDanger}"/>
             <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
@@ -141,7 +142,7 @@
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Background" Value="#451A25"/>
+                                <Setter TargetName="border" Property="Background" Value="#381820"/>
                                 <Setter TargetName="border" Property="BorderBrush" Value="{StaticResource AccentRed}"/>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
@@ -303,7 +304,7 @@
         <Style TargetType="{x:Type ScrollBar}">
             <Setter Property="Stylus.IsPressAndHoldEnabled" Value="false"/>
             <Setter Property="Stylus.IsFlicksEnabled" Value="false"/>
-            <Setter Property="Foreground" Value="#252F42"/>
+            <Setter Property="Foreground" Value="#222D3D"/>
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="Width" Value="8"/>
             <Setter Property="MinWidth" Value="8"/>
@@ -331,7 +332,7 @@
                         </Grid>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="true">
-                                <Setter Property="Foreground" Value="#3B4A68"/>
+                                <Setter Property="Foreground" Value="#334155"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>

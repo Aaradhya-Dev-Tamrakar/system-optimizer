@@ -15,13 +15,14 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" Text="LIVE SYSTEM AUDITOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentCyan}" Margin="0,0,0,4"/>
+        <TextBlock Grid.Row="0" Text="LIVE SYSTEM AUDITOR" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
         <Grid Grid.Row="1" Margin="0,0,0,14">
             <TextBlock Text="Running Processes" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
 
             <!-- Action Buttons Toolbar -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
                 <Button x:Name="BtnEndTask" Content="❌ End Task" Style="{StaticResource DangerButton}" Click="BtnEndTask_Click" Margin="0,0,8,0" Padding="12,6"/>
+                <Button x:Name="BtnTameCpu" Content="⚡ Tame CPU" Style="{StaticResource PrimaryButton}" Click="BtnTameCpu_Click" Margin="0,0,8,0" Padding="12,6" ToolTip="Throttle process with Windows EcoQoS &amp; Idle Priority"/>
                 <Button x:Name="BtnTrimProcess" Content="🧹 Trim RAM" Style="{StaticResource SecondaryButton}" Click="BtnTrimProcess_Click" Margin="0,0,8,0" Padding="12,6"/>
                 <Button x:Name="BtnRefresh" Content="↺ Refresh" Style="{StaticResource SecondaryButton}" Click="BtnRefresh_Click" Padding="10,6"/>
             </StackPanel>
@@ -104,6 +105,7 @@
                         <MenuItem Header="❌ End Task" Click="MenuEndTask_Click"/>
                         <MenuItem Header="⚡ Kill Process Tree" Click="MenuKillTree_Click"/>
                         <Separator Background="{StaticResource BorderCard}"/>
+                        <MenuItem Header="⚡ Tame CPU (EcoQoS / Idle)" Click="MenuTameCpu_Click"/>
                         <MenuItem Header="🧹 Trim Working Set (Clean RAM)" Click="MenuTrimRam_Click"/>
                         <MenuItem Header="📈 Set Priority">
                             <MenuItem Header="Realtime" Click="MenuPriority_Click" Tag="Realtime"/>

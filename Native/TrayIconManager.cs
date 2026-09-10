@@ -216,9 +216,9 @@ namespace NovaOptimizer.Native
         {
             var menu = new ContextMenu
             {
-                Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#161926")!,
+                Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#131926")!,
                 Foreground = System.Windows.Media.Brushes.White,
-                BorderBrush = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#282F48")!
+                BorderBrush = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#1E293B")!
             };
 
             var itemOpen = new MenuItem { Header = "🌌 Open NovaOptimizer", FontWeight = FontWeights.Bold };

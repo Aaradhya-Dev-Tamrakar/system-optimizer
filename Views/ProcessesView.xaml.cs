@@ -241,6 +241,30 @@ namespace NovaOptimizer.Views
             }
         }
 
+        private void BtnTameCpu_Click(object sender, RoutedEventArgs e)
+        {
+            if (_selectedItem != null)
+            {
+                if (_selectedItem.IsSystemCritical)
+                {
+                    MessageBox.Show("Cannot throttle protected Windows system process.", "Access Denied", MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                if (_processMonitor.TameProcess(_selectedItem.Id))
+                {
+                    OnStatusNotification?.Invoke($"❄️ Tamed {_selectedItem.Name} (PID {_selectedItem.Id}) to Eco Mode (Idle Priority).");
+                    _ = RefreshProcessesAsync();
+                }
+                else
+                {
+                    OnStatusNotification?.Invoke($"Could not throttle {_selectedItem.Name}. Process may have exited.");
+                }
+            }
+        }
+
+        private void MenuTameCpu_Click(object sender, RoutedEventArgs e) => BtnTameCpu_Click(sender, e);
+
         private void MenuEndTask_Click(object sender, RoutedEventArgs e) => BtnEndTask_Click(sender, e);
 
         private void MenuKillTree_Click(object sender, RoutedEventArgs e)

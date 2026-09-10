@@ -16,7 +16,7 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" Text="CRASH &amp; FREEZE FORENSICS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource AccentRed}" Margin="0,0,0,4"/>
+        <TextBlock Grid.Row="0" Text="CRASH &amp; FREEZE FORENSICS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,18">
             <TextBlock Text="Hung Process Detector" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}"/>
             <TextBlock Text="  —  audits non-responsive apps and repeat freeze offenders" FontSize="13" Foreground="{StaticResource TextMuted}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>

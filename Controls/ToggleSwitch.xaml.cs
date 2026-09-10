@@ -28,7 +28,7 @@ namespace NovaOptimizer.Controls
                 nameof(AccentBrush),
                 typeof(Brush),
                 typeof(ToggleSwitch),
-                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x38, 0xBD, 0xF8))));
+                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x3B, 0x82, 0xF6))));
 
         public event RoutedPropertyChangedEventHandler<bool>? CheckedChanged;
 
@@ -84,8 +84,8 @@ namespace NovaOptimizer.Controls
             }
         }
 
-        private static readonly SolidColorBrush OffTrackBg = new(Color.FromRgb(0x16, 0x1D, 0x2B));
-        private static readonly SolidColorBrush OffTrackBorder = new(Color.FromRgb(0x2B, 0x37, 0x4E));
+        private static readonly SolidColorBrush OffTrackBg = new(Color.FromRgb(0x0D, 0x12, 0x1B));
+        private static readonly SolidColorBrush OffTrackBorder = new(Color.FromRgb(0x1E, 0x29, 0x3B));
         private static readonly SolidColorBrush OffThumbColor = new(Color.FromRgb(0x94, 0xA3, 0xB8));
 
         private static readonly DoubleAnimation CheckAnim = new()

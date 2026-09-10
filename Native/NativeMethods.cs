@@ -155,6 +155,35 @@ namespace NovaOptimizer.Native
         [return: MarshalAs(UnmanagedType.Bool)]
         public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
 
+        [StructLayout(LayoutKind.Sequential)]
+        public struct PROCESS_POWER_THROTTLING_STATE
+        {
+            public uint Version;
+            public uint ControlMask;
+            public uint StateMask;
+        }
+
+        public const int ProcessPowerThrottling = 4;
+        public const uint PROCESS_POWER_THROTTLING_CURRENT_VERSION = 1;
+        public const uint PROCESS_POWER_THROTTLING_EXECUTION_SPEED = 0x1;
+
+        public const uint IDLE_PRIORITY_CLASS = 0x00000040;
+        public const uint BELOW_NORMAL_PRIORITY_CLASS = 0x00004000;
+        public const uint NORMAL_PRIORITY_CLASS = 0x00000020;
+        public const uint ABOVE_NORMAL_PRIORITY_CLASS = 0x00008000;
+        public const uint HIGH_PRIORITY_CLASS = 0x00000080;
+        public const uint REALTIME_PRIORITY_CLASS = 0x00000100;
+
+        [DllImport("kernel32.dll", SetLastError = true)]
+        public static extern bool SetProcessInformation(
+            IntPtr hProcess,
+            int ProcessInformationClass,
+            ref PROCESS_POWER_THROTTLING_STATE ProcessInformation,
+            uint ProcessInformationSize);
+
+        [DllImport("user32.dll")]
+        public static extern IntPtr GetForegroundWindow();
+
         [DllImport("user32.dll", SetLastError = true)]
         public static extern uint GetWindowThreadProcessId(IntPtr hWnd, out uint lpdwProcessId);
 
@@ -226,6 +255,56 @@ namespace NovaOptimizer.Native
                 CloseHandle(hProc);
             }
             return -1;
+        }
+
+        public static int GetForegroundProcessId()
+        {
+            try
+            {
+                IntPtr hWnd = GetForegroundWindow();
+                if (hWnd == IntPtr.Zero) return 0;
+                GetWindowThreadProcessId(hWnd, out uint pid);
+                return (int)pid;
+            }
+            catch
+            {
+                return 0;
+            }
+        }
+
+        public static bool TameProcess(int pid)
+        {
+            if (pid <= 4) return false;
+            IntPtr hProc = OpenProcess(PROCESS_SET_INFORMATION | PROCESS_SET_QUOTA | PROCESS_QUERY_LIMITED_INFORMATION, false, pid);
+            if (hProc == IntPtr.Zero) return false;
+            try
+            {
+                // 1. Lower Priority to Idle
+                SetPriorityClass(hProc, IDLE_PRIORITY_CLASS);
+
+                // 2. Engage Windows EcoQoS (Efficiency Mode)
+                var state = new PROCESS_POWER_THROTTLING_STATE
+                {
+                    Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION,
+                    ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED,
+                    StateMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED
+                };
+                SetProcessInformation(hProc, ProcessPowerThrottling, ref state, (uint)Marshal.SizeOf(state));
+
+                // 3. Trim working set pages from CPU cache & RAM
+                EmptyWorkingSet(hProc);
+                SetProcessWorkingSetSize(hProc, (IntPtr)(-1), (IntPtr)(-1));
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                CloseHandle(hProc);
+            }
         }
 
         private static readonly Lazy<bool> _isAdminLazy = new(() =>

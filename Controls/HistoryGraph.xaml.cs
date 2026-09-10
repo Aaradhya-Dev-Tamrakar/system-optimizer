@@ -19,7 +19,7 @@ namespace NovaOptimizer.Controls
                 nameof(LineBrush),
                 typeof(Brush),
                 typeof(HistoryGraph),
-                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x38, 0xBD, 0xF8)), OnLineBrushChanged));
+                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x3B, 0x82, 0xF6)), OnLineBrushChanged));
 
         public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register(
@@ -125,7 +125,7 @@ namespace NovaOptimizer.Controls
             double h = ActualHeight;
             if (w <= 0 || h <= 0) return;
 
-            var gridBrush = new SolidColorBrush(Color.FromArgb(40, 255, 255, 255));
+            var gridBrush = new SolidColorBrush(Color.FromArgb(20, 255, 255, 255));
 
             // Horizontal grid lines at 25%, 50%, 75%
             for (int i = 1; i <= 3; i++)

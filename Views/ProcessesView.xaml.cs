@@ -38,7 +38,7 @@ namespace NovaOptimizer.Views
             _searchDebounceTimer.Tick += (s, e) =>
             {
                 _searchDebounceTimer.Stop();
-                ApplyFilter();
+                _ = ApplyFilterAsync();
             };
 
             _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1.5) };
@@ -76,7 +76,7 @@ namespace NovaOptimizer.Views
                 if (!_isActive) return;
 
                 _latestRawProcesses = rawList.OrderByDescending(p => p.WorkingSetMB).ToList();
-                ApplyFilter();
+                await ApplyFilterAsync();
             }
             catch
             {
@@ -93,14 +93,14 @@ namespace NovaOptimizer.Views
             if (sender is RadioButton rb && rb.Tag is string tag)
             {
                 _activeCategory = tag;
-                ApplyFilter();
+                _ = ApplyFilterAsync();
             }
         }
 
         private void BtnClearSearch_Click(object sender, RoutedEventArgs e)
         {
             TxtSearch.Text = "";
-            ApplyFilter();
+            _ = ApplyFilterAsync();
         }
 
         private void BtnRefresh_Click(object sender, RoutedEventArgs e)
@@ -109,37 +109,45 @@ namespace NovaOptimizer.Views
             OnStatusNotification?.Invoke("Process list refreshed.");
         }
 
-        private void ApplyFilter()
+        private async Task ApplyFilterAsync()
         {
             string filter = TxtSearch.Text.Trim();
+            string category = _activeCategory;
             int selectedId = _selectedItem?.Id ?? -1;
 
             TxtPlaceholder.Visibility = string.IsNullOrEmpty(filter) ? Visibility.Visible : Visibility.Collapsed;
             BtnClearSearch.Visibility = string.IsNullOrEmpty(filter) ? Visibility.Collapsed : Visibility.Visible;
 
-            IEnumerable<ProcessItem> targetItems = _latestRawProcesses;
-
-            // Apply category filter
-            targetItems = _activeCategory switch
+            var rawSnapshot = _latestRawProcesses;
+            var targetList = await Task.Run(() =>
             {
-                "Apps" => targetItems.Where(p => p.HasWindow),
-                "Background" => targetItems.Where(p => !p.HasWindow && !p.IsSystemCritical),
-                "HighRam" => targetItems.Where(p => p.IsHighRam),
-                "HighCpu" => targetItems.Where(p => p.IsHighCpu),
-                "Hung" => targetItems.Where(p => p.IsHung),
-                _ => targetItems
-            };
+                IEnumerable<ProcessItem> targetItems = rawSnapshot;
 
-            // Apply text search
-            if (!string.IsNullOrEmpty(filter))
-            {
-                targetItems = targetItems.Where(p =>
-                    p.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
-                    p.Id.ToString().Contains(filter) ||
-                    p.Description.Contains(filter, StringComparison.OrdinalIgnoreCase));
-            }
+                // Apply category filter
+                targetItems = category switch
+                {
+                    "Apps" => targetItems.Where(p => p.HasWindow),
+                    "Background" => targetItems.Where(p => !p.HasWindow && !p.IsSystemCritical),
+                    "HighRam" => targetItems.Where(p => p.IsHighRam),
+                    "HighCpu" => targetItems.Where(p => p.IsHighCpu),
+                    "Hung" => targetItems.Where(p => p.IsHung),
+                    _ => targetItems
+                };
 
-            var targetList = targetItems.ToList();
+                // Apply text search
+                if (!string.IsNullOrEmpty(filter))
+                {
+                    targetItems = targetItems.Where(p =>
+                        p.Name.Contains(filter, StringComparison.OrdinalIgnoreCase) ||
+                        p.Id.ToString().Contains(filter) ||
+                        p.Description.Contains(filter, StringComparison.OrdinalIgnoreCase));
+                }
+
+                return targetItems.ToList();
+            });
+
+            if (!_isActive) return;
+
             var targetPids = new HashSet<int>(targetList.Select(p => p.Id));
 
             // Remove processes no longer present
@@ -160,6 +168,13 @@ namespace NovaOptimizer.Views
                 if (_processMap.TryGetValue(incoming.Id, out var existing))
                 {
                     existing.UpdateFrom(incoming);
+
+                    // Ensure item matches target sorted position
+                    int currentIndex = _displayProcesses.IndexOf(existing);
+                    if (currentIndex != i && currentIndex >= 0)
+                    {
+                        _displayProcesses.Move(currentIndex, i);
+                    }
                 }
                 else
                 {
@@ -171,11 +186,16 @@ namespace NovaOptimizer.Views
                 }
             }
 
-            // Restore selection without UI flicker
+            // Restore selection without UI flicker, or clear if process exited
             if (selectedId != -1 && _processMap.TryGetValue(selectedId, out var reselect))
             {
                 _selectedItem = reselect;
                 DgProcesses.SelectedItem = reselect;
+            }
+            else
+            {
+                _selectedItem = null;
+                DgProcesses.SelectedItem = null;
             }
 
             double totalRamGB = targetList.Sum(p => p.WorkingSetMB) / 1024.0;

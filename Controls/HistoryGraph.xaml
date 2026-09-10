@@ -6,7 +6,7 @@
              mc:Ignorable="d" 
              d:DesignHeight="140" d:DesignWidth="400"
              SizeChanged="UserControl_SizeChanged">
-    <Border Background="#10131D" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
+    <Border Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" ClipToBounds="True">
         <Grid>
             <!-- Background Grid Lines -->
             <Canvas x:Name="GridCanvas" IsHitTestVisible="False"/>

@@ -57,28 +57,51 @@ namespace NovaOptimizer.Views
             }
         }
 
-        private void RefreshData()
+        private async void RefreshData()
         {
             try
             {
-                var allRecords = _watchdog.GetAllRecords();
-                var recentRecords = allRecords.Where(r => r.Timestamp >= DateTime.Now.AddHours(-24)).ToList();
-                var offenders = _watchdog.GetRepeatOffenders();
-                int activeHangs = _watchdog.GetActiveHangCount();
+                string filter = TxtSearchLog.Text.Trim();
+                string activeTab = _activeTab;
+
+                var data = await Task.Run(() =>
+                {
+                    var allRecords = _watchdog.GetAllRecords();
+                    var recentRecords = allRecords.Where(r => r.Timestamp >= DateTime.Now.AddHours(-24)).ToList();
+                    var offenders = _watchdog.GetRepeatOffenders();
+                    int activeHangs = _watchdog.GetActiveHangCount();
+
+                    if (!string.IsNullOrEmpty(filter))
+                    {
+                        offenders = offenders.Where(o => 
+                            o.ProcessName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
+                            o.FilePath.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+
+                        allRecords = allRecords.Where(r => 
+                            r.ProcessName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
+                            r.FilePath.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
+                    }
+
+                    var sortedFullLog = allRecords.OrderByDescending(r => r.Timestamp).ToList();
+
+                    return (allRecords, recentRecords, offenders, activeHangs, sortedFullLog);
+                });
+
+                if (!_refreshTimer.IsEnabled) return;
 
                 // Update summary cards
-                TxtHangs24h.Text = recentRecords.Count.ToString();
-                TxtTotalEvents.Text = allRecords.Count.ToString();
-                TxtActiveHangs.Text = activeHangs.ToString();
+                TxtHangs24h.Text = data.recentRecords.Count.ToString();
+                TxtTotalEvents.Text = data.allRecords.Count.ToString();
+                TxtActiveHangs.Text = data.activeHangs.ToString();
 
                 // Color the active hangs count
-                TxtActiveHangs.Foreground = activeHangs > 0
+                TxtActiveHangs.Foreground = data.activeHangs > 0
                     ? (System.Windows.Media.Brush)FindResource("AccentRed")
                     : (System.Windows.Media.Brush)FindResource("AccentGreen");
 
-                if (offenders.Count > 0)
+                if (data.offenders.Count > 0)
                 {
-                    var top = offenders[0];
+                    var top = data.offenders[0];
                     TxtTopOffender.Text = top.ProcessName;
                     TxtTopOffenderCount.Text = $"{top.HangCount} hangs — {top.DisplayAvgDuration} avg";
                 }
@@ -88,29 +111,14 @@ namespace NovaOptimizer.Views
                     TxtTopOffenderCount.Text = "No hangs detected yet";
                 }
 
-                // Apply search filter
-                string filter = TxtSearchLog.Text.Trim();
-                if (!string.IsNullOrEmpty(filter))
-                {
-                    offenders = offenders.Where(o => 
-                        o.ProcessName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
-                        o.FilePath.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
-
-                    allRecords = allRecords.Where(r => 
-                        r.ProcessName.Contains(filter, StringComparison.OrdinalIgnoreCase) || 
-                        r.FilePath.Contains(filter, StringComparison.OrdinalIgnoreCase)).ToList();
-                }
-
                 // Update the active table
-                if (_activeTab == "Offenders")
+                if (activeTab == "Offenders")
                 {
-                    DgOffenders.ItemsSource = offenders;
+                    DgOffenders.ItemsSource = data.offenders;
                 }
                 else
                 {
-                    DgFullLog.ItemsSource = allRecords
-                        .OrderByDescending(r => r.Timestamp)
-                        .ToList();
+                    DgFullLog.ItemsSource = data.sortedFullLog;
                 }
 
                 TxtFooter.Text = $"Watchdog active — monitoring every 3s | Last refresh: {DateTime.Now:HH:mm:ss}";
@@ -158,15 +166,13 @@ namespace NovaOptimizer.Views
 
             if (dialog.ShowDialog() == true)
             {
-                try
+                if (_watchdog.ExportCsv(dialog.FileName))
                 {
-                    _watchdog.ExportCsv(dialog.FileName);
                     OnStatusNotification?.Invoke($"📥 Exported hung process log to {Path.GetFileName(dialog.FileName)}");
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Failed to export: {ex.Message}", "Export Error",
-                        MessageBoxButton.OK, MessageBoxImage.Error);
+                    MessageBox.Show("Failed to export CSV file. The file may be currently open in another application.", "Export Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                 }
             }
         }

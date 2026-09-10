@@ -61,7 +61,7 @@
         <!-- Processes DataGrid -->
         <Border Grid.Row="3" Style="{StaticResource CardPanel}" Padding="0">
             <DataGrid x:Name="DgProcesses" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="#161926" AlternatingRowBackground="#121520"
+                      Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
                       GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
                       Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True" SelectionChanged="DgProcesses_SelectionChanged"
@@ -74,7 +74,7 @@
                 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#0F121C"/>
+                        <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
@@ -93,14 +93,14 @@
                                 <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
                             </Trigger>
                             <Trigger Property="IsSelected" Value="True">
-                                <Setter Property="Background" Value="#1E2A44"/>
+                                <Setter Property="Background" Value="{StaticResource BadgeBgPrimary}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
                 </DataGrid.RowStyle>
 
                 <DataGrid.ContextMenu>
-                    <ContextMenu Background="#161926" Foreground="{StaticResource TextPrimary}" BorderBrush="{StaticResource BorderCard}">
+                    <ContextMenu Background="{StaticResource BgCardHover}" Foreground="{StaticResource TextPrimary}" BorderBrush="{StaticResource BorderCard}">
                         <MenuItem Header="❌ End Task" Click="MenuEndTask_Click"/>
                         <MenuItem Header="⚡ Kill Process Tree" Click="MenuKillTree_Click"/>
                         <Separator Background="{StaticResource BorderCard}"/>

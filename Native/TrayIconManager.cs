@@ -72,6 +72,7 @@ namespace NovaOptimizer.Native
         private IntPtr _hIcon;
         private bool _isAdded;
         private readonly ContextMenu _contextMenu;
+        private HwndSource? _hwndSource;
 
         public event Action? OnQuickCleanRequested;
         public event Action? OnToggleBoostRequested;
@@ -85,8 +86,8 @@ namespace NovaOptimizer.Native
         public void Initialize()
         {
             _hWnd = new WindowInteropHelper(_window).EnsureHandle();
-            var source = HwndSource.FromHwnd(_hWnd);
-            source?.AddHook(WndProc);
+            _hwndSource = HwndSource.FromHwnd(_hWnd);
+            _hwndSource?.AddHook(WndProc);
 
             LoadIcon();
             AddTrayIcon();
@@ -122,23 +123,33 @@ namespace NovaOptimizer.Native
                     dir = Directory.GetParent(dir)?.FullName;
                 }
 
-                // 3. Fallback: Extract from embedded WPF resource
+                // 3. Fallback: Extract from embedded WPF resource safely
                 try
                 {
                     var sri = Application.GetResourceStream(new Uri("pack://application:,,,/Assets/icon.ico"));
                     if (sri != null)
                     {
-                        string tempPath = Path.Combine(Path.GetTempPath(), "NovaOptimizer_tray_icon.ico");
-                        using (var src = sri.Stream)
-                        using (var dst = File.Create(tempPath))
+                        string tempFile = Path.Combine(Path.GetTempPath(), $"NovaTray_{Guid.NewGuid():N}.ico");
+                        try
                         {
-                            src.CopyTo(dst);
+                            using (var src = sri.Stream)
+                            using (var dst = new FileStream(tempFile, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                            {
+                                src.CopyTo(dst);
+                            }
+
+                            _hIcon = LoadImage(IntPtr.Zero, tempFile, 1, cx, cy, 0x00000010 /*LR_LOADFROMFILE*/);
                         }
-                        if (File.Exists(tempPath))
+                        finally
                         {
-                            _hIcon = LoadImage(IntPtr.Zero, tempPath, 1, cx, cy, 0x00000010);
-                            if (_hIcon != IntPtr.Zero) return;
+                            try
+                            {
+                                if (File.Exists(tempFile)) File.Delete(tempFile);
+                            }
+                            catch { }
                         }
+
+                        if (_hIcon != IntPtr.Zero) return;
                     }
                 }
                 catch { }
@@ -265,6 +276,25 @@ namespace NovaOptimizer.Native
 
         public void Dispose()
         {
+            Dispose(true);
+            GC.SuppressFinalize(this);
+        }
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                if (_hwndSource != null)
+                {
+                    try
+                    {
+                        _hwndSource.RemoveHook(WndProc);
+                    }
+                    catch { }
+                    _hwndSource = null;
+                }
+            }
+
             if (_isAdded)
             {
                 var data = new NOTIFYICONDATA
@@ -282,6 +312,11 @@ namespace NovaOptimizer.Native
                 DestroyIcon(_hIcon);
                 _hIcon = IntPtr.Zero;
             }
+        }
+
+        ~TrayIconManager()
+        {
+            Dispose(false);
         }
     }
 }

@@ -19,8 +19,8 @@ namespace NovaOptimizer.Services
         private readonly RamOptimizerService _ramOptimizer;
 
         // Background services to pause during Game Mode to stop stutter & micro-hiccups
-        private static readonly string[] GameModeServices = new[]
-        {
+        private static readonly string[] GameModeServices =
+        [
             "DiagTrack",   // Connected User Experiences and Telemetry
             "SysMain",     // SuperFetch (causes disk thrashing during game asset loads)
             "WSearch",     // Windows Search Indexer
@@ -28,22 +28,22 @@ namespace NovaOptimizer.Services
             "MapsBroker",  // Downloaded Maps Manager
             "PcaSvc",      // Program Compatibility Assistant Service
             "DPS"          // Diagnostic Policy Service
-        };
+        ];
 
         // Services to suppress in Work / Productivity Mode
-        private static readonly string[] WorkModeServices = new[]
-        {
+        private static readonly string[] WorkModeServices =
+        [
             "DiagTrack",
             "WerSvc",
             "MapsBroker",
             "XblAuthManager",
             "XboxGipSvc",
             "XboxNetApiSvc"
-        };
+        ];
 
         // Services to suppress in Study / Sustained Focus Mode
-        private static readonly string[] StudyModeServices = new[]
-        {
+        private static readonly string[] StudyModeServices =
+        [
             "DiagTrack",
             "WerSvc",
             "MapsBroker",
@@ -51,21 +51,21 @@ namespace NovaOptimizer.Services
             "XboxGipSvc",
             "XboxNetApiSvc",
             "SysMain"
-        };
+        ];
 
         // Idle background updater workers to terminate
-        private static readonly string[] BloatProcessNames = new[]
-        {
+        private static readonly string[] BloatProcessNames =
+        [
             "AdobeUpdateService", "GoogleUpdate", "MicrosoftEdgeUpdate",
             "OneDrive", "GameBarFTServer", "Cortana"
-        };
+        ];
 
         // Distractions to terminate during Study / Focus mode
-        private static readonly string[] DistractionProcessNames = new[]
-        {
+        private static readonly string[] DistractionProcessNames =
+        [
             "Discord", "Spotify", "Steam", "steamwebhelper",
             "EpicGamesLauncher", "GameBarFTServer", "Teams", "ms-teams"
-        };
+        ];
 
         public BoostProfile ActiveProfile { get; private set; } = BoostProfile.None;
         private readonly List<string> _temporarilyStoppedServices = new();
@@ -132,9 +132,16 @@ namespace NovaOptimizer.Services
                         using var sc = new ServiceController(svcName);
                         if (sc.Status == ServiceControllerStatus.Running)
                         {
-                            sc.Stop();
-                            sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
                             _temporarilyStoppedServices.Add(svcName);
+                            sc.Stop();
+                            try
+                            {
+                                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
+                            }
+                            catch (System.ServiceProcess.TimeoutException)
+                            {
+                                // Service stop requested; it will be restored upon Deactivate
+                            }
                             OnLogMessage?.Invoke($"⏸️ Paused background service: {svcName}");
                         }
                     }

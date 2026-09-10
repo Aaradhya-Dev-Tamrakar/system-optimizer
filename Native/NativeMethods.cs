@@ -228,7 +228,7 @@ namespace NovaOptimizer.Native
             return -1;
         }
 
-        public static bool IsAdministrator()
+        private static readonly Lazy<bool> _isAdminLazy = new(() =>
         {
             try
             {
@@ -240,7 +240,9 @@ namespace NovaOptimizer.Native
             {
                 return false;
             }
-        }
+        });
+
+        public static bool IsAdministrator() => _isAdminLazy.Value;
 
         public static bool SetIncreasePrivilege(string privilegeName)
         {
@@ -255,7 +257,7 @@ namespace NovaOptimizer.Native
                     if (!LookupPrivilegeValue(null, privilegeName, out LUID luid))
                         return false;
 
-                    TOKEN_PRIVILEGES tp = new TOKEN_PRIVILEGES
+                    TOKEN_PRIVILEGES tp = new()
                     {
                         PrivilegeCount = 1,
                         Privileges = new LUID_AND_ATTRIBUTES
@@ -265,7 +267,8 @@ namespace NovaOptimizer.Native
                         }
                     };
 
-                    return AdjustTokenPrivileges(hToken, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero);
+                    bool adjusted = AdjustTokenPrivileges(hToken, false, ref tp, 0, IntPtr.Zero, IntPtr.Zero);
+                    return adjusted && Marshal.GetLastWin32Error() == 0;
                 }
                 finally
                 {

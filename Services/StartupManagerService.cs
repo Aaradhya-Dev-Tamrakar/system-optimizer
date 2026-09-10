@@ -49,42 +49,77 @@ namespace NovaOptimizer.Services
                     string? exePath = Environment.ProcessPath;
                     if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
                     {
-                        exePath = Environment.GetCommandLineArgs()[0];
+                        string[] args = Environment.GetCommandLineArgs();
+                        if (args.Length > 0 && !string.IsNullOrEmpty(args[0]))
+                        {
+                            exePath = args[0];
+                        }
                     }
-                    if (exePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
+
+                    if (!string.IsNullOrEmpty(exePath) && exePath.EndsWith(".dll", StringComparison.OrdinalIgnoreCase))
                     {
                         string exeCandidate = Path.ChangeExtension(exePath, ".exe");
                         if (File.Exists(exeCandidate)) exePath = exeCandidate;
                     }
 
-                    // 1. HKCU Run Key
-                    using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    if (string.IsNullOrEmpty(exePath) || !File.Exists(exePath))
                     {
-                        key?.SetValue("NovaOptimizer", $"\"{exePath}\" --autostart");
+                        return false;
                     }
 
-                    // 2. Elevated Task Scheduler (for seamless elevated startup without UAC prompt)
-                    try
+                    // On Windows 11 with administrator privileges:
+                    // Use Task Scheduler with highest privileges to run seamlessly at logon without UAC prompts.
+                    // Clean up any old registry run key to prevent dual-launch.
+                    bool isAdmin = NativeMethods.IsAdministrator();
+                    bool taskCreated = false;
+
+                    if (isAdmin)
                     {
-                        var psi = new System.Diagnostics.ProcessStartInfo
+                        try
                         {
-                            FileName = "schtasks.exe",
-                            Arguments = $"/create /tn \"{taskName}\" /tr \"\\\"{exePath}\\\" --autostart\" /sc onlogon /rl highest /f",
-                            CreateNoWindow = true,
-                            UseShellExecute = false
-                        };
-                        using var proc = System.Diagnostics.Process.Start(psi);
-                        proc?.WaitForExit(3000);
+                            var psi = new System.Diagnostics.ProcessStartInfo
+                            {
+                                FileName = "schtasks.exe",
+                                Arguments = $"/create /tn \"{taskName}\" /tr \"\\\"{exePath}\\\" --autostart\" /sc onlogon /rl highest /f",
+                                CreateNoWindow = true,
+                                UseShellExecute = false
+                            };
+                            using var proc = System.Diagnostics.Process.Start(psi);
+                            if (proc != null)
+                            {
+                                proc.WaitForExit(4000);
+                                taskCreated = proc.ExitCode == 0;
+                            }
+                        }
+                        catch { }
                     }
-                    catch { }
+
+                    // If task scheduler succeeded, remove registry entry so it doesn't double-start
+                    if (taskCreated)
+                    {
+                        try
+                        {
+                            using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                            key?.DeleteValue("NovaOptimizer", false);
+                        }
+                        catch { }
+                    }
+                    else
+                    {
+                        // Fallback: Registry Run key for standard startup
+                        using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
+                        key?.SetValue("NovaOptimizer", $"\"{exePath}\" --autostart");
+                    }
                 }
                 else
                 {
                     // 1. Remove HKCU Run Key
-                    using (var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true))
+                    try
                     {
+                        using var key = Registry.CurrentUser.OpenSubKey(@"Software\Microsoft\Windows\CurrentVersion\Run", true);
                         key?.DeleteValue("NovaOptimizer", false);
                     }
+                    catch { }
 
                     // 2. Remove Task Scheduler
                     try

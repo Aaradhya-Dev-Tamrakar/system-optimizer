@@ -54,7 +54,13 @@ namespace NovaOptimizer
                     string dirPath = Path.Combine(projectDir, folder);
                     if (!Directory.Exists(dirPath)) continue;
 
-                    var newerFile = Directory.EnumerateFiles(dirPath, "*.*", SearchOption.AllDirectories)
+                    var enumOpts = new EnumerationOptions
+                    {
+                        RecurseSubdirectories = true,
+                        IgnoreInaccessible = true
+                    };
+
+                    var newerFile = Directory.EnumerateFiles(dirPath, "*.*", enumOpts)
                         .Where(f => f.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) || 
                                     f.EndsWith(".xaml", StringComparison.OrdinalIgnoreCase))
                         .Any(f => File.GetLastWriteTimeUtc(f) > exeWriteTime);

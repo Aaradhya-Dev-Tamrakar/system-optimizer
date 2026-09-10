@@ -79,26 +79,30 @@ namespace NovaOptimizer
                     if (profile == BoostProfile.GameMode)
                     {
                         TxtBadgeMode.Text = "🔥 GAME BOOST";
-                        TxtBadgeMode.Foreground = System.Windows.Media.Brushes.OrangeRed;
-                        BadgeMode.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#3D161F")!;
+                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentRed");
+                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDanger");
+                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderDanger");
                     }
                     else if (profile == BoostProfile.WorkMode)
                     {
                         TxtBadgeMode.Text = "💼 WORK BOOST";
-                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentCyan");
-                        BadgeMode.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#16283D")!;
+                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentPrimary");
+                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgPrimary");
+                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderPrimary");
                     }
                     else if (profile == BoostProfile.StudyMode)
                     {
                         TxtBadgeMode.Text = "📚 STUDY MODE";
                         TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentBlue");
-                        BadgeMode.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#16253D")!;
+                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgInfo");
+                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderInfo");
                     }
                     else
                     {
                         TxtBadgeMode.Text = "🚀 Standard";
                         TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentPurple");
-                        BadgeMode.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#241B33")!;
+                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDefault");
+                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderDefault");
                     }
                 });
             };

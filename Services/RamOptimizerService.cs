@@ -38,6 +38,9 @@ namespace NovaOptimizer.Services
         {
             if (!AutoCleanEnabled) return;
 
+            // Pause timer to prevent reentrancy during long purges
+            _watchdogTimer?.Change(Timeout.Infinite, Timeout.Infinite);
+
             try
             {
                 var metrics = GetMemoryMetrics();
@@ -56,6 +59,15 @@ namespace NovaOptimizer.Services
             catch
             {
                 // Silent fail in background watchdog
+            }
+            finally
+            {
+                // Resume 15-second tick
+                try
+                {
+                    _watchdogTimer?.Change(15000, 15000);
+                }
+                catch { }
             }
         }
 

@@ -33,14 +33,14 @@
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Image Source="Assets/icon.png" Width="24" Height="24" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
                     <TextBlock Text="NOVA OPTIMIZER" FontSize="14" FontWeight="Black" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                    <Border CornerRadius="4" Background="#1B2236" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
-                        <TextBlock Text="PRO v1.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                    <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
+                        <TextBlock Text="PRO v1.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                     </Border>
                 </StackPanel>
 
                 <!-- Central Floating Toast Notification Banner -->
                 <Border x:Name="ToastBanner" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Background="#192238" BorderBrush="{StaticResource AccentCyan}" BorderThickness="1"
+                        Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1"
                         CornerRadius="20" Padding="14,5" Opacity="0" IsHitTestVisible="False">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Name="TxtToastIcon" Text="⚡" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
@@ -51,7 +51,7 @@
                 <!-- Header Actions & Window Controls -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
                     <!-- Live RAM Indicator Badge -->
-                    <Border CornerRadius="6" Background="#151926" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
+                    <Border CornerRadius="6" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="💾 " FontSize="11" VerticalAlignment="Center"/>
                             <TextBlock x:Name="TxtHeaderRam" Text="RAM: 45%" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
@@ -63,12 +63,12 @@
                             Padding="12,5" FontSize="11.5" Margin="0,0,10,0" Click="BtnQuickClean_Click"/>
 
                     <!-- Active Mode Badge -->
-                    <Border x:Name="BadgeMode" CornerRadius="6" Background="#241B33" Padding="8,5" Margin="0,0,10,0">
+                    <Border x:Name="BadgeMode" CornerRadius="6" Background="{StaticResource BadgeBgDefault}" BorderBrush="{StaticResource BadgeBorderDefault}" BorderThickness="1" Padding="8,5" Margin="0,0,10,0">
                         <TextBlock x:Name="TxtBadgeMode" Text="🚀 Standard" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource AccentPurple}"/>
                     </Border>
 
                     <!-- Admin Badge -->
-                    <Border CornerRadius="6" Background="#122622" BorderBrush="#1B4239" BorderThickness="1" Padding="7,4" Margin="0,0,14,0">
+                    <Border CornerRadius="6" Background="{StaticResource BadgeBgSuccess}" BorderBrush="{StaticResource BadgeBorderSuccess}" BorderThickness="1" Padding="7,4" Margin="0,0,14,0">
                         <TextBlock Text="🛡️ Admin" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource AccentGreen}"/>
                     </Border>
 
@@ -124,7 +124,7 @@
                     </StackPanel>
 
                     <!-- Bottom Pinned Telemetry & Tray Card -->
-                    <Border Grid.Row="2" Background="#0F121C" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                    <Border Grid.Row="2" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
                                 <Border Width="6" Height="6" CornerRadius="3" Background="{StaticResource AccentGreen}" VerticalAlignment="Center" Margin="0,0,6,0"/>

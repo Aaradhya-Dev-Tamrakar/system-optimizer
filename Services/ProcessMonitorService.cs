@@ -17,7 +17,7 @@ namespace NovaOptimizer.Services
         };
 
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (string Description, string FilePath)> _metadataByNameCache = new(StringComparer.OrdinalIgnoreCase);
-        private readonly Dictionary<int, (string Description, string FilePath)> _pidMetadataCache = new();
+        private readonly Dictionary<int, (string Name, string Description, string FilePath)> _pidMetadataCache = new();
 
         private readonly Dictionary<int, (TimeSpan CpuTime, DateTime SnapshotTime)> _processHistory = new();
         private ulong _lastSystemIdle;
@@ -120,7 +120,7 @@ namespace NovaOptimizer.Services
 
                     if (!isCritical)
                     {
-                        if (_pidMetadataCache.TryGetValue(pid, out var cached))
+                        if (_pidMetadataCache.TryGetValue(pid, out var cached) && string.Equals(cached.Name, name, StringComparison.OrdinalIgnoreCase))
                         {
                             description = cached.Description;
                             filePath = cached.FilePath;
@@ -129,7 +129,7 @@ namespace NovaOptimizer.Services
                         {
                             description = nameCached.Description;
                             filePath = nameCached.FilePath;
-                            _pidMetadataCache[pid] = nameCached;
+                            _pidMetadataCache[pid] = (name, nameCached.Description, nameCached.FilePath);
                         }
                         else
                         {
@@ -154,7 +154,7 @@ namespace NovaOptimizer.Services
 
                             if (string.IsNullOrWhiteSpace(description)) description = name;
                             var info = (description, filePath);
-                            _pidMetadataCache[pid] = info;
+                            _pidMetadataCache[pid] = (name, description, filePath);
                             _metadataByNameCache[name] = info;
                         }
                     }

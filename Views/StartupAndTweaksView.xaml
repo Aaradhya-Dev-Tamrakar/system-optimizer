@@ -23,7 +23,7 @@
             <Grid Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="WINDOWS PERFORMANCE TWEAKS" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                    <Border CornerRadius="4" Background="#16253D" Padding="6,2" Margin="10,0,0,0">
+                    <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Padding="6,2" Margin="10,0,0,0">
                         <TextBlock Text="Safe Registry Adjustments" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentBlue}"/>
                     </Border>
                 </StackPanel>
@@ -47,8 +47,8 @@
                                     </Grid.ColumnDefinitions>
                                     <StackPanel Grid.Column="0" Margin="0,0,20,0">
                                         <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                            <Border CornerRadius="4" Background="#192033" BorderBrush="#25304C" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
-                                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                                            <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Category}" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                                             </Border>
                                             <TextBlock Text="{Binding Title}" FontSize="14" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                                         </StackPanel>
@@ -77,8 +77,8 @@
                     </Grid.ColumnDefinitions>
                     <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
                         <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                            <Border CornerRadius="4" Background="#16283D" BorderBrush="#1F3D5C" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
-                                <TextBlock Text="NOVA AUTO-START" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentCyan}"/>
+                            <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <TextBlock Text="NOVA AUTO-START" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                             </Border>
                             <TextBlock Text="Run NovaOptimizer on Windows Boot" FontSize="13.5" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                         </StackPanel>
@@ -93,8 +93,8 @@
             <Grid Margin="0,0,0,12">
                 <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                     <TextBlock Text="STARTUP APPLICATION AUDITOR" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                    <Border CornerRadius="4" Background="#261B30" Padding="6,2" Margin="10,0,0,0">
-                        <TextBlock x:Name="TxtStartupCount" Text="0 Items Found" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPurple}"/>
+                    <Border CornerRadius="4" Background="{StaticResource BadgeBgInfo}" BorderBrush="{StaticResource BadgeBorderInfo}" BorderThickness="1" Padding="6,2" Margin="10,0,0,0">
+                        <TextBlock x:Name="TxtStartupCount" Text="0 Items Found" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentIndigo}"/>
                     </Border>
                 </StackPanel>
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
@@ -105,13 +105,13 @@
 
             <Border Style="{StaticResource CardPanel}" Padding="0">
                 <DataGrid x:Name="DgStartup" AutoGenerateColumns="False" IsReadOnly="True"
-                          Background="Transparent" BorderThickness="0" RowBackground="#161926" AlternatingRowBackground="#121520"
+                          Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
                           GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
                           Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single">
                     
                     <DataGrid.ColumnHeaderStyle>
                         <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="#0F121C"/>
+                            <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
                             <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                             <Setter Property="FontWeight" Value="SemiBold"/>
                             <Setter Property="FontSize" Value="12"/>
@@ -153,13 +153,17 @@
                                     <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0">
                                         <Border.Style>
                                             <Style TargetType="Border">
-                                                <Setter Property="Background" Value="#1E2333"/>
+                                                <Setter Property="Background" Value="{StaticResource BadgeBgWarning}"/>
+                                                <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderWarning}"/>
+                                                <Setter Property="BorderThickness" Value="1"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Impact}" Value="High Impact">
-                                                        <Setter Property="Background" Value="#3D1822"/>
+                                                        <Setter Property="Background" Value="{StaticResource BadgeBgDanger}"/>
+                                                        <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderDanger}"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding Impact}" Value="Low Impact">
-                                                        <Setter Property="Background" Value="#122E22"/>
+                                                        <Setter Property="Background" Value="{StaticResource BadgeBgSuccess}"/>
+                                                        <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderSuccess}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -170,7 +174,7 @@
                                                     <Setter Property="Foreground" Value="{StaticResource AccentOrange}"/>
                                                     <Style.Triggers>
                                                         <DataTrigger Binding="{Binding Impact}" Value="High Impact">
-                                                            <Setter Property="Foreground" Value="#FF6B6B"/>
+                                                            <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
                                                         </DataTrigger>
                                                         <DataTrigger Binding="{Binding Impact}" Value="Low Impact">
                                                             <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>

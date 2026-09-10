@@ -73,40 +73,61 @@ namespace NovaOptimizer.Views
 
         private async void BtnGameBoost_Click(object sender, RoutedEventArgs e)
         {
-            if (_turboBoost.ActiveProfile == BoostProfile.GameMode)
+            try
             {
-                await _turboBoost.DeactivateBoostAsync();
+                if (_turboBoost.ActiveProfile == BoostProfile.GameMode)
+                {
+                    await _turboBoost.DeactivateBoostAsync();
+                }
+                else
+                {
+                    await _turboBoost.ActivateBoostAsync(BoostProfile.GameMode);
+                    OnStatusNotification?.Invoke("🔥 Game Boost Activated! System is fully optimized.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await _turboBoost.ActivateBoostAsync(BoostProfile.GameMode);
-                OnStatusNotification?.Invoke("🔥 Game Boost Activated! System is fully optimized.");
+                OnStatusNotification?.Invoke($"⚠️ Could not activate Game Boost: {ex.Message}");
             }
         }
 
         private async void BtnWorkBoost_Click(object sender, RoutedEventArgs e)
         {
-            if (_turboBoost.ActiveProfile == BoostProfile.WorkMode)
+            try
             {
-                await _turboBoost.DeactivateBoostAsync();
+                if (_turboBoost.ActiveProfile == BoostProfile.WorkMode)
+                {
+                    await _turboBoost.DeactivateBoostAsync();
+                }
+                else
+                {
+                    await _turboBoost.ActivateBoostAsync(BoostProfile.WorkMode);
+                    OnStatusNotification?.Invoke("💼 Work Boost Activated! Memory primed for heavy tasks.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await _turboBoost.ActivateBoostAsync(BoostProfile.WorkMode);
-                OnStatusNotification?.Invoke("💼 Work Boost Activated! Memory primed for heavy tasks.");
+                OnStatusNotification?.Invoke($"⚠️ Could not activate Work Boost: {ex.Message}");
             }
         }
 
         private async void BtnStudyMode_Click(object sender, RoutedEventArgs e)
         {
-            if (_turboBoost.ActiveProfile == BoostProfile.StudyMode)
+            try
             {
-                await _turboBoost.DeactivateBoostAsync();
+                if (_turboBoost.ActiveProfile == BoostProfile.StudyMode)
+                {
+                    await _turboBoost.DeactivateBoostAsync();
+                }
+                else
+                {
+                    await _turboBoost.ActivateBoostAsync(BoostProfile.StudyMode);
+                    OnStatusNotification?.Invoke("📚 Study Mode Activated! Distractions blocked & silent sustained profile enabled.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                await _turboBoost.ActivateBoostAsync(BoostProfile.StudyMode);
-                OnStatusNotification?.Invoke("📚 Study Mode Activated! Distractions blocked & silent sustained profile enabled.");
+                OnStatusNotification?.Invoke($"⚠️ Could not activate Study Mode: {ex.Message}");
             }
         }
 
@@ -361,25 +382,22 @@ namespace NovaOptimizer.Views
             });
         }
 
+        private readonly System.Collections.Generic.List<string> _logEntries = new(100);
+
         public void LogMessage(string message)
         {
             Dispatcher.Invoke(() =>
             {
                 string timestamp = DateTime.Now.ToString("HH:mm:ss");
-                string newEntry = $"[{timestamp}] {message}\n";
-                string current = TxtActivityLog.Text;
+                string newEntry = $"[{timestamp}] {message}";
 
-                // Keep log size bounded to avoid UI render degradation and excessive memory allocations
-                if (current.Length > 8000)
+                if (_logEntries.Count >= 80)
                 {
-                    int newlineIdx = current.IndexOf('\n', 4000);
-                    if (newlineIdx > 0)
-                    {
-                        current = current.Substring(0, newlineIdx + 1);
-                    }
+                    _logEntries.RemoveAt(_logEntries.Count - 1);
                 }
+                _logEntries.Insert(0, newEntry);
 
-                TxtActivityLog.Text = newEntry + current;
+                TxtActivityLog.Text = string.Join("\n", _logEntries);
             });
         }
     }

@@ -10,7 +10,7 @@ namespace NovaOptimizer.Controls
     public partial class HistoryGraph : UserControl
     {
         private const int MaxPoints = 60;
-        private readonly List<double> _values = new(MaxPoints);
+        private readonly Queue<double> _values = new(MaxPoints);
         private double _maxValue = 100.0;
         private string _unit = "%";
 
@@ -19,7 +19,7 @@ namespace NovaOptimizer.Controls
                 nameof(LineBrush),
                 typeof(Brush),
                 typeof(HistoryGraph),
-                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0, 229, 255)), OnLineBrushChanged));
+                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x38, 0xBD, 0xF8)), OnLineBrushChanged));
 
         public static readonly DependencyProperty TitleProperty =
             DependencyProperty.Register(
@@ -57,7 +57,7 @@ namespace NovaOptimizer.Controls
             InitializeComponent();
             for (int i = 0; i < MaxPoints; i++)
             {
-                _values.Add(0.0);
+                _values.Enqueue(0.0);
             }
             UpdateBrushes();
         }
@@ -104,9 +104,9 @@ namespace NovaOptimizer.Controls
         {
             if (_values.Count >= MaxPoints)
             {
-                _values.RemoveAt(0);
+                _values.Dequeue();
             }
-            _values.Add(val);
+            _values.Enqueue(val);
 
             TxtCurrentValue.Text = $"{val:F0}{_unit}";
             Redraw();
@@ -149,17 +149,19 @@ namespace NovaOptimizer.Controls
         {
             double w = ActualWidth;
             double h = ActualHeight;
-            if (w <= 0 || h <= 0 || _values.Count < 2) return;
+            int count = _values.Count;
+            if (w <= 0 || h <= 0 || count < 2) return;
 
             double stepX = w / (MaxPoints - 1);
-            var points = new PointCollection(_values.Count);
-            var areaPoints = new PointCollection(_values.Count + 2);
+            var points = new PointCollection(count);
+            var areaPoints = new PointCollection(count + 2);
 
             areaPoints.Add(new Point(0, h));
 
-            for (int i = 0; i < _values.Count; i++)
+            int i = 0;
+            foreach (double v in _values)
             {
-                double val = Math.Clamp(_values[i], 0, _maxValue);
+                double val = Math.Clamp(v, 0, _maxValue);
                 double norm = val / _maxValue;
                 double x = i * stepX;
                 double y = h - (norm * (h - 24)) - 4; // leave 24px clearance for header text
@@ -167,9 +169,10 @@ namespace NovaOptimizer.Controls
                 var pt = new Point(x, y);
                 points.Add(pt);
                 areaPoints.Add(pt);
+                i++;
             }
 
-            areaPoints.Add(new Point((_values.Count - 1) * stepX, h));
+            areaPoints.Add(new Point((count - 1) * stepX, h));
 
             CurveLine.Points = points;
             AreaPolygon.Points = areaPoints;

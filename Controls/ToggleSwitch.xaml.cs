@@ -28,7 +28,7 @@ namespace NovaOptimizer.Controls
                 nameof(AccentBrush),
                 typeof(Brush),
                 typeof(ToggleSwitch),
-                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0, 229, 255))));
+                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x38, 0xBD, 0xF8))));
 
         public event RoutedPropertyChangedEventHandler<bool>? CheckedChanged;
 
@@ -84,6 +84,33 @@ namespace NovaOptimizer.Controls
             }
         }
 
+        private static readonly SolidColorBrush OffTrackBg = new(Color.FromRgb(0x16, 0x1D, 0x2B));
+        private static readonly SolidColorBrush OffTrackBorder = new(Color.FromRgb(0x2B, 0x37, 0x4E));
+        private static readonly SolidColorBrush OffThumbColor = new(Color.FromRgb(0x94, 0xA3, 0xB8));
+
+        private static readonly DoubleAnimation CheckAnim = new()
+        {
+            To = 23.0,
+            Duration = TimeSpan.FromMilliseconds(150),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        private static readonly DoubleAnimation UncheckAnim = new()
+        {
+            To = 3.0,
+            Duration = TimeSpan.FromMilliseconds(150),
+            EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
+        };
+
+        static ToggleSwitch()
+        {
+            OffTrackBg.Freeze();
+            OffTrackBorder.Freeze();
+            OffThumbColor.Freeze();
+            CheckAnim.Freeze();
+            UncheckAnim.Freeze();
+        }
+
         private void Toggle_Click(object sender, MouseButtonEventArgs e)
         {
             IsChecked = !IsChecked;
@@ -92,22 +119,17 @@ namespace NovaOptimizer.Controls
         private void UpdateVisualState(bool animate)
         {
             double targetLeft = IsChecked ? 23.0 : 3.0;
-            var targetTrackBg = IsChecked ? AccentBrush : new SolidColorBrush(Color.FromRgb(0x1F, 0x24, 0x33));
-            var targetTrackBorder = IsChecked ? AccentBrush : new SolidColorBrush(Color.FromRgb(0x32, 0x38, 0x4D));
-            var targetThumbColor = IsChecked ? Brushes.White : new SolidColorBrush(Color.FromRgb(0x9C, 0xA3, 0xAF));
+            var targetTrackBg = IsChecked ? AccentBrush : OffTrackBg;
+            var targetTrackBorder = IsChecked ? AccentBrush : OffTrackBorder;
+            var targetThumbColor = IsChecked ? Brushes.White : OffThumbColor;
 
             if (animate)
             {
-                var anim = new DoubleAnimation
-                {
-                    To = targetLeft,
-                    Duration = TimeSpan.FromMilliseconds(150),
-                    EasingFunction = new QuadraticEase { EasingMode = EasingMode.EaseOut }
-                };
-                Thumb.BeginAnimation(Canvas.LeftProperty, anim);
+                Thumb.BeginAnimation(Canvas.LeftProperty, IsChecked ? CheckAnim : UncheckAnim);
             }
             else
             {
+                Thumb.BeginAnimation(Canvas.LeftProperty, null);
                 Canvas.SetLeft(Thumb, targetLeft);
             }
 

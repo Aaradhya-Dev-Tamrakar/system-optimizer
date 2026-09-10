@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.Win32;
 using NovaOptimizer.Models;
+using NovaOptimizer.Native;
 
 namespace NovaOptimizer.Services
 {
@@ -48,22 +49,23 @@ namespace NovaOptimizer.Services
 
         public bool ApplyTweak(string tweakId)
         {
+            if (!NativeMethods.IsAdministrator() && tweakId != "GameDVR")
+            {
+                return false;
+            }
+
             try
             {
                 switch (tweakId)
                 {
                     case "GameDVR":
-                        SetGameDVR(false);
-                        return true;
+                        return SetGameDVR(false);
                     case "NetworkThrottling":
-                        SetNetworkThrottling(false);
-                        return true;
+                        return SetNetworkThrottling(false);
                     case "SystemResponsiveness":
-                        SetSystemResponsiveness(0);
-                        return true;
+                        return SetSystemResponsiveness(0);
                     case "Telemetry":
-                        SetTelemetry(false);
-                        return true;
+                        return SetTelemetry(false);
                 }
             }
             catch { }
@@ -72,22 +74,23 @@ namespace NovaOptimizer.Services
 
         public bool RevertTweak(string tweakId)
         {
+            if (!NativeMethods.IsAdministrator() && tweakId != "GameDVR")
+            {
+                return false;
+            }
+
             try
             {
                 switch (tweakId)
                 {
                     case "GameDVR":
-                        SetGameDVR(true);
-                        return true;
+                        return SetGameDVR(true);
                     case "NetworkThrottling":
-                        SetNetworkThrottling(true);
-                        return true;
+                        return SetNetworkThrottling(true);
                     case "SystemResponsiveness":
-                        SetSystemResponsiveness(20);
-                        return true;
+                        return SetSystemResponsiveness(20);
                     case "Telemetry":
-                        SetTelemetry(true);
-                        return true;
+                        return SetTelemetry(true);
                 }
             }
             catch { }
@@ -109,17 +112,18 @@ namespace NovaOptimizer.Services
             return false;
         }
 
-        private void SetGameDVR(bool enabled)
+        private bool SetGameDVR(bool enabled)
         {
             try
             {
                 using var key = Registry.CurrentUser.CreateSubKey(@"System\GameConfigStore");
-                key.SetValue("GameDVR_Enabled", enabled ? 1 : 0, RegistryValueKind.DWord);
+                key?.SetValue("GameDVR_Enabled", enabled ? 1 : 0, RegistryValueKind.DWord);
 
                 using var policyKey = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\GameDVR");
-                policyKey.SetValue("AllowGameDVR", enabled ? 1 : 0, RegistryValueKind.DWord);
+                policyKey?.SetValue("AllowGameDVR", enabled ? 1 : 0, RegistryValueKind.DWord);
+                return true;
             }
-            catch { }
+            catch { return false; }
         }
 
         private bool CheckNetworkThrottlingDisabled()
@@ -137,14 +141,15 @@ namespace NovaOptimizer.Services
             return false;
         }
 
-        private void SetNetworkThrottling(bool enabled)
+        private bool SetNetworkThrottling(bool enabled)
         {
             try
             {
                 using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile");
-                key.SetValue("NetworkThrottlingIndex", enabled ? 10 : unchecked((int)0xFFFFFFFF), RegistryValueKind.DWord);
+                key?.SetValue("NetworkThrottlingIndex", enabled ? 10 : unchecked((int)0xFFFFFFFF), RegistryValueKind.DWord);
+                return true;
             }
-            catch { }
+            catch { return false; }
         }
 
         private bool CheckSystemResponsivenessApplied()
@@ -162,14 +167,15 @@ namespace NovaOptimizer.Services
             return false;
         }
 
-        private void SetSystemResponsiveness(int value)
+        private bool SetSystemResponsiveness(int value)
         {
             try
             {
                 using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile");
-                key.SetValue("SystemResponsiveness", value, RegistryValueKind.DWord);
+                key?.SetValue("SystemResponsiveness", value, RegistryValueKind.DWord);
+                return true;
             }
-            catch { }
+            catch { return false; }
         }
 
         private bool CheckTelemetryDisabled()
@@ -187,14 +193,15 @@ namespace NovaOptimizer.Services
             return false;
         }
 
-        private void SetTelemetry(bool enabled)
+        private bool SetTelemetry(bool enabled)
         {
             try
             {
                 using var key = Registry.LocalMachine.CreateSubKey(@"SOFTWARE\Policies\Microsoft\Windows\DataCollection");
-                key.SetValue("AllowTelemetry", enabled ? 3 : 0, RegistryValueKind.DWord);
+                key?.SetValue("AllowTelemetry", enabled ? 3 : 0, RegistryValueKind.DWord);
+                return true;
             }
-            catch { }
+            catch { return false; }
         }
     }
 }

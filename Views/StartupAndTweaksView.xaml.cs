@@ -56,13 +56,29 @@ namespace NovaOptimizer.Views
             {
                 if (e.NewValue)
                 {
-                    _systemTweaks.ApplyTweak(tweakId);
-                    OnStatusNotification?.Invoke($"Applied performance tweak: {tweakId}");
+                    bool success = _systemTweaks.ApplyTweak(tweakId);
+                    if (success)
+                    {
+                        OnStatusNotification?.Invoke($"Applied performance tweak: {tweakId}");
+                    }
+                    else
+                    {
+                        OnStatusNotification?.Invoke($"⚠️ Administrator rights required to modify {tweakId}");
+                        ts.IsChecked = false;
+                    }
                 }
                 else
                 {
-                    _systemTweaks.RevertTweak(tweakId);
-                    OnStatusNotification?.Invoke($"Reverted tweak: {tweakId}");
+                    bool success = _systemTweaks.RevertTweak(tweakId);
+                    if (success)
+                    {
+                        OnStatusNotification?.Invoke($"Reverted tweak: {tweakId}");
+                    }
+                    else
+                    {
+                        OnStatusNotification?.Invoke($"⚠️ Administrator rights required to revert {tweakId}");
+                        ts.IsChecked = true;
+                    }
                 }
             }
         }

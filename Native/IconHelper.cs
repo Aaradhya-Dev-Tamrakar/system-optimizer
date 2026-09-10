@@ -51,23 +51,18 @@ namespace NovaOptimizer.Native
             string key = !string.IsNullOrEmpty(filePath) ? filePath : fallbackName;
             if (string.IsNullOrWhiteSpace(key)) return null;
 
-            if (Cache.TryGetValue(key, out var cached))
+            return Cache.GetOrAdd(key, _ =>
             {
-                return cached;
-            }
-
-            ImageSource? icon = null;
-            try
-            {
-                if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                try
                 {
-                    icon = ExtractFromFile(filePath);
+                    if (!string.IsNullOrEmpty(filePath) && File.Exists(filePath))
+                    {
+                        return ExtractFromFile(filePath);
+                    }
                 }
-            }
-            catch { }
-
-            Cache[key] = icon;
-            return icon;
+                catch { }
+                return null;
+            });
         }
 
         private static ImageSource? ExtractFromFile(string filePath)

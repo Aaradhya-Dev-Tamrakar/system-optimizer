@@ -298,35 +298,43 @@ namespace NovaOptimizer.Services
         }
 
         /// <summary>
-        /// Exports log records to a CSV file.
+        /// Exports log records to a CSV file safely.
         /// </summary>
-        public void ExportCsv(string outputPath)
+        public bool ExportCsv(string outputPath)
         {
-            var records = GetAllRecords();
-            var lines = new List<string>
+            try
             {
-                "Timestamp,Process Name,PID,File Path,Description,CPU%,RAM (MB),Parent Process,Parent PID,Hang Duration (s),Recovered,Recovered At"
-            };
+                var records = GetAllRecords();
+                var lines = new List<string>
+                {
+                    "Timestamp,Process Name,PID,File Path,Description,CPU%,RAM (MB),Parent Process,Parent PID,Hang Duration (s),Recovered,Recovered At"
+                };
 
-            foreach (var r in records)
-            {
-                lines.Add(string.Join(",",
-                    Escape(r.DisplayTimestamp),
-                    Escape(r.ProcessName),
-                    r.PID,
-                    Escape(r.FilePath),
-                    Escape(r.Description),
-                    r.CpuPercent,
-                    $"{r.WorkingSetMB:F1}",
-                    Escape(r.ParentProcessName),
-                    r.ParentPID,
-                    $"{r.HangDurationSeconds:F1}",
-                    r.Recovered,
-                    r.RecoveredAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? ""
-                ));
+                foreach (var r in records)
+                {
+                    lines.Add(string.Join(",",
+                        Escape(r.DisplayTimestamp),
+                        Escape(r.ProcessName),
+                        r.PID,
+                        Escape(r.FilePath),
+                        Escape(r.Description),
+                        r.CpuPercent,
+                        $"{r.WorkingSetMB:F1}",
+                        Escape(r.ParentProcessName),
+                        r.ParentPID,
+                        $"{r.HangDurationSeconds:F1}",
+                        r.Recovered,
+                        r.RecoveredAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? ""
+                    ));
+                }
+
+                File.WriteAllLines(outputPath, lines);
+                return true;
             }
-
-            File.WriteAllLines(outputPath, lines);
+            catch
+            {
+                return false;
+            }
         }
 
         private static string Escape(string value)

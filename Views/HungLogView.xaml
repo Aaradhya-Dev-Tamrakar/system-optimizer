@@ -99,14 +99,14 @@
         <!-- Repeat Offenders Table -->
         <Border x:Name="PanelOffenders" Grid.Row="4" Style="{StaticResource CardPanel}" Padding="0">
             <DataGrid x:Name="DgOffenders" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="#161926" AlternatingRowBackground="#121520"
+                      Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
                       GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
                       Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#0F121C"/>
+                        <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
@@ -154,14 +154,14 @@
         <!-- Full Event Log Table (hidden by default) -->
         <Border x:Name="PanelFullLog" Grid.Row="4" Style="{StaticResource CardPanel}" Padding="0" Visibility="Collapsed">
             <DataGrid x:Name="DgFullLog" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="#161926" AlternatingRowBackground="#121520"
+                      Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
                       GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
                       Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="#0F121C"/>
+                        <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
                         <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
@@ -211,10 +211,13 @@
                                 <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="6,0">
                                     <Border.Style>
                                         <Style TargetType="Border">
-                                            <Setter Property="Background" Value="#3D1822"/>
+                                            <Setter Property="Background" Value="{StaticResource BadgeBgDanger}"/>
+                                            <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderDanger}"/>
+                                            <Setter Property="BorderThickness" Value="1"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Recovered}" Value="True">
-                                                    <Setter Property="Background" Value="#122E22"/>
+                                                    <Setter Property="Background" Value="{StaticResource BadgeBgSuccess}"/>
+                                                    <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderSuccess}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -222,7 +225,7 @@
                                     <TextBlock Text="{Binding DisplayStatus}" FontSize="11" FontWeight="Bold">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="#FF6B6B"/>
+                                                <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Recovered}" Value="True">
                                                         <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>

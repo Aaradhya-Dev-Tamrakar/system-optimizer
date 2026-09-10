@@ -10,6 +10,12 @@ namespace NovaOptimizer
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            DispatcherUnhandledException += (s, args) =>
+            {
+                Debug.WriteLine($"[Unhandled UI Exception] {args.Exception}");
+                args.Handled = true;
+            };
+
             // Check if running directly from within a source repository tree
             // and if newer source code files exist compared to this executable
             CheckAndPerformSourceAutoUpdate(e.Args);

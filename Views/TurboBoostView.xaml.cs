@@ -107,6 +107,26 @@ namespace NovaOptimizer.Views
             ColFree.Width = new GridLength(free, GridUnitType.Star);
         }
 
+        private System.Windows.Media.Brush GetBrush(string key, string fallbackHex = "#3B82F6")
+        {
+            try
+            {
+                if (TryFindResource(key) is System.Windows.Media.Brush b) return b;
+            }
+            catch { }
+            return (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom(fallbackHex)!;
+        }
+
+        private Style? GetStyle(string key)
+        {
+            try
+            {
+                return TryFindResource(key) as Style;
+            }
+            catch { }
+            return null;
+        }
+
         private void UpdateCpuUi()
         {
             double cpu = _cpuOptimizer.GetSystemCpuUsage();
@@ -115,23 +135,23 @@ namespace NovaOptimizer.Views
             if (cpu < 40.0)
             {
                 TxtCpuLoadStatus.Text = $"Optimal ({cpu:F0}%)";
-                TxtCpuLoadStatus.Foreground = (System.Windows.Media.Brush)FindResource("AccentGreen");
-                BadgeCpuLoad.Background = (System.Windows.Media.Brush)FindResource("BadgeBgSuccess");
-                BadgeCpuLoad.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderSuccess");
+                TxtCpuLoadStatus.Foreground = GetBrush("AccentGreen", "#10B981");
+                BadgeCpuLoad.Background = GetBrush("BadgeBgSuccess", "#0B271E");
+                BadgeCpuLoad.BorderBrush = GetBrush("BadgeBorderSuccess", "#144A37");
             }
             else if (cpu < 70.0)
             {
                 TxtCpuLoadStatus.Text = $"Moderate ({cpu:F0}%)";
-                TxtCpuLoadStatus.Foreground = (System.Windows.Media.Brush)FindResource("AccentYellow");
-                BadgeCpuLoad.Background = (System.Windows.Media.Brush)FindResource("BadgeBgWarning");
-                BadgeCpuLoad.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderWarning");
+                TxtCpuLoadStatus.Foreground = GetBrush("AccentYellow", "#EAB308");
+                BadgeCpuLoad.Background = GetBrush("BadgeBgWarning", "#291E0E");
+                BadgeCpuLoad.BorderBrush = GetBrush("BadgeBorderWarning", "#4D3819");
             }
             else
             {
                 TxtCpuLoadStatus.Text = $"High Load ({cpu:F0}%)";
-                TxtCpuLoadStatus.Foreground = (System.Windows.Media.Brush)FindResource("AccentRed");
-                BadgeCpuLoad.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDanger");
-                BadgeCpuLoad.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderDanger");
+                TxtCpuLoadStatus.Foreground = GetBrush("AccentRed", "#F43F5E");
+                BadgeCpuLoad.Background = GetBrush("BadgeBgDanger", "#2A1319");
+                BadgeCpuLoad.BorderBrush = GetBrush("BadgeBorderDanger", "#501E29");
             }
 
             _uiTickCount++;
@@ -321,12 +341,12 @@ namespace NovaOptimizer.Views
             if (_isBreakPhase)
             {
                 TxtPomodoroPhase.Text = "☕ Break Time";
-                TxtPomodoroPhase.Foreground = (System.Windows.Media.Brush)FindResource("AccentGreen");
+                TxtPomodoroPhase.Foreground = GetBrush("AccentGreen", "#10B981");
             }
             else
             {
                 TxtPomodoroPhase.Text = "📖 Focus Session";
-                TxtPomodoroPhase.Foreground = (System.Windows.Media.Brush)FindResource("AccentBlue");
+                TxtPomodoroPhase.Foreground = GetBrush("AccentBlue", "#60A5FA");
             }
 
             TxtPomodoroCounter.Text = $"Session #{_sessionCount}";
@@ -440,9 +460,9 @@ namespace NovaOptimizer.Views
         {
             Dispatcher.Invoke(() =>
             {
-                var primaryBrush = (System.Windows.Media.Brush)FindResource("AccentPrimary");
-                var borderCard = (System.Windows.Media.Brush)FindResource("BorderCard");
-                var bgCard = (System.Windows.Media.Brush)FindResource("BgCard");
+                var primaryBrush = GetBrush("AccentPrimary", "#3B82F6");
+                var borderCard = GetBrush("BorderCard", "#1E293B");
+                var bgCard = GetBrush("BgCard", "#131926");
                 var dangerBrush = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#E11D48")!;
 
                 // Reset badges and borders
@@ -575,39 +595,42 @@ namespace NovaOptimizer.Views
 
             var profile = _acerCooling.CurrentProfile;
 
-            var secondaryStyle = (Style)FindResource("SecondaryButton");
-            var primaryStyle = (Style)FindResource("PrimaryButton");
+            var secondaryStyle = GetStyle("SecondaryButton");
+            var primaryStyle = GetStyle("PrimaryButton");
 
-            BtnCoolingQuiet.Style = profile == AcerThermalProfile.Quiet ? primaryStyle : secondaryStyle;
-            BtnCoolingBalanced.Style = profile == AcerThermalProfile.Balanced ? primaryStyle : secondaryStyle;
-            BtnCoolingPerformance.Style = profile == AcerThermalProfile.Performance ? primaryStyle : secondaryStyle;
-            BtnCoolingTurbo.Style = profile == AcerThermalProfile.Turbo ? primaryStyle : secondaryStyle;
+            if (secondaryStyle != null && primaryStyle != null)
+            {
+                BtnCoolingQuiet.Style = profile == AcerThermalProfile.Quiet ? primaryStyle : secondaryStyle;
+                BtnCoolingBalanced.Style = profile == AcerThermalProfile.Balanced ? primaryStyle : secondaryStyle;
+                BtnCoolingPerformance.Style = profile == AcerThermalProfile.Performance ? primaryStyle : secondaryStyle;
+                BtnCoolingTurbo.Style = profile == AcerThermalProfile.Turbo ? primaryStyle : secondaryStyle;
+            }
 
             switch (profile)
             {
                 case AcerThermalProfile.Quiet:
                     TxtAcerActiveProfile.Text = "● Quiet (Whisper Fans)";
-                    TxtAcerActiveProfile.Foreground = (System.Windows.Media.Brush)FindResource("AccentBlue");
-                    BadgeAcerProfile.Background = (System.Windows.Media.Brush)FindResource("BadgeBgPrimary");
-                    BadgeAcerProfile.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderPrimary");
+                    TxtAcerActiveProfile.Foreground = GetBrush("AccentBlue", "#60A5FA");
+                    BadgeAcerProfile.Background = GetBrush("BadgeBgPrimary", "#0F2238");
+                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderPrimary", "#1B3B60");
                     break;
                 case AcerThermalProfile.Balanced:
                     TxtAcerActiveProfile.Text = "● Balanced (Factory Standard)";
-                    TxtAcerActiveProfile.Foreground = (System.Windows.Media.Brush)FindResource("AccentPrimary");
-                    BadgeAcerProfile.Background = (System.Windows.Media.Brush)FindResource("BadgeBgPrimary");
-                    BadgeAcerProfile.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderPrimary");
+                    TxtAcerActiveProfile.Foreground = GetBrush("AccentPrimary", "#3B82F6");
+                    BadgeAcerProfile.Background = GetBrush("BadgeBgPrimary", "#0F2238");
+                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderPrimary", "#1B3B60");
                     break;
                 case AcerThermalProfile.Performance:
                     TxtAcerActiveProfile.Text = "● Performance (Aggressive)";
-                    TxtAcerActiveProfile.Foreground = (System.Windows.Media.Brush)FindResource("AccentYellow");
-                    BadgeAcerProfile.Background = (System.Windows.Media.Brush)FindResource("BadgeBgWarning");
-                    BadgeAcerProfile.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderWarning");
+                    TxtAcerActiveProfile.Foreground = GetBrush("AccentYellow", "#EAB308");
+                    BadgeAcerProfile.Background = GetBrush("BadgeBgWarning", "#291E0E");
+                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderWarning", "#4D3819");
                     break;
                 case AcerThermalProfile.Turbo:
                     TxtAcerActiveProfile.Text = "● Turbo (Max Dissipation)";
-                    TxtAcerActiveProfile.Foreground = (System.Windows.Media.Brush)FindResource("AccentRed");
-                    BadgeAcerProfile.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDanger");
-                    BadgeAcerProfile.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderDanger");
+                    TxtAcerActiveProfile.Foreground = GetBrush("AccentRed", "#F43F5E");
+                    BadgeAcerProfile.Background = GetBrush("BadgeBgDanger", "#2A1319");
+                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderDanger", "#501E29");
                     break;
             }
         }

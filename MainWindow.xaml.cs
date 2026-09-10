@@ -91,30 +91,30 @@ namespace NovaOptimizer
                     if (profile == BoostProfile.GameMode)
                     {
                         TxtBadgeMode.Text = "🔥 GAME BOOST";
-                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentRed");
-                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDanger");
-                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderDanger");
+                        TxtBadgeMode.Foreground = GetBrush("AccentRed", "#F43F5E");
+                        BadgeMode.Background = GetBrush("BadgeBgDanger", "#2A1319");
+                        BadgeMode.BorderBrush = GetBrush("BadgeBorderDanger", "#501E29");
                     }
                     else if (profile == BoostProfile.WorkMode)
                     {
                         TxtBadgeMode.Text = "💼 WORK BOOST";
-                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentPrimary");
-                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgPrimary");
-                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderPrimary");
+                        TxtBadgeMode.Foreground = GetBrush("AccentPrimary", "#3B82F6");
+                        BadgeMode.Background = GetBrush("BadgeBgPrimary", "#0F2238");
+                        BadgeMode.BorderBrush = GetBrush("BadgeBorderPrimary", "#1B3B60");
                     }
                     else if (profile == BoostProfile.StudyMode)
                     {
                         TxtBadgeMode.Text = "📚 STUDY MODE";
-                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("AccentBlue");
-                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgInfo");
-                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BadgeBorderInfo");
+                        TxtBadgeMode.Foreground = GetBrush("AccentBlue", "#60A5FA");
+                        BadgeMode.Background = GetBrush("BadgeBgInfo", "#171B38");
+                        BadgeMode.BorderBrush = GetBrush("BadgeBorderInfo", "#2B3264");
                     }
                     else
                     {
                         TxtBadgeMode.Text = "🚀 Standard";
-                        TxtBadgeMode.Foreground = (System.Windows.Media.Brush)FindResource("TextSecondary");
-                        BadgeMode.Background = (System.Windows.Media.Brush)FindResource("BadgeBgDefault");
-                        BadgeMode.BorderBrush = (System.Windows.Media.Brush)FindResource("BorderCard");
+                        TxtBadgeMode.Foreground = GetBrush("TextSecondary", "#94A3B8");
+                        BadgeMode.Background = GetBrush("BadgeBgDefault", "#131824");
+                        BadgeMode.BorderBrush = GetBrush("BorderCard", "#1E293B");
                     }
                 });
             };
@@ -148,6 +148,16 @@ namespace NovaOptimizer
 
             Loaded += MainWindow_Loaded;
             Closing += MainWindow_Closing;
+        }
+
+        private System.Windows.Media.Brush GetBrush(string key, string fallbackHex = "#3B82F6")
+        {
+            try
+            {
+                if (TryFindResource(key) is System.Windows.Media.Brush b) return b;
+            }
+            catch { }
+            return (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom(fallbackHex)!;
         }
 
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)

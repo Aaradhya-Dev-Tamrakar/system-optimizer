@@ -60,3 +60,20 @@
 
 ## 6. Battery Longevity
 * Enabled Acer Care Center / Acer Sense **80% Battery Charge Limit** (Optimized Battery Protection) to prevent battery swelling and cell degradation while running connected to AC power.
+
+---
+
+## 7. Native Tooling De-Duplication & Redundancy Audit
+* **De-Duplication Strategy:** Audited NovaOptimizer codebase against Windows 11 default factory applications and Acer OEM software (`Acer Sense`) to eliminate redundant feature overlap and maintain a zero-overhead footprint.
+* **Pruned Redundancies:**
+  * **Acer Hardware Fan Control:** Removed internal WMI ACPI fan profile hooks and UI controls. Hardware thermal curves, cooling mode transitions (Quiet, Balanced, Performance), and keyboard shortcuts are delegated exclusively to factory **Acer Sense**.
+  * **Pomodoro Focus Timer:** Removed embedded countdown strip and timer loops from Turbo Boost, delegating focus sessions to the factory **Windows Clock ("Focus Sessions")** application (native Spotify integration, break alerts, and Do Not Disturb linking).
+  * **Startup Apps Auditor:** Removed third-party startup program registry enumeration and deletion grid. Startup program impact and toggling remain handled by the default factory **Windows Task Manager ("Startup apps" tab)** and **Windows Settings**.
+  * **Generic Task Manager & Performance Charts:** Removed standard process list and CPU/RAM history graphs, leaving general task monitoring to native **Windows Task Manager (`taskmgr.exe`)**.
+* **Retained Core Differentiators:**
+  * **NT Kernel Standby List & Working Set Purge** (`NtSetSystemInformation` + Auto-RAM Watchdog).
+  * **Turbo Boost Service Suspension** (temporary pausing of `DiagTrack`, `SysMain`, `WSearch`, etc., with one-click restore).
+  * **CPU Cooldown & Hog Tamer** (Windows EcoQoS / Efficiency Mode auto-tamer).
+  * **Safe Windows Latency Tweaks** (Network Throttling Index, Game DVR, Foreground CPU Priority).
+  * **Hung Process Watchdog & Event Log** (`IsHungAppWindow` detection and recovery logging).
+

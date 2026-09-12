@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="NovaOptimizer — System Optimizer &amp; Task Manager" 
+        Title="NovaOptimizer — System Optimizer" 
         Icon="Assets/icon.png"
         Height="760" Width="1180" MinHeight="640" MinWidth="980"
         Background="{StaticResource BgDark}" WindowStartupLocation="CenterScreen"
@@ -108,13 +108,7 @@
                         <RadioButton x:Name="NavBoost" Content="⚡ Turbo Boost" IsChecked="True" Style="{StaticResource NavRadioButton}" 
                                      Click="Nav_Click" Tag="Boost"/>
 
-                        <RadioButton x:Name="NavProcesses" Content="📋 Task Manager" Style="{StaticResource NavRadioButton}" 
-                                     Click="Nav_Click" Tag="Processes"/>
-
-                        <RadioButton x:Name="NavPerformance" Content="📊 Performance" Style="{StaticResource NavRadioButton}" 
-                                     Click="Nav_Click" Tag="Performance"/>
-
-                        <RadioButton x:Name="NavTweaks" Content="⚙️ Startup &amp; Tweaks" Style="{StaticResource NavRadioButton}" 
+                        <RadioButton x:Name="NavTweaks" Content="⚙️ System Tweaks" Style="{StaticResource NavRadioButton}" 
                                      Click="Nav_Click" Tag="Tweaks"/>
 
                         <RadioButton x:Name="NavHungLog" Style="{StaticResource NavRadioButton}" Click="Nav_Click" Tag="HungLog">

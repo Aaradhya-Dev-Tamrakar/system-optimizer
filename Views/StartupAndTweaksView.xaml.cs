@@ -44,10 +44,6 @@ namespace NovaOptimizer.Views
             _isSyncingNovaToggle = true;
             ToggleNovaStartup.IsChecked = _startupManager.IsNovaStartupEnabled();
             _isSyncingNovaToggle = false;
-
-            var startupItems = _startupManager.GetStartupItems();
-            DgStartup.ItemsSource = startupItems;
-            TxtStartupCount.Text = $"{startupItems.Count} Items Found";
         }
 
         private void TweakToggle_CheckedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
@@ -126,69 +122,6 @@ namespace NovaOptimizer.Views
                 OnStatusNotification?.Invoke(e.NewValue
                     ? "🚀 NovaOptimizer registered to start with Windows."
                     : "NovaOptimizer removed from Windows startup.");
-
-                // Refresh list so NovaOptimizer appears/disappears in the auditor list
-                var items = _startupManager.GetStartupItems();
-                DgStartup.ItemsSource = items;
-                TxtStartupCount.Text = $"{items.Count} Items Found";
-            }
-        }
-
-        private void BtnAddStartup_Click(object sender, RoutedEventArgs e)
-        {
-            var dlg = new Microsoft.Win32.OpenFileDialog
-            {
-                Title = "Select Application to Add to Startup",
-                Filter = "Executables & Shortcuts (*.exe;*.lnk;*.bat;*.cmd)|*.exe;*.lnk;*.bat;*.cmd|All Files (*.*)|*.*",
-                CheckFileExists = true
-            };
-
-            if (dlg.ShowDialog() == true)
-            {
-                string selectedFile = dlg.FileName;
-                string appName = System.IO.Path.GetFileNameWithoutExtension(selectedFile);
-
-                bool success = _startupManager.AddStartupItem(appName, selectedFile);
-                if (success)
-                {
-                    var items = _startupManager.GetStartupItems();
-                    DgStartup.ItemsSource = items;
-                    TxtStartupCount.Text = $"{items.Count} Items Found";
-                    OnStatusNotification?.Invoke($"✨ Added '{appName}' to Windows startup apps!");
-                }
-                else
-                {
-                    OnStatusNotification?.Invoke($"Failed to add '{appName}' to startup.");
-                }
-            }
-        }
-
-        private void BtnRefreshStartup_Click(object sender, RoutedEventArgs e)
-        {
-            var items = _startupManager.GetStartupItems();
-            DgStartup.ItemsSource = items;
-            TxtStartupCount.Text = $"{items.Count} Items Found";
-            OnStatusNotification?.Invoke("Startup items list refreshed.");
-        }
-
-        private void BtnRemoveStartup_Click(object sender, RoutedEventArgs e)
-        {
-            if (sender is Button btn && btn.Tag is StartupItem item)
-            {
-                var result = MessageBox.Show(
-                    $"Remove '{item.Name}' from starting automatically with Windows?",
-                    "Confirm Removal",
-                    MessageBoxButton.YesNo,
-                    MessageBoxImage.Question);
-
-                if (result == MessageBoxResult.Yes)
-                {
-                    _startupManager.RemoveStartupItem(item);
-                    var items = _startupManager.GetStartupItems();
-                    DgStartup.ItemsSource = items;
-                    TxtStartupCount.Text = $"{items.Count} Items Found";
-                    OnStatusNotification?.Invoke($"Removed {item.Name} from Windows startup.");
-                }
             }
         }
     }

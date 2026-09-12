@@ -70,16 +70,13 @@ namespace NovaOptimizer.Services
         public BoostProfile ActiveProfile { get; private set; } = BoostProfile.None;
         private readonly List<string> _temporarilyStoppedServices = new();
         private string? _previousPowerPlanGuid;
-        private readonly AcerHardwareCoolingService? _acerCooling;
-        private AcerThermalProfile? _previousAcerProfile;
 
         public event Action<BoostProfile>? OnProfileChanged;
         public event Action<string>? OnLogMessage;
 
-        public TurboBoostService(RamOptimizerService ramOptimizer, AcerHardwareCoolingService? acerCooling = null)
+        public TurboBoostService(RamOptimizerService ramOptimizer)
         {
             _ramOptimizer = ramOptimizer;
-            _acerCooling = acerCooling;
         }
 
         public async Task<bool> ActivateBoostAsync(BoostProfile profile)
@@ -95,26 +92,6 @@ namespace NovaOptimizer.Services
 
             await Task.Run(() =>
             {
-                // 0. Synchronize Acer firmware cooling profile
-                if (_acerCooling != null && _acerCooling.IsSupported)
-                {
-                    try
-                    {
-                        _previousAcerProfile = _acerCooling.CurrentProfile;
-                        AcerThermalProfile targetCooling = profile switch
-                        {
-                            BoostProfile.GameMode => AcerThermalProfile.Performance,
-                            BoostProfile.WorkMode => AcerThermalProfile.Balanced,
-                            BoostProfile.StudyMode => AcerThermalProfile.Quiet,
-                            _ => AcerThermalProfile.Balanced
-                        };
-                        _acerCooling.SetProfile(targetCooling);
-                    }
-                    catch (Exception ex)
-                    {
-                        OnLogMessage?.Invoke($"Firmware cooling notice: {ex.Message}");
-                    }
-                }
 
                 // 1. Record and switch power scheme
                 try
@@ -246,17 +223,6 @@ namespace NovaOptimizer.Services
                     {
                         SetPowerPlan(_previousPowerPlanGuid);
                         OnLogMessage?.Invoke("⚡ Restored original Windows Power Scheme");
-                    }
-                    catch { }
-                }
-
-                // 3. Restore Acer firmware cooling profile
-                if (_acerCooling != null && _acerCooling.IsSupported && _previousAcerProfile.HasValue)
-                {
-                    try
-                    {
-                        _acerCooling.SetProfile(_previousAcerProfile.Value);
-                        _previousAcerProfile = null;
                     }
                     catch { }
                 }

@@ -12,24 +12,20 @@ namespace NovaOptimizer.Views
         private readonly RamOptimizerService _ramOptimizer;
         private readonly TurboBoostService _turboBoost;
         private readonly CpuOptimizerService _cpuOptimizer;
-        private readonly AcerHardwareCoolingService _acerCooling;
         private readonly DispatcherTimer _timer;
         private int _uiTickCount = 0;
 
         public event Action<string>? OnStatusNotification;
 
-        public TurboBoostView(RamOptimizerService ramOptimizer, TurboBoostService turboBoost, CpuOptimizerService cpuOptimizer, AcerHardwareCoolingService? acerCooling = null)
+        public TurboBoostView(RamOptimizerService ramOptimizer, TurboBoostService turboBoost, CpuOptimizerService cpuOptimizer)
         {
             InitializeComponent();
             _ramOptimizer = ramOptimizer;
             _turboBoost = turboBoost;
             _cpuOptimizer = cpuOptimizer;
-            _acerCooling = acerCooling ?? new AcerHardwareCoolingService();
 
             _turboBoost.OnLogMessage += LogMessage;
             _turboBoost.OnProfileChanged += ProfileChanged;
-            _acerCooling.OnProfileChanged += (p) => Dispatcher.Invoke(UpdateCoolingUi);
-            _acerCooling.OnLogMessage += LogMessage;
             _ramOptimizer.OnAutoCleanPerformed += (freed) =>
             {
                 Dispatcher.Invoke(() =>
@@ -66,7 +62,6 @@ namespace NovaOptimizer.Views
             ToggleAutoTameCpu.IsChecked = _cpuOptimizer.AutoTameEnabled;
             UpdateMemoryUi();
             UpdateCpuUi();
-            UpdateCoolingUi();
 
             Loaded += (s, e) => RootScrollViewer.ScrollToTop();
         }
@@ -155,16 +150,10 @@ namespace NovaOptimizer.Views
             }
 
             _uiTickCount++;
-            if (_uiTickCount % 2 == 0) // refresh hog list and cooling telemetry every 2 seconds
+            if (_uiTickCount % 2 == 0) // refresh hog list every 2 seconds
             {
                 var hogs = _cpuOptimizer.GetTopCpuHogs(4);
                 IcTopCpuHogs.ItemsSource = hogs;
-
-                if (_acerCooling.IsSupported)
-                {
-                    _acerCooling.UpdateFanSpeeds();
-                    UpdateCoolingUi();
-                }
             }
         }
 
@@ -228,131 +217,6 @@ namespace NovaOptimizer.Views
             }
         }
 
-        #region Pomodoro Focus Timer
-        private DispatcherTimer? _pomodoroTimer;
-        private int _remainingSeconds = 25 * 60;
-        private bool _isBreakPhase = false;
-        private bool _isTimerRunning = false;
-        private int _sessionCount = 1;
-
-        private void InitPomodoroTimer()
-        {
-            _pomodoroTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(1) };
-            _pomodoroTimer.Tick += PomodoroTimer_Tick;
-            UpdatePomodoroDisplay();
-        }
-
-        private void PomodoroTimer_Tick(object? sender, EventArgs e)
-        {
-            if (_remainingSeconds > 0)
-            {
-                _remainingSeconds--;
-                UpdatePomodoroDisplay();
-            }
-            else
-            {
-                // Switch phase
-                _isBreakPhase = !_isBreakPhase;
-                if (!_isBreakPhase)
-                {
-                    _sessionCount++;
-                }
-
-                int nextMins = _isBreakPhase ? GetBreakMinutes() : GetFocusMinutes();
-                _remainingSeconds = nextMins * 60;
-                UpdatePomodoroDisplay();
-
-                string alertMsg = _isBreakPhase 
-                    ? "☕ Focus session complete! Time for a short break." 
-                    : $"📖 Break over! Starting Focus Session #{_sessionCount}.";
-
-                LogMessage($"[Pomodoro] {alertMsg}");
-                OnStatusNotification?.Invoke(alertMsg);
-
-                try
-                {
-                    System.Media.SystemSounds.Exclamation.Play();
-                }
-                catch { }
-            }
-        }
-
-        private void BtnPomodoroToggle_Click(object sender, RoutedEventArgs e)
-        {
-            if (_pomodoroTimer == null)
-            {
-                InitPomodoroTimer();
-            }
-
-            if (_isTimerRunning)
-            {
-                _pomodoroTimer?.Stop();
-                _isTimerRunning = false;
-                BtnPomodoroToggle.Content = "▶ Resume Timer";
-                BtnPomodoroToggle.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#0F2238")!;
-                BtnPomodoroToggle.Foreground = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#3B82F6")!;
-            }
-            else
-            {
-                // Check if remaining seconds is 0 or needs reset
-                if (_remainingSeconds <= 0)
-                {
-                    int mins = _isBreakPhase ? GetBreakMinutes() : GetFocusMinutes();
-                    _remainingSeconds = mins * 60;
-                }
-
-                _pomodoroTimer?.Start();
-                _isTimerRunning = true;
-                BtnPomodoroToggle.Content = "⏸ Pause Timer";
-                BtnPomodoroToggle.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#291E0E")!;
-                BtnPomodoroToggle.Foreground = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#F59E0B")!;
-            }
-        }
-
-        private void BtnPomodoroReset_Click(object sender, RoutedEventArgs e)
-        {
-            _pomodoroTimer?.Stop();
-            _isTimerRunning = false;
-            _isBreakPhase = false;
-            _remainingSeconds = GetFocusMinutes() * 60;
-            BtnPomodoroToggle.Content = "▶ Start Timer";
-            BtnPomodoroToggle.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#0F2238")!;
-            BtnPomodoroToggle.Foreground = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#3B82F6")!;
-            UpdatePomodoroDisplay();
-            LogMessage("[Pomodoro] Timer reset to Focus Session.");
-        }
-
-        private int GetFocusMinutes()
-        {
-            return int.TryParse(TxtFocusMins.Text.Trim(), out int val) && val > 0 ? val : 25;
-        }
-
-        private int GetBreakMinutes()
-        {
-            return int.TryParse(TxtBreakMins.Text.Trim(), out int val) && val > 0 ? val : 5;
-        }
-
-        private void UpdatePomodoroDisplay()
-        {
-            int mins = _remainingSeconds / 60;
-            int secs = _remainingSeconds % 60;
-            TxtPomodoroCountdown.Text = $"{mins:D2}:{secs:D2}";
-
-            if (_isBreakPhase)
-            {
-                TxtPomodoroPhase.Text = "☕ Break Time";
-                TxtPomodoroPhase.Foreground = GetBrush("AccentGreen", "#10B981");
-            }
-            else
-            {
-                TxtPomodoroPhase.Text = "📖 Focus Session";
-                TxtPomodoroPhase.Foreground = GetBrush("AccentBlue", "#60A5FA");
-            }
-
-            TxtPomodoroCounter.Text = $"Session #{_sessionCount}";
-        }
-        #endregion
-
         private async void BtnDeepClean_Click(object sender, RoutedEventArgs e)
         {
             BtnDeepClean.IsEnabled = false;
@@ -372,27 +236,6 @@ namespace NovaOptimizer.Views
                 BtnDeepClean.Content = origContent;
                 BtnDeepClean.IsEnabled = true;
             }
-        }
-
-        private void Preset25_Click(object sender, RoutedEventArgs e)
-        {
-            TxtFocusMins.Text = "25";
-            TxtBreakMins.Text = "5";
-            BtnPomodoroReset_Click(sender, e);
-        }
-
-        private void Preset50_Click(object sender, RoutedEventArgs e)
-        {
-            TxtFocusMins.Text = "50";
-            TxtBreakMins.Text = "10";
-            BtnPomodoroReset_Click(sender, e);
-        }
-
-        private void Preset90_Click(object sender, RoutedEventArgs e)
-        {
-            TxtFocusMins.Text = "90";
-            TxtBreakMins.Text = "15";
-            BtnPomodoroReset_Click(sender, e);
         }
 
         private void ToggleAutoClean_CheckedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
@@ -530,109 +373,6 @@ namespace NovaOptimizer.Views
                     BtnStudyMode.Background = primaryBrush;
                 }
             });
-        }
-
-        private void BtnCoolingQuiet_Click(object sender, RoutedEventArgs e)
-        {
-            if (_acerCooling.SetProfile(AcerThermalProfile.Quiet))
-            {
-                OnStatusNotification?.Invoke("🌙 Acer Cooling: Quiet Mode engaged (whisper fans).");
-                UpdateCoolingUi();
-            }
-        }
-
-        private void BtnCoolingBalanced_Click(object sender, RoutedEventArgs e)
-        {
-            if (_acerCooling.SetProfile(AcerThermalProfile.Balanced))
-            {
-                OnStatusNotification?.Invoke("⚖️ Acer Cooling: Balanced Mode engaged (factory curve).");
-                UpdateCoolingUi();
-            }
-        }
-
-        private void BtnCoolingPerformance_Click(object sender, RoutedEventArgs e)
-        {
-            if (_acerCooling.SetProfile(AcerThermalProfile.Performance))
-            {
-                OnStatusNotification?.Invoke("⚡ Acer Cooling: Performance Mode engaged (high fan speed).");
-                UpdateCoolingUi();
-            }
-        }
-
-        private void BtnCoolingTurbo_Click(object sender, RoutedEventArgs e)
-        {
-            if (_acerCooling.SetProfile(AcerThermalProfile.Turbo))
-            {
-                OnStatusNotification?.Invoke("🔥 Acer Cooling: Turbo Mode engaged (maximum dissipation).");
-                UpdateCoolingUi();
-            }
-        }
-
-        private void UpdateCoolingUi()
-        {
-            if (!_acerCooling.IsSupported)
-            {
-                TxtAcerActiveProfile.Text = "Hardware WMI Inactive";
-                TxtAcerActiveProfile.Foreground = (System.Windows.Media.Brush)FindResource("TextMuted");
-                TxtHardwareLinkNote.Text = "Acer ACPI Firmware WMI link requires Administrator privileges or supported Acer model.";
-                BtnCoolingQuiet.IsEnabled = false;
-                BtnCoolingBalanced.IsEnabled = false;
-                BtnCoolingPerformance.IsEnabled = false;
-                BtnCoolingTurbo.IsEnabled = false;
-                return;
-            }
-
-            TxtHardwareLinkNote.Text = $"Firmware Link: {_acerCooling.LaptopModel} • Hardware Thermal Watchdog Active";
-
-            if (_acerCooling.CpuFanRpm > 0)
-            {
-                TxtCpuFanRpm.Text = $"{_acerCooling.CpuFanRpm} RPM";
-            }
-            if (_acerCooling.GpuFanRpm > 0)
-            {
-                TxtGpuFanRpm.Text = $"{_acerCooling.GpuFanRpm} RPM";
-            }
-
-            var profile = _acerCooling.CurrentProfile;
-
-            var secondaryStyle = GetStyle("SecondaryButton");
-            var primaryStyle = GetStyle("PrimaryButton");
-
-            if (secondaryStyle != null && primaryStyle != null)
-            {
-                BtnCoolingQuiet.Style = profile == AcerThermalProfile.Quiet ? primaryStyle : secondaryStyle;
-                BtnCoolingBalanced.Style = profile == AcerThermalProfile.Balanced ? primaryStyle : secondaryStyle;
-                BtnCoolingPerformance.Style = profile == AcerThermalProfile.Performance ? primaryStyle : secondaryStyle;
-                BtnCoolingTurbo.Style = profile == AcerThermalProfile.Turbo ? primaryStyle : secondaryStyle;
-            }
-
-            switch (profile)
-            {
-                case AcerThermalProfile.Quiet:
-                    TxtAcerActiveProfile.Text = "● Quiet (Whisper Fans)";
-                    TxtAcerActiveProfile.Foreground = GetBrush("AccentBlue", "#60A5FA");
-                    BadgeAcerProfile.Background = GetBrush("BadgeBgPrimary", "#0F2238");
-                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderPrimary", "#1B3B60");
-                    break;
-                case AcerThermalProfile.Balanced:
-                    TxtAcerActiveProfile.Text = "● Balanced (Factory Standard)";
-                    TxtAcerActiveProfile.Foreground = GetBrush("AccentPrimary", "#3B82F6");
-                    BadgeAcerProfile.Background = GetBrush("BadgeBgPrimary", "#0F2238");
-                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderPrimary", "#1B3B60");
-                    break;
-                case AcerThermalProfile.Performance:
-                    TxtAcerActiveProfile.Text = "● Performance (Aggressive)";
-                    TxtAcerActiveProfile.Foreground = GetBrush("AccentYellow", "#EAB308");
-                    BadgeAcerProfile.Background = GetBrush("BadgeBgWarning", "#291E0E");
-                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderWarning", "#4D3819");
-                    break;
-                case AcerThermalProfile.Turbo:
-                    TxtAcerActiveProfile.Text = "● Turbo (Max Dissipation)";
-                    TxtAcerActiveProfile.Foreground = GetBrush("AccentRed", "#F43F5E");
-                    BadgeAcerProfile.Background = GetBrush("BadgeBgDanger", "#2A1319");
-                    BadgeAcerProfile.BorderBrush = GetBrush("BadgeBorderDanger", "#501E29");
-                    break;
-            }
         }
 
         private readonly System.Collections.Generic.List<string> _logEntries = new(100);

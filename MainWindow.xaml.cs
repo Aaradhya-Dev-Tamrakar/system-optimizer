@@ -13,16 +13,12 @@ namespace NovaOptimizer
     {
         private readonly RamOptimizerService _ramOptimizer;
         private readonly CpuOptimizerService _cpuOptimizer;
-        private readonly ProcessMonitorService _processMonitor;
         private readonly TurboBoostService _turboBoost;
         private readonly StartupManagerService _startupManager;
         private readonly SystemTweakService _systemTweaks;
         private readonly HungProcessWatchdogService _hungWatchdog;
-        private readonly AcerHardwareCoolingService _acerCooling;
 
         private readonly TurboBoostView _boostView;
-        private readonly ProcessesView _processesView;
-        private readonly PerformanceView _performanceView;
         private readonly StartupAndTweaksView _startupAndTweaksView;
         private readonly HungLogView _hungLogView;
 
@@ -38,23 +34,18 @@ namespace NovaOptimizer
             // Initialize Services
             _ramOptimizer = new RamOptimizerService();
             _cpuOptimizer = new CpuOptimizerService();
-            _processMonitor = new ProcessMonitorService();
-            _acerCooling = new AcerHardwareCoolingService();
-            _turboBoost = new TurboBoostService(_ramOptimizer, _acerCooling);
+            _turboBoost = new TurboBoostService(_ramOptimizer);
             _startupManager = new StartupManagerService();
             _systemTweaks = new SystemTweakService();
             _hungWatchdog = new HungProcessWatchdogService();
 
             // Initialize Views
-            _boostView = new TurboBoostView(_ramOptimizer, _turboBoost, _cpuOptimizer, _acerCooling);
-            _processesView = new ProcessesView(_processMonitor);
-            _performanceView = new PerformanceView(_ramOptimizer);
+            _boostView = new TurboBoostView(_ramOptimizer, _turboBoost, _cpuOptimizer);
             _startupAndTweaksView = new StartupAndTweaksView(_startupManager, _systemTweaks);
             _hungLogView = new HungLogView(_hungWatchdog);
 
             // Connect notifications
             _boostView.OnStatusNotification += (msg) => ShowNotification(msg, "⚡");
-            _processesView.OnStatusNotification += (msg) => ShowNotification(msg, "📋");
             _startupAndTweaksView.OnStatusNotification += (msg) => ShowNotification(msg, "⚙️");
             _hungLogView.OnStatusNotification += (msg) => ShowNotification(msg, "🔍");
 
@@ -122,8 +113,6 @@ namespace NovaOptimizer
             // Set default view and pause inactive views
             MainContent.Content = _boostView;
             _boostView.ResumeMonitoring();
-            _processesView.PauseMonitoring();
-            _performanceView.PauseMonitoring();
             _hungLogView.PauseMonitoring();
 
             // Timer for header CPU and RAM updates
@@ -248,8 +237,6 @@ namespace NovaOptimizer
             {
                 // Pause background monitoring on inactive views
                 _boostView.PauseMonitoring();
-                _processesView.PauseMonitoring();
-                _performanceView.PauseMonitoring();
                 _hungLogView.PauseMonitoring();
 
                 switch (tag)
@@ -257,14 +244,6 @@ namespace NovaOptimizer
                     case "Boost":
                         MainContent.Content = _boostView;
                         _boostView.ResumeMonitoring();
-                        break;
-                    case "Processes":
-                        MainContent.Content = _processesView;
-                        _processesView.ResumeMonitoring();
-                        break;
-                    case "Performance":
-                        MainContent.Content = _performanceView;
-                        _performanceView.ResumeMonitoring();
                         break;
                     case "Tweaks":
                         MainContent.Content = _startupAndTweaksView;

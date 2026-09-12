@@ -2,7 +2,7 @@
   <img src="Assets/icon.png" width="128" height="128" alt="NovaOptimizer Logo" />
 </p>
 
-# 🌌 NovaOptimizer — High-Efficiency Windows Task Manager & System Optimizer
+# 🌌 NovaOptimizer — High-Efficiency Windows System Optimizer
 
 > Built with **C# / .NET 10** and **WPF** for Windows 10 & 11. Engineered for zero overhead, instant response, and maximum system optimization before gaming or intensive work.
 
@@ -10,14 +10,16 @@
 
 ## ⚡ What is NovaOptimizer?
 
-NovaOptimizer is a native, ultra-lightweight Windows Task Manager and System Optimizer. Rather than being a heavy electron or browser-based utility that consumes hundreds of megabytes of your memory, NovaOptimizer runs on a micro-footprint (~25 MB RAM), launches in milliseconds, and directly manipulates native Windows NT kernel APIs to unlock maximum performance from your hardware.
+NovaOptimizer is a native, ultra-lightweight Windows System Optimizer designed strictly to complement—not duplicate—default factory Windows and OEM tools. Rather than cloning built-in utilities like Windows Task Manager, Windows Clock Focus Sessions, or OEM thermal utilities (like Acer Sense), NovaOptimizer focuses exclusively on advanced NT kernel optimizations that default factory apps cannot perform.
+
+NovaOptimizer runs with a micro-footprint (~25 MB RAM), launches in milliseconds, and directly manipulates native Windows NT kernel APIs to unlock maximum performance from your hardware.
 
 ---
 
-## 🚀 Key Features
+## 🚀 Core Features (Retained & Optimized)
 
 ### 1. 🧹 Deep Physical RAM Purge (ISLC & Sysinternals RAMMap Level)
-Standard task managers can only kill processes. NovaOptimizer interfaces with the Windows NT memory manager:
+Standard tools only terminate processes. NovaOptimizer directly interfaces with the Windows NT memory manager:
 - **Process Working Set Trimming**: Iterates active user and background processes (whitelisting protected system processes) and flushes dormant memory pages using `EmptyWorkingSet` and `SetProcessWorkingSetSize(-1, -1)`.
 - **Kernel Standby List Purging**: Invokes undocumented kernel calls via `NtSetSystemInformation(SystemMemoryListInformation = 80)` with commands `MemoryPurgeStandbyList (4)` and `MemoryPurgeLowPriorityStandbyList (5)`. This instantly cleans gigabytes of cached standby RAM that cause micro-stutters and frame drops in modern games.
 - **System Working Set Purge**: Flushes system-level cache using `MemoryEmptyWorkingSets (2)`.
@@ -34,41 +36,30 @@ Standard task managers can only kill processes. NovaOptimizer interfaces with th
     - `PcaSvc` (Program Compatibility Assistant)
     - `DPS` (Diagnostic Policy Service)
   - **Bloat Worker Killer**: Automatically terminates idle background updater agents (`AdobeUpdateService`, `GoogleUpdate`, `MicrosoftEdgeUpdate`, `OneDrive` background sync, `Cortana`, `GameBarFTServer`).
-  - **Windows Power Plan Unconstraining**: Engages the High Performance or Ultimate Performance power scheme to prevent aggressive CPU core parking and downclocking.
+  - **Windows Power Plan Unconstraining**: Engages the High Performance power scheme to prevent aggressive CPU core parking and downclocking.
   - **One-Click Restoration**: Restores all original services and previous power scheme upon deactivating boost.
 - **💼 Work / Dev Mode**:
-  - Trims memory on idle apps and dev tools, devotes maximum physical RAM to IDEs (Visual Studio, VS Code, JetBrains, Docker) and viewport suites (Blender, Premiere, Unreal).
+  - Trims memory on idle apps and dev tools, devotes maximum physical RAM to IDEs (Visual Studio, VS Code, JetBrains, Docker) and creative viewport suites.
   - Pauses unnecessary background telemetry and Xbox subsystems.
-- **📚 Study Mode (Sustained Focus & Battery Quiet Profile)**:
-  - **Distraction Killer**: Terminating intrusive entertainment, streaming, and chatting apps (`Discord`, `Spotify`, `Steam`, `EpicGamesLauncher`, `Teams`).
+- **📚 Study Mode**:
+  - **Distraction Killer**: Terminates intrusive entertainment, streaming, and chatting apps (`Discord`, `Spotify`, `Steam`, `EpicGamesLauncher`, `Teams`).
   - **Cool & Quiet Operation**: Switches Windows power scheme to **Balanced**, keeping CPU temperatures low and reducing fan noise during long library and desk study sessions.
   - **Telemetry & SuperFetch Suppressed**: Disables background indexing and reporting churn.
-  - **Built-in Pomodoro Focus Timer**: Integrated directly into the card with configurable Focus and Break lengths (e.g. 25m/5m), audio cue notifications, session iteration tracking, and one-click play/pause/reset.
 
-### 3. 📋 Real-Time Task Manager
-- Live process table with PID, Process Name, Working Set (RAM in MB), CPU %, Status, Priority Class, and Description.
-- Search and filter by Process Name, PID, or Description.
-- Context Menu Controls:
-  - **End Task** (graceful kill)
-  - **Kill Process Tree** (forceful `/F /T` termination of parent and all children)
-  - **Trim Working Set** (reclaim RAM from an individual process on demand)
-  - **Set Priority Class** (Realtime, High, Above Normal, Normal, Below Normal, Idle)
-  - **Open File Location** (reveals process binary in Windows File Explorer)
+### 3. ⚡ CPU Cooldown & Background Hog Tamer
+- Real-time CPU load meter with adaptive threshold status.
+- **Intelligent Hog Detection**: Continuously monitors top background CPU consumers (excluding foreground applications and protected OS processes).
+- **EcoQoS Efficiency Mode**: Automatically or manually throttles rogue background hogs using Windows EcoQoS (`PROCESS_POWER_THROTTLING_EXECUTION_SPEED`) and Idle priority.
 
-### 4. 📊 Performance & Architecture Dashboard
-- Real-time CPU % and RAM % utilization gauges and progress meters.
-- Physical Memory breakdown: In-Use, Standby Cache, and Free Unallocated RAM.
-- Windows Memory Architecture details: Committed / Pagefile limit, Paged Pool, Non-Paged Pool (Hardware drivers), Total Processes, System Uptime, and Processor Specs.
-
-### 5. 🚀 Startup Apps & Windows Debloat Tweaks
-- **Startup Apps Auditor**: Inspects Registry (`HKCU` & `HKLM` `Software\Microsoft\Windows\CurrentVersion\Run`) and Windows Startup folders. Allows removing autorun bloat to accelerate Windows boot times.
+### 4. ⚙️ System Latency & Debloat Registry Tweaks
+- **Nova Auto-Start**: Launches NovaOptimizer minimized to the system notification tray at logon with highest privileges to maintain standby memory cleaning silently.
 - **System Performance Tweaks**:
   - **Disable Game DVR / Background Captures**: Stops Windows from background-recording 3D viewports, fixing input latency.
   - **Disable Network Throttling Index**: Sets `NetworkThrottlingIndex = 0xFFFFFFFF` to eliminate network latency packet caps.
   - **Foreground Task Responsiveness**: Allocates 100% processing priority to foreground tasks instead of Windows reserving 20% for background apps.
   - **Disable Telemetry**: Disables Microsoft diagnostic data uploads.
 
-### 6. 🔍 Hung Process Watchdog & Event Log
+### 5. 🔍 Hung Process Watchdog & Event Log
 - Background monitor tracking non-responsive (frozen / "Not Responding") desktop applications using Win32 `IsHungAppWindow`.
 - Logs timestamped hung events, recovery durations, and crash/force-kill actions.
 - Real-time toast notifications alerting users when processes freeze or recover.
@@ -107,26 +98,24 @@ system-optimizer/
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
 ├── NovaOptimizer.csproj       # Project configuration (.NET 10 WPF Windows)
 ├── Native/
-│   └── NativeMethods.cs       # P/Invoke kernel32, ntdll, psapi, advapi32, user32, token privileges
+│   ├── IconHelper.cs          # Icon extractor for application executables
+│   ├── NativeMethods.cs       # P/Invoke kernel32, ntdll, psapi, advapi32, user32, token privileges
+│   └── TrayIconManager.cs     # Notification system tray icon and background manager
 ├── Models/
 │   ├── HungProcessRecord.cs   # Data model for frozen application events & durations
 │   ├── MemoryMetrics.cs       # Physical RAM, Standby, Free, Commit metrics
-│   ├── ProcessItem.cs         # Data model for Task Manager process table
-│   ├── StartupItem.cs         # Startup app registry & folder model
 │   └── TweakItem.cs           # System debloat & performance tweak model
 ├── Services/
+│   ├── CpuOptimizerService.cs # Background CPU hog detector & EcoQoS tamer
 │   ├── HungProcessWatchdogService.cs # IsHungAppWindow polling watchdog & event dispatch
 │   ├── RamOptimizerService.cs # Working Set trimmer, NT Standby cleaner, Watchdog
-│   ├── ProcessMonitorService.cs # Process enumerator, CPU% calculator, tree killer
-│   ├── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, power plan
-│   ├── StartupManagerService.cs # Startup items inspector & remover
-│   └── SystemTweakService.cs  # Windows Registry latency & debloat tweaks
+│   ├── StartupManagerService.cs # NovaOptimizer logon autostart manager
+│   ├── SystemTweakService.cs  # Windows Registry latency & debloat tweaks
+│   └── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, power plan
 └── Views/
     ├── HungLogView.xaml       # Real-time event log for hung/frozen process incidents
-    ├── TurboBoostView.xaml    # Boost profiles (Game, Work, Study + Pomodoro), RAM breakdown bar
-    ├── ProcessesView.xaml     # Task Manager process grid with search & context menu
-    ├── PerformanceView.xaml   # Real-time resource meters & kernel pool specs
-    └── StartupAndTweaksView.xaml # Startup manager & performance tweak switches
+    ├── StartupAndTweaksView.xaml # Safe registry performance tweaks & auto-start toggle
+    └── TurboBoostView.xaml    # Boost profiles, RAM breakdown bar, CPU Cooldown & Hog Tamer
 ```
 
 ---

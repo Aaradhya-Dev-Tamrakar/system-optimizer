@@ -14,10 +14,32 @@
                     <TextBlock Text="SYSTEM DEBLOAT &amp; LATENCY" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
                     <TextBlock Text=" • WINDOWS SUB-MS TUNING" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextDisabled}"/>
                 </StackPanel>
-                <TextBlock Text="Startup Apps &amp; System Tweaks" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"/>
-                <TextBlock Text="Audit background startup programs and apply kernel registry tweaks to reduce input delay and disk thrashing." 
+                <TextBlock Text="System Performance Tweaks" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,0,0,6"/>
+                <TextBlock Text="Apply safe Windows kernel and registry tweaks to eliminate network packet throttling, disable Game DVR input delay, and prioritize foreground tasks." 
                            FontSize="13" Foreground="{StaticResource TextSecondary}"/>
             </StackPanel>
+
+            <!-- NovaOptimizer Startup Integration Card -->
+            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,20" Padding="16,14">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
+                        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
+                            <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
+                                <TextBlock Text="NOVA AUTO-START" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                            </Border>
+                            <TextBlock Text="Run NovaOptimizer on Windows Boot" FontSize="13.5" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                        </StackPanel>
+                        <TextBlock Text="Launches NovaOptimizer minimized to the system tray at logon to maintain sub-ms timer resolution and keep RAM clear silently." 
+                                   FontSize="11.5" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
+                    </StackPanel>
+                    <controls:ToggleSwitch x:Name="ToggleNovaStartup" Grid.Column="1" VerticalAlignment="Center"
+                                           CheckedChanged="ToggleNovaStartup_CheckedChanged"/>
+                </Grid>
+            </Border>
 
             <!-- System Latency & Debloat Tweaks Section -->
             <Grid Margin="0,0,0,12">
@@ -35,7 +57,7 @@
                 </StackPanel>
             </Grid>
 
-            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,28">
+            <Border Style="{StaticResource CardPanel}">
                 <ItemsControl x:Name="IcTweaks">
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
@@ -65,142 +87,6 @@
                         </DataTemplate>
                     </ItemsControl.ItemTemplate>
                 </ItemsControl>
-            </Border>
-
-            <!-- Startup Apps Manager Section -->
-            <!-- NovaOptimizer Startup Integration Card -->
-            <Border Style="{StaticResource CardPanel}" Margin="0,0,0,16" Padding="16,14">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="Auto"/>
-                    </Grid.ColumnDefinitions>
-                    <StackPanel Grid.Column="0" VerticalAlignment="Center" Margin="0,0,16,0">
-                        <StackPanel Orientation="Horizontal" Margin="0,0,0,3">
-                            <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Padding="6,2" Margin="0,0,8,0" VerticalAlignment="Center">
-                                <TextBlock Text="NOVA AUTO-START" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
-                            </Border>
-                            <TextBlock Text="Run NovaOptimizer on Windows Boot" FontSize="13.5" FontWeight="Bold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                        </StackPanel>
-                        <TextBlock Text="Launches NovaOptimizer minimized to the system tray at startup to maintain sub-ms timer resolution and keep RAM clear." 
-                                   FontSize="11.5" Foreground="{StaticResource TextSecondary}" TextWrapping="Wrap"/>
-                    </StackPanel>
-                    <controls:ToggleSwitch x:Name="ToggleNovaStartup" Grid.Column="1" VerticalAlignment="Center"
-                                           CheckedChanged="ToggleNovaStartup_CheckedChanged"/>
-                </Grid>
-            </Border>
-
-            <Grid Margin="0,0,0,12">
-                <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                    <TextBlock Text="STARTUP APPLICATION AUDITOR" FontSize="12" FontWeight="Bold" Foreground="{StaticResource TextSecondary}" VerticalAlignment="Center"/>
-                    <Border CornerRadius="4" Background="{StaticResource BadgeBgInfo}" BorderBrush="{StaticResource BadgeBorderInfo}" BorderThickness="1" Padding="6,2" Margin="10,0,0,0">
-                        <TextBlock x:Name="TxtStartupCount" Text="0 Items Found" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentIndigo}"/>
-                    </Border>
-                </StackPanel>
-                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-                    <Button Content="➕ Add App" Style="{StaticResource PrimaryButton}" Padding="12,5" FontSize="11" Margin="0,0,8,0" Click="BtnAddStartup_Click"/>
-                    <Button Content="↺ Refresh List" Style="{StaticResource SecondaryButton}" Padding="10,5" FontSize="11" Click="BtnRefreshStartup_Click"/>
-                </StackPanel>
-            </Grid>
-
-            <Border Style="{StaticResource CardPanel}" Padding="0">
-                <DataGrid x:Name="DgStartup" AutoGenerateColumns="False" IsReadOnly="True"
-                          Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
-                          GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
-                          Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single">
-                    
-                    <DataGrid.ColumnHeaderStyle>
-                        <Style TargetType="DataGridColumnHeader">
-                            <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
-                            <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
-                            <Setter Property="FontWeight" Value="SemiBold"/>
-                            <Setter Property="FontSize" Value="12"/>
-                            <Setter Property="Padding" Value="12,10"/>
-                            <Setter Property="BorderBrush" Value="{StaticResource BorderCard}"/>
-                            <Setter Property="BorderThickness" Value="0,0,0,1"/>
-                        </Style>
-                    </DataGrid.ColumnHeaderStyle>
-
-                    <DataGrid.RowStyle>
-                        <Style TargetType="DataGridRow">
-                            <Setter Property="Height" Value="38"/>
-                            <Setter Property="FontSize" Value="12.5"/>
-                            <Style.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
-                                </Trigger>
-                            </Style.Triggers>
-                        </Style>
-                    </DataGrid.RowStyle>
-
-                    <DataGrid.Columns>
-                        <!-- Program Name with App Icon -->
-                        <DataGridTemplateColumn Header="Program Name" Width="220">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <StackPanel Orientation="Horizontal" Margin="8,0" VerticalAlignment="Center">
-                                        <Image Source="{Binding Icon}" Width="16" Height="16" Margin="0,0,8,0" VerticalAlignment="Center" RenderOptions.BitmapScalingMode="HighQuality"/>
-                                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"/>
-                                    </StackPanel>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <!-- Impact Badge -->
-                        <DataGridTemplateColumn Header="Boot Impact" Width="120">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="8,0">
-                                        <Border.Style>
-                                            <Style TargetType="Border">
-                                                <Setter Property="Background" Value="{StaticResource BadgeBgWarning}"/>
-                                                <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderWarning}"/>
-                                                <Setter Property="BorderThickness" Value="1"/>
-                                                <Style.Triggers>
-                                                    <DataTrigger Binding="{Binding Impact}" Value="High Impact">
-                                                        <Setter Property="Background" Value="{StaticResource BadgeBgDanger}"/>
-                                                        <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderDanger}"/>
-                                                    </DataTrigger>
-                                                    <DataTrigger Binding="{Binding Impact}" Value="Low Impact">
-                                                        <Setter Property="Background" Value="{StaticResource BadgeBgSuccess}"/>
-                                                        <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderSuccess}"/>
-                                                    </DataTrigger>
-                                                </Style.Triggers>
-                                            </Style>
-                                        </Border.Style>
-                                        <TextBlock Text="{Binding Impact}" FontSize="11" FontWeight="Bold">
-                                            <TextBlock.Style>
-                                                <Style TargetType="TextBlock">
-                                                    <Setter Property="Foreground" Value="{StaticResource AccentOrange}"/>
-                                                    <Style.Triggers>
-                                                        <DataTrigger Binding="{Binding Impact}" Value="High Impact">
-                                                            <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
-                                                        </DataTrigger>
-                                                        <DataTrigger Binding="{Binding Impact}" Value="Low Impact">
-                                                            <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
-                                                        </DataTrigger>
-                                                    </Style.Triggers>
-                                                </Style>
-                                            </TextBlock.Style>
-                                        </TextBlock>
-                                    </Border>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-
-                        <DataGridTextColumn Header="Registry / Folder Location" Binding="{Binding Location}" Width="160"/>
-                        <DataGridTextColumn Header="Executable Command" Binding="{Binding Command}" Width="*"/>
-
-                        <!-- Actions -->
-                        <DataGridTemplateColumn Header="Action" Width="100">
-                            <DataGridTemplateColumn.CellTemplate>
-                                <DataTemplate>
-                                    <Button Content="Remove" Style="{StaticResource DangerButton}" Click="BtnRemoveStartup_Click" Tag="{Binding}" Margin="6,0"/>
-                                </DataTemplate>
-                            </DataGridTemplateColumn.CellTemplate>
-                        </DataGridTemplateColumn>
-                    </DataGrid.Columns>
-                </DataGrid>
             </Border>
         </StackPanel>
     </ScrollViewer>

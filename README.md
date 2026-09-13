@@ -97,6 +97,10 @@ system-optimizer/
 ├── MainWindow.xaml            # Main shell with sidebar navigation & top status bar
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
 ├── NovaOptimizer.csproj       # Project configuration (.NET 10 WPF Windows)
+├── Run.bat                    # One-click launcher for the WPF application
+├── Run-Optimization.bat       # One-click administrator launcher for Windows service debloat
+├── optimize-services.ps1      # Standalone PowerShell script for telemetry & service optimization
+├── SYSTEM_OPTIMIZATION_LOG.md # Comprehensive system audit & tuning log
 ├── Native/
 │   ├── IconHelper.cs          # Icon extractor for application executables
 │   ├── NativeMethods.cs       # P/Invoke kernel32, ntdll, psapi, advapi32, user32, token privileges
@@ -117,6 +121,16 @@ system-optimizer/
     ├── StartupAndTweaksView.xaml # Safe registry performance tweaks & auto-start toggle
     └── TurboBoostView.xaml    # Boost profiles, RAM breakdown bar, CPU Cooldown & Hog Tamer
 ```
+
+---
+
+## ⚡ Standalone Background Service Debloat Script
+For quick headless or scriptable optimization without running the GUI:
+* Right-click **`Run-Optimization.bat`** and select **Run as administrator**.
+* Disables pure telemetry (`IntelCollectorService`, `IntelTelemetryAgent`, `Killer Analytics`).
+* Sets heavy background updaters and OEM bloat (`DSAService`, `AcerCCAgent`, `ESRV`, `PresentMon`, `edgeupdate`, `GoogleUpdater`) to **Manual** and halts running processes.
+* Preserves **`chromoting`** (Chrome Remote Desktop) as **Automatic** for uninterrupted remote desktop access.
+
 
 ---
 

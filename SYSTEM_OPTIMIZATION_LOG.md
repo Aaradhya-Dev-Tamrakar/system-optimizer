@@ -77,3 +77,27 @@
   * **Safe Windows Latency Tweaks** (Network Throttling Index, Game DVR, Foreground CPU Priority).
   * **Hung Process Watchdog & Event Log** (`IsHungAppWindow` detection and recovery logging).
 
+---
+
+## 8. Background Services Optimization & Telemetry Debloat
+* **Date:** September 13, 2026
+* **Target Services:**
+  * **Explicitly Preserved (Automatic):**
+    * `chromoting` (Chrome Remote Desktop Service) — Retained on `Automatic` to guarantee persistent remote access.
+  * **Disabled (Telemetry & Analytics):**
+    * `IntelCollectorService` (Intel Collector Service) -> `Disabled` & Stopped.
+    * `IntelTelemetryAgent` (Intel Telemetry Agent Service) -> `Disabled` & Stopped.
+    * `Killer Analytics Service` (Killer Analytics Telemetry) -> `Disabled` & Stopped.
+  * **Set to Manual (OEM Bloat & Heavy Updaters):**
+    * `DSAService` (Intel Driver & Support Assistant) -> `Manual` & Stopped (freed ~111 MB RAM).
+    * `DSAUpdateService` (Intel DSA Updater) -> `Manual` & Stopped.
+    * `Killer Provider Data Helper Service` -> `Manual` & Stopped.
+    * `ESRV_SVC_QUEENCREEK` / `USER_ESRV_SVC_QUEENCREEK` -> `Manual` & Stopped.
+    * `AcerCCAgentSvis` (Acer Care Center) -> `Manual` & Stopped.
+    * `AcerEZSvc` (Acer Experience Zone) -> `Manual` & Stopped.
+    * `PresentMonSharedService` (Intel PresentMon frame capture) -> `Manual` & Stopped.
+    * `edgeupdate` & `GoogleUpdater*` (Edge and Google background updaters) -> `Manual` & Stopped.
+* **Automation Scripts:**
+  * `optimize-services.ps1`: Automated PowerShell script to enforce service states and terminate active memory hogs.
+  * `Run-Optimization.bat`: One-click elevated wrapper to execute optimization with UAC elevation.
+

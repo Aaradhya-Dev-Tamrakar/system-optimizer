@@ -4,7 +4,7 @@
 
 # 🌌 NovaOptimizer — High-Efficiency Windows System Optimizer
 
-> Built with **C# / .NET 10** and **WPF** for Windows 10 & 11. Engineered for zero overhead, instant response, and maximum system optimization before gaming or intensive work.
+> Built with **C# / .NET 8 LTS** and **WPF** with **universal compatibility for Windows 10 & 11**. Engineered for zero overhead, instant response, and maximum system optimization before gaming or intensive work.
 
 ---
 
@@ -83,10 +83,12 @@ publish\NovaOptimizer.exe
 dotnet run -c Release
 ```
 
-### Option 3: Build & Publish
+### Option 3: Universal Standalone Portable Release (Windows 10 & 11)
+Double-click **`Publish-Release.bat`** or run:
 ```powershell
-dotnet publish -c Release -r win-x64 --no-self-contained -o ./publish
+dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./bin/Publish/win-x64
 ```
+This produces a zero-dependency, self-contained `NovaOptimizer.exe` that runs out-of-the-box on **any** Windows 10 (1607+) or Windows 11 64-bit machine without installing any .NET runtimes.
 
 ---
 
@@ -99,8 +101,9 @@ system-optimizer/
 ├── app.manifest               # Administrator elevation & PerMonitorV2 DPI manifest
 ├── MainWindow.xaml            # Main shell with sidebar navigation & top status bar
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
-├── NovaOptimizer.csproj       # Project configuration (.NET 10 WPF Windows)
+├── NovaOptimizer.csproj       # Project configuration (.NET 8 LTS WPF Windows)
 ├── Run.bat                    # One-click launcher for the WPF application
+├── Publish-Release.bat        # One-click standalone zero-dependency release publisher
 ├── Run-Optimization.bat       # One-click administrator launcher for Windows service debloat
 ├── optimize-services.ps1      # Standalone PowerShell script for telemetry & service optimization
 ├── SYSTEM_OPTIMIZATION_LOG.md # Comprehensive system audit & tuning log

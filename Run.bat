@@ -10,5 +10,11 @@ if %errorlevel% neq 0 (
     exit /b %errorlevel%
 )
 
-start "" "%~dp0bin\Release\net10.0-windows\NovaOptimizer.exe" %*
+if exist "%~dp0bin\Release\net8.0-windows\NovaOptimizer.exe" (
+    start "" "%~dp0bin\Release\net8.0-windows\NovaOptimizer.exe" %*
+) else if exist "%~dp0bin\Publish\win-x64\NovaOptimizer.exe" (
+    start "" "%~dp0bin\Publish\win-x64\NovaOptimizer.exe" %*
+) else (
+    start "" "%~dp0bin\Release\net10.0-windows\NovaOptimizer.exe" %*
+)
 exit /b 0

@@ -282,14 +282,21 @@ namespace NovaOptimizer.Native
                 // 1. Lower Priority to Idle
                 SetPriorityClass(hProc, IDLE_PRIORITY_CLASS);
 
-                // 2. Engage Windows EcoQoS (Efficiency Mode)
-                var state = new PROCESS_POWER_THROTTLING_STATE
+                // 2. Engage Windows EcoQoS (Efficiency Mode) if supported (Windows 10 Build 16299+ and Windows 11)
+                if (Environment.OSVersion.Version.Build >= 16299)
                 {
-                    Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION,
-                    ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED,
-                    StateMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED
-                };
-                SetProcessInformation(hProc, ProcessPowerThrottling, ref state, (uint)Marshal.SizeOf(state));
+                    try
+                    {
+                        var state = new PROCESS_POWER_THROTTLING_STATE
+                        {
+                            Version = PROCESS_POWER_THROTTLING_CURRENT_VERSION,
+                            ControlMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED,
+                            StateMask = PROCESS_POWER_THROTTLING_EXECUTION_SPEED
+                        };
+                        SetProcessInformation(hProc, ProcessPowerThrottling, ref state, (uint)Marshal.SizeOf(state));
+                    }
+                    catch { }
+                }
 
                 // 3. Trim working set pages from CPU cache & RAM
                 EmptyWorkingSet(hProc);

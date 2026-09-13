@@ -106,4 +106,9 @@
 * **Automation Scripts:**
   * `optimize-services.ps1`: Automated PowerShell script to enforce service states and terminate active memory hogs.
   * `Run-Optimization.bat`: One-click elevated wrapper to execute optimization with UAC elevation.
+* **NovaOptimizer Application Integration:**
+  * Added **Killer Performance Suite**, **Intel System Usage Report (esrv.exe)**, and **OEM Bloat / Updaters** directly to `SystemTweakService.cs` as interactive switches in the GUI ("Startup & Tweaks" view).
+  * Added worker processes (`KillerTray`, `KillerNetworkService`, `esrv`, `esrv_svc`, `SurSvc`) to `TurboBoostService.cs` bloat suppression engine so they are automatically cleaned during Game, Work, and Study boost modes.
+  * Rebuilt and published updated application binaries to `publish/NovaOptimizer.exe`.
+
 

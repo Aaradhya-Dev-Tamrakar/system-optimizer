@@ -53,11 +53,14 @@ Standard tools only terminate processes. NovaOptimizer directly interfaces with 
 
 ### 4. ⚙️ System Latency & Debloat Registry Tweaks
 - **Nova Auto-Start**: Launches NovaOptimizer minimized to the system notification tray at logon with highest privileges to maintain standby memory cleaning silently.
-- **System Performance Tweaks**:
+- **System Performance & Service Debloat Tweaks**:
   - **Disable Game DVR / Background Captures**: Stops Windows from background-recording 3D viewports, fixing input latency.
   - **Disable Network Throttling Index**: Sets `NetworkThrottlingIndex = 0xFFFFFFFF` to eliminate network latency packet caps.
   - **Foreground Task Responsiveness**: Allocates 100% processing priority to foreground tasks instead of Windows reserving 20% for background apps.
   - **Disable Telemetry**: Disables Microsoft diagnostic data uploads.
+  - **Disable Killer Performance Suite & Network Helper**: Disables `Killer Network Service`, stops `KillerTray.exe` and background polling.
+  - **Disable Intel System Usage Report & Energy Server**: Disables `ESRV_SVC_QUEENCREEK` and `SUR` services, halts `esrv.exe`.
+  - **Set OEM Bloat & Heavy Updaters to Manual**: Switches Acer Care Center, Acer Experience Zone, DSAService, and browser updaters to on-demand manual start.
 
 ### 5. 🔍 Hung Process Watchdog & Event Log
 - Background monitor tracking non-responsive (frozen / "Not Responding") desktop applications using Win32 `IsHungAppWindow`.

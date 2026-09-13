@@ -57,7 +57,8 @@ namespace NovaOptimizer.Services
         private static readonly string[] BloatProcessNames =
         [
             "AdobeUpdateService", "GoogleUpdate", "MicrosoftEdgeUpdate",
-            "OneDrive", "GameBarFTServer", "Cortana"
+            "OneDrive", "GameBarFTServer", "Cortana",
+            "KillerTray", "KillerNetworkService", "esrv", "esrv_svc", "SurSvc"
         ];
 
         // Distractions to terminate during Study / Focus mode

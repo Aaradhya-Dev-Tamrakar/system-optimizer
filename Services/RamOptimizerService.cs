@@ -18,7 +18,37 @@ namespace NovaOptimizer.Services
         };
 
         private Timer? _watchdogTimer;
-        public bool AutoCleanEnabled { get; set; } = false;
+        private bool? _autoCleanEnabled;
+        public bool AutoCleanEnabled
+        {
+            get
+            {
+                if (!_autoCleanEnabled.HasValue)
+                {
+                    try
+                    {
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        var val = key?.GetValue("AutoCleanEnabled");
+                        _autoCleanEnabled = val is int i ? (i != 0) : true;
+                    }
+                    catch
+                    {
+                        _autoCleanEnabled = true;
+                    }
+                }
+                return _autoCleanEnabled.Value;
+            }
+            set
+            {
+                _autoCleanEnabled = value;
+                try
+                {
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    key?.SetValue("AutoCleanEnabled", value ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+                catch { }
+            }
+        }
         public double AutoCleanThresholdPercent { get; set; } = 85.0; // Clean when RAM > 85% used
         public double AutoCleanStandbyThresholdGB { get; set; } = 3.0; // or Standby > 3 GB
 

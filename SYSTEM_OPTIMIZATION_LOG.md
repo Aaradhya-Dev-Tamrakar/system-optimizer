@@ -110,5 +110,8 @@
   * Added **Killer Performance Suite**, **Intel System Usage Report (esrv.exe)**, and **OEM Bloat / Updaters** directly to `SystemTweakService.cs` as interactive switches in the GUI ("Startup & Tweaks" view).
   * Added worker processes (`KillerTray`, `KillerNetworkService`, `esrv`, `esrv_svc`, `SurSvc`) to `TurboBoostService.cs` bloat suppression engine so they are automatically cleaned during Game, Work, and Study boost modes.
   * Rebuilt and published updated application binaries to `publish/NovaOptimizer.exe`.
+  * **Auto-Tame & Auto-Purge Startup Default**:
+    * Configured **Auto-Tame (CPU Hog Tamer)** and **Auto-Purge (Intelligent Memory Watchdog)** to turn ON automatically by default on every startup.
+    * Backed by persistent registry storage (`HKCU\Software\NovaOptimizer`) to remember user preferences across sessions.
 
 

@@ -23,7 +23,7 @@ Standard tools only terminate processes. NovaOptimizer directly interfaces with 
 - **Process Working Set Trimming**: Iterates active user and background processes (whitelisting protected system processes) and flushes dormant memory pages using `EmptyWorkingSet` and `SetProcessWorkingSetSize(-1, -1)`.
 - **Kernel Standby List Purging**: Invokes undocumented kernel calls via `NtSetSystemInformation(SystemMemoryListInformation = 80)` with commands `MemoryPurgeStandbyList (4)` and `MemoryPurgeLowPriorityStandbyList (5)`. This instantly cleans gigabytes of cached standby RAM that cause micro-stutters and frame drops in modern games.
 - **System Working Set Purge**: Flushes system-level cache using `MemoryEmptyWorkingSets (2)`.
-- **Intelligent Auto-RAM Watchdog**: Runs silently in the background every 15 seconds. If In-Use RAM exceeds 85% or Standby cache exceeds 3.0 GB, it triggers a silent purge without interrupting your workflow.
+- **Intelligent Auto-RAM Watchdog (Auto-Purge)**: Enabled by default at startup. Runs silently in the background every 15 seconds. If In-Use RAM exceeds 85% or Standby cache exceeds 3.0 GB, it triggers a silent purge without interrupting your workflow. User toggle state is persisted across boots.
 
 ### 2. 🎮 Turbo Boost Engine (Game, Work & Study Profiles)
 - **🎮 Game Mode**:
@@ -49,7 +49,7 @@ Standard tools only terminate processes. NovaOptimizer directly interfaces with 
 ### 3. ⚡ CPU Cooldown & Background Hog Tamer
 - Real-time CPU load meter with adaptive threshold status.
 - **Intelligent Hog Detection**: Continuously monitors top background CPU consumers (excluding foreground applications and protected OS processes).
-- **EcoQoS Efficiency Mode**: Automatically or manually throttles rogue background hogs using Windows EcoQoS (`PROCESS_POWER_THROTTLING_EXECUTION_SPEED`) and Idle priority.
+- **EcoQoS Efficiency Mode & Auto-Tamer**: Enabled by default at startup. Continuously and automatically throttles rogue background hogs using Windows EcoQoS (`PROCESS_POWER_THROTTLING_EXECUTION_SPEED`) and Idle priority. User toggle state is persisted across boots.
 
 ### 4. ⚙️ System Latency & Debloat Registry Tweaks
 - **Nova Auto-Start**: Launches NovaOptimizer minimized to the system notification tray at logon with highest privileges to maintain standby memory cleaning silently.

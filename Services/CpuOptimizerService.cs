@@ -45,7 +45,37 @@ namespace NovaOptimizer.Services
         private ulong _lastSysUser;
         private DateTime _lastSysSample = DateTime.MinValue;
 
-        public bool AutoTameEnabled { get; set; } = false;
+        private bool? _autoTameEnabled;
+        public bool AutoTameEnabled
+        {
+            get
+            {
+                if (!_autoTameEnabled.HasValue)
+                {
+                    try
+                    {
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        var val = key?.GetValue("AutoTameEnabled");
+                        _autoTameEnabled = val is int i ? (i != 0) : true;
+                    }
+                    catch
+                    {
+                        _autoTameEnabled = true;
+                    }
+                }
+                return _autoTameEnabled.Value;
+            }
+            set
+            {
+                _autoTameEnabled = value;
+                try
+                {
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    key?.SetValue("AutoTameEnabled", value ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+                catch { }
+            }
+        }
         public double AutoTameCpuThreshold { get; set; } = 75.0; // Trigger when overall CPU > 75%
         public double SingleProcessHogThreshold { get; set; } = 12.0; // Or single background process > 12%
 

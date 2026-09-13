@@ -19,24 +19,28 @@ $autoServices = @(
     "chromoting"   # Chrome Remote Desktop (User explicitly requested Auto)
 )
 
-# 2. DISABLE (Pure Telemetry & Analytics)
+# 2. DISABLE (Pure Telemetry, Analytics, Killer Suite & System Usage Report)
 $disableServices = @(
-    "IntelCollectorService",        # Intel Collector Telemetry
-    "IntelTelemetryAgent",          # Intel Telemetry Agent
-    "Killer Analytics Service"      # Killer Analytics Telemetry
+    "IntelCollectorService",               # Intel Collector Telemetry
+    "IntelTelemetryAgent",                 # Intel Telemetry Agent
+    "Killer Network Service",              # Launches Killer Performance Suite & KillerTray
+    "Killer Analytics Service",            # Killer Analytics Telemetry
+    "Killer Provider Data Helper Service", # Killer Provider Telemetry
+    "Intel Network Helper Service",        # Intel Network Helper
+    "ESRV_SVC_QUEENCREEK",                 # Intel Energy / System Usage Report service (esrv.exe)
+    "USER_ESRV_SVC_QUEENCREEK",            # User Energy / Usage Report service
+    "SystemUsageReportSvc_QUEENCREEK",     # System Usage Report Service
+    "Intel(R) SUR QC SAM"                  # Intel Software Asset Manager / SUR
 )
 
 # 3. SET TO MANUAL (Heavy Background Updaters & OEM Bloat)
 $manualServices = @(
-    "DSAService",                   # Intel Driver & Support Assistant (~111MB RAM)
-    "DSAUpdateService",             # Intel DSA Updater
-    "Killer Provider Data Helper Service",
-    "ESRV_SVC_QUEENCREEK",          # Energy Server Service
-    "USER_ESRV_SVC_QUEENCREEK",
-    "AcerCCAgentSvis",              # Acer Care Center
-    "AcerEZSvc",                    # Acer Experience Zone
-    "PresentMonSharedService",      # PresentMon frame capture
-    "edgeupdate"                    # Edge background updater
+    "DSAService",                          # Intel Driver & Support Assistant (~111MB RAM)
+    "DSAUpdateService",                    # Intel DSA Updater
+    "AcerCCAgentSvis",                     # Acer Care Center
+    "AcerEZSvc",                           # Acer Experience Zone
+    "PresentMonSharedService",             # PresentMon frame capture
+    "edgeupdate"                           # Edge background updater
 )
 
 function Update-ServiceConfig {
@@ -87,6 +91,16 @@ foreach ($s in $manualServices) {
 # Handle dynamic Google Updater services if present
 Get-Service -Name "GoogleUpdater*" -ErrorAction SilentlyContinue | ForEach-Object {
     Update-ServiceConfig -ServiceName $_.Name -TargetStartupType "Manual" -StopIfRunning $true
+}
+
+Write-Host "`n[4/4] Terminating lingering background worker processes..." -ForegroundColor White
+$processesToKill = @("KillerTray", "KillerNetworkService", "esrv", "esrv_svc", "SurSvc", "IntelSoftwareAssetManagerService", "IntelNetworkHelperService")
+foreach ($p in $processesToKill) {
+    $running = Get-Process -Name $p -ErrorAction SilentlyContinue
+    if ($running) {
+        $running | Stop-Process -Force -ErrorAction SilentlyContinue
+        Write-Host ("     Killed active process: {0}" -f $p) -ForegroundColor Yellow
+    }
 }
 
 Write-Host "`n==========================================================" -ForegroundColor Cyan

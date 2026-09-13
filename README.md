@@ -127,8 +127,10 @@ system-optimizer/
 ## ⚡ Standalone Background Service Debloat Script
 For quick headless or scriptable optimization without running the GUI:
 * Right-click **`Run-Optimization.bat`** and select **Run as administrator**.
-* Disables pure telemetry (`IntelCollectorService`, `IntelTelemetryAgent`, `Killer Analytics`).
-* Sets heavy background updaters and OEM bloat (`DSAService`, `AcerCCAgent`, `ESRV`, `PresentMon`, `edgeupdate`, `GoogleUpdater`) to **Manual** and halts running processes.
+* Disables pure telemetry & tracking (`IntelCollectorService`, `IntelTelemetryAgent`, `Killer Analytics`).
+* Disables **Killer Performance Suite** background service (`Killer Network Service`) to stop `KillerTray.exe` from launching.
+* Disables **Intel System Usage Report** (`ESRV_SVC_QUEENCREEK`, `USER_ESRV`, `SUR QC SAM`) to prevent `esrv.exe` from spawning.
+* Sets heavy background updaters and OEM bloat (`DSAService`, `AcerCCAgent`, `PresentMon`, `edgeupdate`, `GoogleUpdater`) to **Manual** and halts running processes.
 * Preserves **`chromoting`** (Chrome Remote Desktop) as **Automatic** for uninterrupted remote desktop access.
 
 

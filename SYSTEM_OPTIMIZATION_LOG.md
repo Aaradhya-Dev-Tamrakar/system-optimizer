@@ -84,19 +84,25 @@
 * **Target Services:**
   * **Explicitly Preserved (Automatic):**
     * `chromoting` (Chrome Remote Desktop Service) — Retained on `Automatic` to guarantee persistent remote access.
-  * **Disabled (Telemetry & Analytics):**
+  * **Disabled (Telemetry, Analytics, Killer Suite & Intel SUR):**
     * `IntelCollectorService` (Intel Collector Service) -> `Disabled` & Stopped.
     * `IntelTelemetryAgent` (Intel Telemetry Agent Service) -> `Disabled` & Stopped.
+    * `Killer Network Service` (Parent service spawning `KillerTray.exe` / Killer Performance Suite) -> `Disabled` & Stopped.
     * `Killer Analytics Service` (Killer Analytics Telemetry) -> `Disabled` & Stopped.
+    * `Killer Provider Data Helper Service` (Killer Provider Telemetry) -> `Disabled` & Stopped.
+    * `Intel Network Helper Service` (Intel Network Helper) -> `Disabled` & Stopped.
+    * `ESRV_SVC_QUEENCREEK` / `USER_ESRV_SVC_QUEENCREEK` (Energy Server / `esrv.exe` Intel System Usage Report) -> `Disabled` & Stopped.
+    * `SystemUsageReportSvc_QUEENCREEK` / `Intel(R) SUR QC SAM` (Intel System Usage Report & Asset Manager) -> `Disabled` & Stopped.
   * **Set to Manual (OEM Bloat & Heavy Updaters):**
     * `DSAService` (Intel Driver & Support Assistant) -> `Manual` & Stopped (freed ~111 MB RAM).
     * `DSAUpdateService` (Intel DSA Updater) -> `Manual` & Stopped.
-    * `Killer Provider Data Helper Service` -> `Manual` & Stopped.
-    * `ESRV_SVC_QUEENCREEK` / `USER_ESRV_SVC_QUEENCREEK` -> `Manual` & Stopped.
-    * `AcerCCAgentSvis` (Acer Care Center) -> `Manual` & Stopped.
+    * `AcerCCAgentSvis` (Acer Care Center) -> `Manual` (on-demand).
     * `AcerEZSvc` (Acer Experience Zone) -> `Manual` & Stopped.
     * `PresentMonSharedService` (Intel PresentMon frame capture) -> `Manual` & Stopped.
     * `edgeupdate` & `GoogleUpdater*` (Edge and Google background updaters) -> `Manual` & Stopped.
+* **Process Terminations:**
+    * Killed lingering `KillerTray.exe` (Intel Killer Performance Suite tray app).
+    * Killed lingering `esrv.exe` (Intel System Usage Report).
 * **Automation Scripts:**
   * `optimize-services.ps1`: Automated PowerShell script to enforce service states and terminate active memory hogs.
   * `Run-Optimization.bat`: One-click elevated wrapper to execute optimization with UAC elevation.

@@ -114,4 +114,27 @@
     * Configured **Auto-Tame (CPU Hog Tamer)** and **Auto-Purge (Intelligent Memory Watchdog)** to turn ON automatically by default on every startup.
     * Backed by persistent registry storage (`HKCU\Software\NovaOptimizer`) to remember user preferences across sessions.
 
+---
 
+## 9. Windows Security / Defender Startup Notification Audit
+* **Date:** September 16, 2026
+* **Symptom:** On every restart, a Windows Security toast notification appeared stating:
+  > *"Turn on virus protection. Virus protection is turned off. Tap or click to turn on Antivirus Microsoft Defender."*
+  Clicking the toast revealed that Windows Security was already green and fully operational.
+* **Integrity & Interference Audit:**
+  * **NovaOptimizer Codebase & Scripts:** Verified that neither `NovaOptimizer`, `SystemTweakService.cs`, nor `optimize-services.ps1` modify Defender services (`WinDefend`, `SecurityHealthService`, `wscsvc`) or group policies.
+  * **Tamper Protection:** Confirmed `(Get-MpComputerStatus).IsTamperProtected` is `True` (kernel-enforced protection prevents third-party processes from silently modifying Defender state).
+  * **Real-Time Protection Status:** Confirmed `RealTimeProtectionEnabled = True`, `AntivirusEnabled = True`, and `AMRunningMode = Normal`.
+* **Root Cause Analysis (Event Log Inspection):**
+  * Inspected `Microsoft-Windows-Windows Defender/Operational` event logs around boot (Event ID 5007 / 1150):
+    * `04:43:43 PM`: Defender started engine initialization following a platform update (`InitializingComponentProgress = InitializeMiscConfigLibrary -> PostPlatformUpdate -> LoadingEngine`). During this brief window, `IsServiceRunning` was `0`.
+    * Because the machine achieves a ~4.8s fast NVMe/BIOS boot, Windows Explorer and Windows Security Center (`wscsvc` / `SecurityHealthSystray.exe`) loaded before the Defender engine finished loading signatures into memory.
+    * Security Center polled status, found the engine not ready yet, and raised the toast notification.
+    * `04:43:54 PM` (11 seconds later): Defender completed initialization (`ServiceStartedSuccessfully`), and Event 1150 confirmed *"Endpoint Protection client is up and running in a healthy state"*.
+* **Resolution & Remediation:**
+  * **Primary Fix:** Refreshed and finalized security intelligence signatures via `Update-MpSignature` to version `1.459.238.0`, resolving the pending `PostPlatformUpdate` delay.
+  * **Fallback / UI Cache Fix:** Re-register/reset the Security app package if notification state persists:
+    ```powershell
+    Get-AppxPackage *SecHealthUI* | Reset-AppxPackage
+    ```
+  * **Notification Setting:** Optionally silence non-critical informational notifications under *Windows Security -> Virus & threat protection settings -> Manage notifications -> Receive informational notifications (Off)*.

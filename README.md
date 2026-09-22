@@ -102,6 +102,7 @@ system-optimizer/
 ├── MainWindow.xaml            # Main shell with sidebar navigation & top status bar
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
 ├── NovaOptimizer.csproj       # Project configuration (.NET 8 LTS WPF Windows)
+├── sync.ps1                   # Automated build verification, secret scanning & git sync
 ├── Run.bat                    # One-click launcher for the WPF application
 ├── Publish-Release.bat        # One-click standalone zero-dependency release publisher
 ├── Run-Optimization.bat       # One-click administrator launcher for Windows service debloat
@@ -139,6 +140,17 @@ For quick headless or scriptable optimization without running the GUI:
 * Sets heavy background updaters and OEM bloat (`DSAService`, `AcerCCAgent`, `PresentMon`, `edgeupdate`, `GoogleUpdater`) to **Manual** and halts running processes.
 * Preserves **`chromoting`** (Chrome Remote Desktop) as **Automatic** for uninterrupted remote desktop access.
 
+
+---
+
+## 🔄 Developer & Workflow Synchronization (`sync.ps1`)
+To maintain repository hygiene, build verification, and clean conventional commits, all synchronization is handled via `sync.ps1`:
+```powershell
+.\sync.ps1                                # Routine sync: pull (rebase), dotnet build, secret scan, commit & push
+.\sync.ps1 -m "feat(scope): message"      # Custom conventional commit
+.\sync.ps1 -PullOnly                      # Safe pull with rebase and autostash
+.\sync.ps1 -WhatIf                        # Dry-run preview of build and commit message
+```
 
 ---
 

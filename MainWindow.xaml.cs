@@ -213,7 +213,12 @@ namespace NovaOptimizer
             }
             else
             {
+                _headerTimer.Stop();
+                _toastTimer.Stop();
                 _trayManager?.Dispose();
+                _ramOptimizer.Dispose();
+                _cpuOptimizer.Dispose();
+                _hungWatchdog.Dispose();
             }
         }
 
@@ -273,13 +278,27 @@ namespace NovaOptimizer
                 var cpuResult = await cpuTask;
 
                 double mb = freed / (1024.0 * 1024.0);
-                if (cpuResult.TamedCount > 0)
+                if (mb > 0)
                 {
-                    ShowNotification($"Quick Clean: {mb:F0} MB RAM freed & {cpuResult.TamedCount} CPU hogs tamed to Eco Mode!", "✨");
+                    if (cpuResult.TamedCount > 0)
+                    {
+                        ShowNotification($"Quick Clean: {mb:F0} MB RAM freed & {cpuResult.TamedCount} CPU hogs tamed to Eco Mode!", "✨");
+                    }
+                    else
+                    {
+                        ShowNotification($"Quick Clean: {mb:F0} MB RAM liberated! CPU is calm.", "✨");
+                    }
                 }
                 else
                 {
-                    ShowNotification($"Quick Clean: {mb:F0} MB RAM liberated! CPU is calm.", "✨");
+                    if (cpuResult.TamedCount > 0)
+                    {
+                        ShowNotification($"Quick Clean: RAM is already optimal & {cpuResult.TamedCount} CPU hogs tamed to Eco Mode!", "✨");
+                    }
+                    else
+                    {
+                        ShowNotification("Quick Clean: System memory & CPU are already in an optimal state.", "✨");
+                    }
                 }
             }
             catch { }

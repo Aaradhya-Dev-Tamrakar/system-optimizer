@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Management;
 using System.Text.Json;
 using System.Threading;
 using NovaOptimizer.Models;
@@ -14,6 +13,7 @@ namespace NovaOptimizer.Services
 {
     public class HungProcessWatchdogService : IDisposable
     {
+        private const int MaxCachedRecords = 1000;
         private static readonly string LogDirectory =
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NovaOptimizer");
         private static readonly string LogFilePath =
@@ -50,8 +50,11 @@ namespace NovaOptimizer.Services
                 if (!File.Exists(LogFilePath)) return;
                 try
                 {
-                    foreach (var line in File.ReadAllLines(LogFilePath))
+                    var lines = File.ReadAllLines(LogFilePath);
+                    var startingIndex = Math.Max(0, lines.Length - MaxCachedRecords);
+                    for (int i = startingIndex; i < lines.Length; i++)
                     {
+                        var line = lines[i];
                         if (string.IsNullOrWhiteSpace(line)) continue;
                         try
                         {
@@ -219,6 +222,10 @@ namespace NovaOptimizer.Services
                 lock (_fileLock)
                 {
                     _cachedRecords.Add(record);
+                    if (_cachedRecords.Count > MaxCachedRecords)
+                    {
+                        _cachedRecords.RemoveAt(0);
+                    }
                     File.AppendAllText(LogFilePath, json + Environment.NewLine);
                 }
             }

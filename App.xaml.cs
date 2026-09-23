@@ -16,9 +16,21 @@ namespace NovaOptimizer
                 args.Handled = true;
             };
 
-            // Check if running directly from within a source repository tree
-            // and if newer source code files exist compared to this executable
-            CheckAndPerformSourceAutoUpdate(e.Args);
+            // Auto-rebuild is only enabled if explicitly requested via --enable-source-rebuild or in DEBUG builds
+            // This prevents arbitrary code execution vulnerabilities when running elevated in production.
+            bool allowSourceRebuild = false;
+#if DEBUG
+            allowSourceRebuild = true;
+#endif
+            if (e.Args.Contains("--enable-source-rebuild", StringComparer.OrdinalIgnoreCase))
+            {
+                allowSourceRebuild = true;
+            }
+
+            if (allowSourceRebuild)
+            {
+                CheckAndPerformSourceAutoUpdate(e.Args);
+            }
 
             base.OnStartup(e);
         }
@@ -26,7 +38,7 @@ namespace NovaOptimizer
         private static void CheckAndPerformSourceAutoUpdate(string[] args)
         {
             // Prevent recursive loop if this instance was just launched by an auto-rebuild
-            if (args.Contains("--no-source-check")) return;
+            if (args.Contains("--no-source-check", StringComparer.OrdinalIgnoreCase)) return;
 
             try
             {
@@ -95,7 +107,7 @@ namespace NovaOptimizer
 
                 if (hasNewerSource)
                 {
-                    // Recompile the project seamlessly
+                    // Recompile the project
                     var psi = new ProcessStartInfo
                     {
                         FileName = "dotnet",
@@ -108,12 +120,20 @@ namespace NovaOptimizer
                     using var buildProc = Process.Start(psi);
                     if (buildProc != null)
                     {
-                        buildProc.WaitForExit(15000);
+                        buildProc.WaitForExit(20000);
                         if (buildProc.ExitCode == 0)
                         {
-                            // Launch the newly recompiled binary
-                            string newBinaryPath = Path.Combine(projectDir, "bin", "Release", "net10.0-windows", "NovaOptimizer.exe");
-                            if (File.Exists(newBinaryPath))
+                            // Dynamically locate the newly compiled binary under bin/Release
+                            string releaseBinDir = Path.Combine(projectDir, "bin", "Release");
+                            string? newBinaryPath = null;
+
+                            if (Directory.Exists(releaseBinDir))
+                            {
+                                var candidates = Directory.GetFiles(releaseBinDir, "NovaOptimizer.exe", SearchOption.AllDirectories);
+                                newBinaryPath = candidates.OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault();
+                            }
+
+                            if (!string.IsNullOrEmpty(newBinaryPath) && File.Exists(newBinaryPath))
                             {
                                 var runPsi = new ProcessStartInfo
                                 {
@@ -128,9 +148,9 @@ namespace NovaOptimizer
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // In case of permission or file lock issues, continue launching current instance
+                Debug.WriteLine($"[App] Source auto-update check error: {ex.Message}");
             }
         }
     }

@@ -31,13 +31,6 @@ namespace NovaOptimizer.Services
 
     public class CpuOptimizerService : IDisposable
     {
-        private static readonly HashSet<string> ProtectedProcesses = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "system", "idle", "csrss", "smss", "wininit", "winlogon", "services",
-            "lsass", "svchost", "fontdrvhost", "dwm", "registry", "memcompression",
-            "explorer"
-        };
-
         private readonly Timer? _watchdogTimer;
         private readonly Dictionary<int, (TimeSpan CpuTime, DateTime SampleTime)> _procHistory = new();
         private ulong _lastSysIdle;
@@ -112,7 +105,7 @@ namespace NovaOptimizer.Services
                     h.Pid > 4 &&
                     h.Pid != currentPid &&
                     h.Pid != fgPid &&
-                    !ProtectedProcesses.Contains(h.Name) &&
+                    !SystemProcessAllowlist.IsProtected(h.Name, includeExplorer: true) &&
                     !string.Equals(h.Priority, "Idle", StringComparison.OrdinalIgnoreCase) &&
                     (overallCpu >= AutoTameCpuThreshold || h.CpuPercent >= SingleProcessHogThreshold)
                 ).ToList();
@@ -182,7 +175,7 @@ namespace NovaOptimizer.Services
             int currentPid = Environment.ProcessId;
 
             return hogs
-                .Where(h => h.Pid > 4 && h.Pid != currentPid && !ProtectedProcesses.Contains(h.Name))
+                .Where(h => h.Pid > 4 && h.Pid != currentPid && !SystemProcessAllowlist.IsProtected(h.Name, includeExplorer: true))
                 .Select(h => { h.IsForeground = (h.Pid == fgPid); return h; })
                 .OrderByDescending(h => h.CpuPercent)
                 .Take(count)
@@ -206,7 +199,7 @@ namespace NovaOptimizer.Services
                 h.Pid > 4 &&
                 h.Pid != currentPid &&
                 h.Pid != fgPid &&
-                !ProtectedProcesses.Contains(h.Name) &&
+                !SystemProcessAllowlist.IsProtected(h.Name, includeExplorer: true) &&
                 !string.Equals(h.Priority, "Idle", StringComparison.OrdinalIgnoreCase) &&
                 h.CpuPercent >= minCpuThreshold
             ).ToList();

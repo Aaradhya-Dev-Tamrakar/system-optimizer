@@ -9,15 +9,10 @@ using NovaOptimizer.Native;
 
 namespace NovaOptimizer.Services
 {
-    public class RamOptimizerService
+    public class RamOptimizerService : IDisposable
     {
-        private static readonly HashSet<string> CriticalProcesses = new(StringComparer.OrdinalIgnoreCase)
-        {
-            "system", "idle", "csrss", "smss", "wininit", "winlogon", "services", 
-            "lsass", "svchost", "fontdrvhost", "dwm", "registry", "memcompression"
-        };
-
         private Timer? _watchdogTimer;
+        private bool _disposed;
         private bool? _autoCleanEnabled;
         public bool AutoCleanEnabled
         {
@@ -66,7 +61,7 @@ namespace NovaOptimizer.Services
 
         private void WatchdogTick(object? state)
         {
-            if (!AutoCleanEnabled) return;
+            if (_disposed || !AutoCleanEnabled) return;
 
             // Pause timer to prevent reentrancy during long purges
             _watchdogTimer?.Change(Timeout.Infinite, Timeout.Infinite);
@@ -92,10 +87,13 @@ namespace NovaOptimizer.Services
             }
             finally
             {
-                // Resume 15-second tick
+                // Resume 15-second tick if not disposed
                 try
                 {
-                    _watchdogTimer?.Change(15000, 15000);
+                    if (!_disposed)
+                    {
+                        _watchdogTimer?.Change(15000, 15000);
+                    }
                 }
                 catch { }
             }
@@ -189,7 +187,7 @@ namespace NovaOptimizer.Services
                 try
                 {
                     if (proc.Id <= 4 || proc.Id == currentPid) return;
-                    if (CriticalProcesses.Contains(proc.ProcessName)) return;
+                    if (SystemProcessAllowlist.IsProtected(proc.ProcessName)) return;
 
                     IntPtr hProc = NativeMethods.OpenProcess(
                         NativeMethods.PROCESS_SET_QUOTA | NativeMethods.PROCESS_QUERY_INFORMATION, 
@@ -250,7 +248,25 @@ namespace NovaOptimizer.Services
                 return (long)(afterAvail - beforeAvail);
             }
 
-            return (long)(before.StandbyBytes > after.StandbyBytes ? before.StandbyBytes - after.StandbyBytes : 50 * 1024 * 1024);
+            if (before.StandbyBytes > after.StandbyBytes)
+            {
+                return (long)(before.StandbyBytes - after.StandbyBytes);
+            }
+
+            return 0;
+        }
+
+        public void Dispose()
+        {
+            if (_disposed) return;
+            _disposed = true;
+
+            try
+            {
+                _watchdogTimer?.Dispose();
+            }
+            catch { }
+            _watchdogTimer = null;
         }
     }
 }

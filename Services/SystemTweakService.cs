@@ -211,12 +211,27 @@ namespace NovaOptimizer.Services
                 {
                     try
                     {
-                        foreach (var p in Process.GetProcessesByName(proc))
+                        var procs = Process.GetProcessesByName(proc);
+                        foreach (var p in procs)
                         {
-                            p.Kill();
+                            try
+                            {
+                                p.Kill();
+                            }
+                            catch (Exception ex)
+                            {
+                                Debug.WriteLine($"[SystemTweakService] Error killing process {proc}: {ex.Message}");
+                            }
+                            finally
+                            {
+                                p.Dispose();
+                            }
                         }
                     }
-                    catch { }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"[SystemTweakService] Error listing processes for {proc}: {ex.Message}");
+                    }
                 }
             }
 

@@ -139,3 +139,18 @@
     Get-AppxPackage *SecHealthUI* | Reset-AppxPackage
     ```
   * **Notification Setting:** Optionally silence non-critical informational notifications under *Windows Security -> Virus & threat protection settings -> Manage notifications -> Receive informational notifications (Off)*.
+
+---
+
+## 10. Core Codebase Fixes, Resource Leakage & Security Hardening
+* **Date:** September 23, 2026
+* **Scope:** Systematic resolution of bugs, memory leaks, concurrency races, and privilege risks across core services.
+* **Key Enhancements & Fixes:**
+  * **Memory Leaks & Timer Disposal:** Implemented `IDisposable` in `RamOptimizerService` and wired complete disposal for all service timers (`_ramOptimizer`, `_cpuOptimizer`, `_hungWatchdog`, and `MainWindow` timers) on application exit.
+  * **Elimination of Fabricated Metrics:** Refactored `RamOptimizerService.DeepCleanRam` to strictly return genuine bytes freed (`0` when already optimal) instead of a synthetic 50 MB fallback value. Updated UI toast banners to display `"System memory & CPU are already in an optimal state"` when no purge is necessary.
+  * **Unified System Process Allowlist:** Created `Native/SystemProcessAllowlist.cs` to eliminate divergent, duplicated critical process collections across RAM and CPU optimization services.
+  * **Turbo Boost Concurrency Gate:** Added `SemaphoreSlim` synchronization and automated restoration of previous profile services when switching between Game, Work, and Study modes to eliminate orphaned stopped services and state races.
+  * **Security Hardening (Auto-Rebuild Gate):** Gated automatic elevated recompilation in `App.xaml.cs` behind explicit `--enable-source-rebuild` or DEBUG builds, mitigating unauthorized execution of modified source files. Dynamically resolve build output binaries instead of relying on a hardcoded legacy framework path.
+  * **Unbounded Log Memory Capping:** Capped in-memory log cache in `HungProcessWatchdogService` to the latest 1,000 entries. Removed unused `System.Management` dependency from project and codebase.
+  * **Handle Cleanup:** Ensured all `Process` instances retrieved during service suppression in `SystemTweakService` and `TurboBoostService` are properly disposed via `try/finally` blocks.
+

@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceProcess;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace NovaOptimizer.Services
@@ -17,6 +18,8 @@ namespace NovaOptimizer.Services
     public class TurboBoostService
     {
         private readonly RamOptimizerService _ramOptimizer;
+        private readonly SemaphoreSlim _gate = new(1, 1);
+        private readonly object _servicesLock = new();
 
         // Background services to pause during Game Mode to stop stutter & micro-hiccups
         private static readonly string[] GameModeServices =
@@ -81,94 +84,140 @@ namespace NovaOptimizer.Services
 
         public async Task<bool> ActivateBoostAsync(BoostProfile profile)
         {
-            if (profile == BoostProfile.None)
+            await _gate.WaitAsync();
+            try
             {
-                return await DeactivateBoostAsync();
+                if (profile == BoostProfile.None)
+                {
+                    return await InternalDeactivateBoostAsync();
+                }
+
+                // If already on a profile, restore services from previous profile first
+                if (ActiveProfile != BoostProfile.None)
+                {
+                    await InternalDeactivateBoostAsync();
+                }
+
+                ActiveProfile = profile;
+                OnProfileChanged?.Invoke(profile);
+                OnLogMessage?.Invoke($"Activating {profile}...");
+
+                await Task.Run(() =>
+                {
+                    // 1. Suspend non-critical background services
+                    string[] targetServices = profile switch
+                    {
+                        BoostProfile.GameMode => GameModeServices,
+                        BoostProfile.WorkMode => WorkModeServices,
+                        BoostProfile.StudyMode => StudyModeServices,
+                        _ => Array.Empty<string>()
+                    };
+
+                    lock (_servicesLock)
+                    {
+                        _temporarilyStoppedServices.Clear();
+                    }
+
+                    foreach (var svcName in targetServices)
+                    {
+                        try
+                        {
+                            using var sc = new ServiceController(svcName);
+                            if (sc.Status == ServiceControllerStatus.Running)
+                            {
+                                lock (_servicesLock)
+                                {
+                                    _temporarilyStoppedServices.Add(svcName);
+                                }
+                                sc.Stop();
+                                try
+                                {
+                                    sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
+                                }
+                                catch (System.ServiceProcess.TimeoutException)
+                                {
+                                    // Service stop requested; it will be restored upon Deactivate
+                                }
+                                OnLogMessage?.Invoke($"⏸️ Paused background service: {svcName}");
+                            }
+                        }
+                        catch
+                        {
+                            // Service might not exist or need elevation
+                        }
+                    }
+
+                    // 2. Terminate idle background updater bloatware and distractions
+                    int killedCount = 0;
+                    var targetsToKill = new List<string>(BloatProcessNames);
+                    if (profile == BoostProfile.StudyMode)
+                    {
+                        targetsToKill.AddRange(DistractionProcessNames);
+                    }
+
+                    foreach (var procName in targetsToKill)
+                    {
+                        try
+                        {
+                            var procs = Process.GetProcessesByName(procName);
+                            foreach (var p in procs)
+                            {
+                                try
+                                {
+                                    p.Kill();
+                                    killedCount++;
+                                }
+                                finally
+                                {
+                                    p.Dispose();
+                                }
+                            }
+                        }
+                        catch { }
+                    }
+                    if (killedCount > 0)
+                    {
+                        string label = profile == BoostProfile.StudyMode 
+                            ? "idle updaters & distraction processes" 
+                            : "idle background updater workers";
+                        OnLogMessage?.Invoke($"🧹 Terminated {killedCount} {label}");
+                    }
+
+                    // 3. Heavy RAM Deep Clean
+                    long freedBytes = _ramOptimizer.DeepCleanRam();
+                    double freedMB = (double)freedBytes / (1024 * 1024);
+                    if (freedMB > 0)
+                    {
+                        OnLogMessage?.Invoke($"🚀 Deep RAM Purge complete: {freedMB:F1} MB recovered!");
+                    }
+                    else
+                    {
+                        OnLogMessage?.Invoke("🚀 Deep RAM Purge complete: System memory already optimal.");
+                    }
+                });
+
+                return true;
             }
-
-            ActiveProfile = profile;
-            OnProfileChanged?.Invoke(profile);
-            OnLogMessage?.Invoke($"Activating {profile}...");
-
-            await Task.Run(() =>
+            finally
             {
-                // 1. Suspend non-critical background services
-                string[] targetServices = profile switch
-                {
-                    BoostProfile.GameMode => GameModeServices,
-                    BoostProfile.WorkMode => WorkModeServices,
-                    BoostProfile.StudyMode => StudyModeServices,
-                    _ => Array.Empty<string>()
-                };
-
-                _temporarilyStoppedServices.Clear();
-
-                foreach (var svcName in targetServices)
-                {
-                    try
-                    {
-                        using var sc = new ServiceController(svcName);
-                        if (sc.Status == ServiceControllerStatus.Running)
-                        {
-                            _temporarilyStoppedServices.Add(svcName);
-                            sc.Stop();
-                            try
-                            {
-                                sc.WaitForStatus(ServiceControllerStatus.Stopped, TimeSpan.FromSeconds(2));
-                            }
-                            catch (System.ServiceProcess.TimeoutException)
-                            {
-                                // Service stop requested; it will be restored upon Deactivate
-                            }
-                            OnLogMessage?.Invoke($"⏸️ Paused background service: {svcName}");
-                        }
-                    }
-                    catch
-                    {
-                        // Service might not exist or need elevation
-                    }
-                }
-
-                // 2. Terminate idle background updater bloatware and distractions
-                int killedCount = 0;
-                var targetsToKill = new List<string>(BloatProcessNames);
-                if (profile == BoostProfile.StudyMode)
-                {
-                    targetsToKill.AddRange(DistractionProcessNames);
-                }
-
-                foreach (var procName in targetsToKill)
-                {
-                    try
-                    {
-                        var procs = Process.GetProcessesByName(procName);
-                        foreach (var p in procs)
-                        {
-                            p.Kill();
-                            p.Dispose();
-                            killedCount++;
-                        }
-                    }
-                    catch { }
-                }
-                if (killedCount > 0)
-                {
-                    string label = profile == BoostProfile.StudyMode 
-                        ? "idle updaters & distraction processes" 
-                        : "idle background updater workers";
-                    OnLogMessage?.Invoke($"🧹 Terminated {killedCount} {label}");
-                }
-
-                // 3. Heavy RAM Deep Clean
-                long freedBytes = _ramOptimizer.DeepCleanRam();
-                double freedMB = (double)freedBytes / (1024 * 1024);
-                OnLogMessage?.Invoke($"🚀 Deep RAM Purge complete: {freedMB:F1} MB recovered!");
-            });
-
-            return true;
+                _gate.Release();
+            }
         }
 
         public async Task<bool> DeactivateBoostAsync()
+        {
+            await _gate.WaitAsync();
+            try
+            {
+                return await InternalDeactivateBoostAsync();
+            }
+            finally
+            {
+                _gate.Release();
+            }
+        }
+
+        private async Task<bool> InternalDeactivateBoostAsync()
         {
             if (ActiveProfile == BoostProfile.None) return true;
 
@@ -176,8 +225,15 @@ namespace NovaOptimizer.Services
 
             await Task.Run(() =>
             {
+                List<string> servicesToRestore;
+                lock (_servicesLock)
+                {
+                    servicesToRestore = new List<string>(_temporarilyStoppedServices);
+                    _temporarilyStoppedServices.Clear();
+                }
+
                 // 1. Restore services
-                foreach (var svcName in _temporarilyStoppedServices)
+                foreach (var svcName in servicesToRestore)
                 {
                     try
                     {
@@ -191,7 +247,6 @@ namespace NovaOptimizer.Services
                     }
                     catch { }
                 }
-                _temporarilyStoppedServices.Clear();
             });
 
             ActiveProfile = BoostProfile.None;

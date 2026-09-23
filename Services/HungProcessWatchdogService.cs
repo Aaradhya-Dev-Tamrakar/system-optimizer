@@ -25,6 +25,73 @@ namespace NovaOptimizer.Services
         private readonly object _fileLock = new();
         private bool _disposed;
 
+        // Auto-kill settings
+        private bool? _autoKillEnabled;
+        private int? _autoKillTimeoutSeconds;
+
+        /// <summary>
+        /// When enabled, hung processes exceeding AutoKillTimeoutSeconds are automatically terminated.
+        /// </summary>
+        public bool AutoKillEnabled
+        {
+            get
+            {
+                if (!_autoKillEnabled.HasValue)
+                {
+                    try
+                    {
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        var val = key?.GetValue("AutoKillHungEnabled");
+                        _autoKillEnabled = val is int i && i != 0;
+                    }
+                    catch { _autoKillEnabled = false; }
+                }
+                return _autoKillEnabled.Value;
+            }
+            set
+            {
+                _autoKillEnabled = value;
+                try
+                {
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    key?.SetValue("AutoKillHungEnabled", value ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+                catch { }
+            }
+        }
+
+        /// <summary>
+        /// Number of seconds a process must remain hung before auto-kill triggers. Default 30.
+        /// </summary>
+        public int AutoKillTimeoutSeconds
+        {
+            get
+            {
+                if (!_autoKillTimeoutSeconds.HasValue)
+                {
+                    try
+                    {
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        var val = key?.GetValue("AutoKillHungTimeout");
+                        _autoKillTimeoutSeconds = val is int i && i >= 5 ? i : 30;
+                    }
+                    catch { _autoKillTimeoutSeconds = 30; }
+                }
+                return _autoKillTimeoutSeconds.Value;
+            }
+            set
+            {
+                int clamped = Math.Clamp(value, 5, 300);
+                _autoKillTimeoutSeconds = clamped;
+                try
+                {
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    key?.SetValue("AutoKillHungTimeout", clamped, Microsoft.Win32.RegistryValueKind.DWord);
+                }
+                catch { }
+            }
+        }
+
         /// <summary>
         /// Fired when a new hung process is first detected (not on every tick).
         /// </summary>
@@ -34,6 +101,11 @@ namespace NovaOptimizer.Services
         /// Fired when a previously-hung process recovers on its own.
         /// </summary>
         public event Action<HungProcessRecord>? OnHungRecovered;
+
+        /// <summary>
+        /// Fired when a hung process is killed (manually or via auto-kill).
+        /// </summary>
+        public event Action<HungProcessRecord>? OnHungKilled;
 
         public HungProcessWatchdogService()
         {
@@ -210,6 +282,92 @@ namespace NovaOptimizer.Services
                     OnHungRecovered?.Invoke(recoveredRecord);
                 }
             }
+
+            // --- Auto-kill: terminate processes that have been hung longer than the timeout ---
+            if (AutoKillEnabled)
+            {
+                foreach (var kvp in _activeHangs.ToArray())
+                {
+                    if (kvp.Value.HangDurationSeconds >= AutoKillTimeoutSeconds)
+                    {
+                        KillHungProcess(kvp.Key, isAutoKill: true);
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Terminates a single hung process by PID. Returns true if the process was killed successfully.
+        /// Protected system processes (csrss, dwm, lsass, etc.) are blocked from termination.
+        /// </summary>
+        public bool KillHungProcess(int pid, bool isAutoKill = false)
+        {
+            try
+            {
+                using var proc = Process.GetProcessById(pid);
+
+                // Safety gate: never kill critical system processes
+                if (SystemProcessAllowlist.IsProtected(proc.ProcessName, includeExplorer: true))
+                {
+                    Debug.WriteLine($"[HungWatchdog] Blocked kill of protected process: {proc.ProcessName} (PID {pid})");
+                    return false;
+                }
+
+                // Capture state before killing
+                double ramMB = 0;
+                try { ramMB = proc.WorkingSet64 / (1024.0 * 1024.0); } catch { }
+
+                proc.Kill();
+
+                // Update the tracking record
+                if (_activeHangs.TryRemove(pid, out var record))
+                {
+                    record.KilledByUser = true;
+                    record.Recovered = false;
+                    record.RecoveredAt = DateTime.Now;
+                    record.HangDurationSeconds = (DateTime.Now - record.Timestamp).TotalSeconds;
+                    AppendRecord(record);
+                    OnHungKilled?.Invoke(record);
+                }
+                else
+                {
+                    // Process was hung but not actively tracked (edge case)
+                    var killRecord = new HungProcessRecord
+                    {
+                        Timestamp = DateTime.Now,
+                        ProcessName = proc.ProcessName,
+                        PID = pid,
+                        FilePath = NativeMethods.GetProcessFilePath(pid) ?? string.Empty,
+                        WorkingSetMB = ramMB,
+                        KilledByUser = true,
+                        RecoveredAt = DateTime.Now
+                    };
+                    AppendRecord(killRecord);
+                    OnHungKilled?.Invoke(killRecord);
+                }
+
+                Debug.WriteLine($"[HungWatchdog] {(isAutoKill ? "Auto-killed" : "User killed")} hung process: {proc.ProcessName} (PID {pid})");
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[HungWatchdog] Failed to kill PID {pid}: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Terminates all currently active hung processes. Returns the count of successfully killed processes.
+        /// </summary>
+        public int KillAllActiveHangs()
+        {
+            int killed = 0;
+            foreach (var kvp in _activeHangs.ToArray())
+            {
+                if (KillHungProcess(kvp.Key))
+                    killed++;
+            }
+            return killed;
         }
 
         private void AppendRecord(HungProcessRecord record)
@@ -314,7 +472,7 @@ namespace NovaOptimizer.Services
                 var records = GetAllRecords();
                 var lines = new List<string>
                 {
-                    "Timestamp,Process Name,PID,File Path,Description,CPU%,RAM (MB),Parent Process,Parent PID,Hang Duration (s),Recovered,Recovered At"
+                    "Timestamp,Process Name,PID,File Path,Description,CPU%,RAM (MB),Parent Process,Parent PID,Hang Duration (s),Recovered,Recovered At,Killed By User"
                 };
 
                 foreach (var r in records)
@@ -331,7 +489,8 @@ namespace NovaOptimizer.Services
                         r.ParentPID,
                         $"{r.HangDurationSeconds:F1}",
                         r.Recovered,
-                        r.RecoveredAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? ""
+                        r.RecoveredAt?.ToString("yyyy-MM-dd HH:mm:ss") ?? "",
+                        r.KilledByUser
                     ));
                 }
 

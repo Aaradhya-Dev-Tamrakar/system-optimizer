@@ -41,6 +41,9 @@ namespace NovaOptimizer.Models
         [JsonPropertyName("recoveredAt")]
         public DateTime? RecoveredAt { get; set; }
 
+        [JsonPropertyName("killedByUser")]
+        public bool KilledByUser { get; set; }
+
         // Display helpers for the UI
         [JsonIgnore]
         public string DisplayTimestamp => Timestamp.ToString("yyyy-MM-dd HH:mm:ss");
@@ -59,7 +62,8 @@ namespace NovaOptimizer.Models
 
         [JsonIgnore]
         public string DisplayStatus =>
-            Recovered ? "✅ Recovered"
+            KilledByUser ? "💀 Killed"
+            : Recovered ? "✅ Recovered"
             : HangDurationSeconds > 0 ? "🔴 Hung"
             : "⚪ Logged";
 

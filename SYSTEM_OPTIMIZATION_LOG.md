@@ -69,6 +69,7 @@
   * **Acer Hardware Fan Control:** Removed internal WMI ACPI fan profile hooks and UI controls. Hardware thermal curves, cooling mode transitions (Quiet, Balanced, Performance), and keyboard shortcuts are delegated exclusively to factory **Acer Sense**.
   * **Pomodoro Focus Timer:** Removed embedded countdown strip and timer loops from Turbo Boost, delegating focus sessions to the factory **Windows Clock ("Focus Sessions")** application (native Spotify integration, break alerts, and Do Not Disturb linking).
   * **Startup Apps Auditor:** Removed third-party startup program registry enumeration and deletion grid. Startup program impact and toggling remain handled by the default factory **Windows Task Manager ("Startup apps" tab)** and **Windows Settings**.
+  * **Power Plan Tweaking:** Removed Windows power scheme switching (`powercfg`) from all three boost profiles (Game Boost, Work Boost, Study Mode). Acer Swift laptops maintain optimal thermal envelopes, dynamic CPU boost curves, and acoustic fan tables under the native **Balanced** mode even for gaming; overriding schemes with High Performance via `powercfg` caused unnecessary thermal thrashing and conflict with Acer Sense.
   * **Generic Task Manager & Performance Charts:** Removed standard process list and CPU/RAM history graphs, leaving general task monitoring to native **Windows Task Manager (`taskmgr.exe`)**.
 * **Retained Core Differentiators:**
   * **NT Kernel Standby List & Working Set Purge** (`NtSetSystemInformation` + Auto-RAM Watchdog).

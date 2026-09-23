@@ -36,14 +36,14 @@ Standard tools only terminate processes. NovaOptimizer directly interfaces with 
     - `PcaSvc` (Program Compatibility Assistant)
     - `DPS` (Diagnostic Policy Service)
   - **Bloat Worker Killer**: Automatically terminates idle background updater agents (`AdobeUpdateService`, `GoogleUpdate`, `MicrosoftEdgeUpdate`, `OneDrive` background sync, `Cortana`, `GameBarFTServer`).
-  - **Windows Power Plan Unconstraining**: Engages the High Performance power scheme to prevent aggressive CPU core parking and downclocking.
-  - **One-Click Restoration**: Restores all original services and previous power scheme upon deactivating boost.
+  - **Native Power & Thermal Preservation**: Keeps the system on its native Balanced power plan to ensure optimal dynamic boosting, fan curves, and battery thermals without aggressive power plan overrides.
+  - **One-Click Restoration**: Restores all paused services cleanly upon deactivating boost.
 - **💼 Work / Dev Mode**:
   - Trims memory on idle apps and dev tools, devotes maximum physical RAM to IDEs (Visual Studio, VS Code, JetBrains, Docker) and creative viewport suites.
   - Pauses unnecessary background telemetry and Xbox subsystems.
 - **📚 Study Mode**:
   - **Distraction Killer**: Terminates intrusive entertainment, streaming, and chatting apps (`Discord`, `Spotify`, `Steam`, `EpicGamesLauncher`, `Teams`).
-  - **Cool & Quiet Operation**: Switches Windows power scheme to **Balanced**, keeping CPU temperatures low and reducing fan noise during long library and desk study sessions.
+  - **Cool & Quiet Operation**: Maintains calm thermal profile and quiet fans during long study sessions.
   - **Telemetry & SuperFetch Suppressed**: Disables background indexing and reporting churn.
 
 ### 3. ⚡ CPU Cooldown & Background Hog Tamer
@@ -122,7 +122,7 @@ system-optimizer/
 │   ├── RamOptimizerService.cs # Working Set trimmer, NT Standby cleaner, Watchdog
 │   ├── StartupManagerService.cs # NovaOptimizer logon autostart manager
 │   ├── SystemTweakService.cs  # Windows Registry latency & debloat tweaks
-│   └── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, power plan
+│   └── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, RAM purge
 └── Views/
     ├── HungLogView.xaml       # Real-time event log for hung/frozen process incidents
     ├── StartupAndTweaksView.xaml # Safe registry performance tweaks & auto-start toggle

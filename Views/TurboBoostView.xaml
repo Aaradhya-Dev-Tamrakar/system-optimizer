@@ -58,14 +58,14 @@
                             </Border>
                         </Grid>
 
-                        <TextBlock Grid.Row="1" Text="Suspends Windows Search, DiagTrack telemetry, and SuperFetch. Engages Ultimate CPU power plan, and purges kernel Standby Cache." 
+                        <TextBlock Grid.Row="1" Text="Suspends Windows Search, DiagTrack telemetry, and SuperFetch. Purges standby memory and eliminates background micro-stutters." 
                                    TextWrapping="Wrap" FontSize="12" LineHeight="17" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14"/>
 
                         <StackPanel Grid.Row="2" Margin="0,0,0,16">
                             <TextBlock Text="• Telemetry &amp; Error Reporting paused" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                             <TextBlock Text="• SuperFetch &amp; Search Indexing suspended" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                             <TextBlock Text="• Standby memory purged" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
-                            <TextBlock Text="• Ultimate/High Power Plan engaged" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
+                            <TextBlock Text="• Preserves native Balanced power &amp; thermals" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                         </StackPanel>
 
                         <Button x:Name="BtnGameBoost" Grid.Row="3" Content="Activate Game Boost" Style="{StaticResource PrimaryButton}" 
@@ -145,13 +145,13 @@
                         </Grid>
 
                         <!-- Description -->
-                        <TextBlock Grid.Row="1" Text="Kills distraction entertainment apps (Discord, Spotify, Steam), silences telemetry, and engages Balanced power for silent fan desk study sessions." 
+                        <TextBlock Grid.Row="1" Text="Kills distraction entertainment apps (Discord, Spotify, Steam), silences telemetry, and purges memory for silent desk study sessions." 
                                    TextWrapping="Wrap" FontSize="12" LineHeight="17" Foreground="{StaticResource TextSecondary}" Margin="0,0,0,14"/>
 
                         <!-- Bullet points -->
                         <StackPanel Grid.Row="2" Margin="0,0,0,16">
                             <TextBlock Text="• Distraction apps terminated (Discord, Spotify)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
-                            <TextBlock Text="• Balanced power plan (cool, quiet fans)" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
+                            <TextBlock Text="• Preserves quiet Balanced power &amp; fan curve" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                             <TextBlock Text="• Telemetry &amp; SuperFetch paused" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                             <TextBlock Text="• Low acoustic profile for desk and study sessions" FontSize="11.5" Foreground="{StaticResource TextMuted}" Margin="0,2.5"/>
                         </StackPanel>

@@ -70,7 +70,6 @@ namespace NovaOptimizer.Services
 
         public BoostProfile ActiveProfile { get; private set; } = BoostProfile.None;
         private readonly List<string> _temporarilyStoppedServices = new();
-        private string? _previousPowerPlanGuid;
 
         public event Action<BoostProfile>? OnProfileChanged;
         public event Action<string>? OnLogMessage;
@@ -93,30 +92,7 @@ namespace NovaOptimizer.Services
 
             await Task.Run(() =>
             {
-
-                // 1. Record and switch power scheme
-                try
-                {
-                    _previousPowerPlanGuid = GetActivePowerPlan();
-                    if (profile == BoostProfile.StudyMode)
-                    {
-                        // 381b4222-f694-41f0-9685-ff5bb260df2e is Balanced scheme (cool, quiet, energy-saving)
-                        SetPowerPlan("381b4222-f694-41f0-9685-ff5bb260df2e");
-                        OnLogMessage?.Invoke("⚡ Windows Power Plan set to Balanced (Quiet & Efficient)");
-                    }
-                    else
-                    {
-                        // 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c is High Performance
-                        SetPowerPlan("8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c");
-                        OnLogMessage?.Invoke("⚡ Windows Power Plan set to High Performance");
-                    }
-                }
-                catch (Exception ex)
-                {
-                    OnLogMessage?.Invoke($"Power plan notice: {ex.Message}");
-                }
-
-                // 2. Suspend non-critical background services
+                // 1. Suspend non-critical background services
                 string[] targetServices = profile switch
                 {
                     BoostProfile.GameMode => GameModeServices,
@@ -153,7 +129,7 @@ namespace NovaOptimizer.Services
                     }
                 }
 
-                // 3. Terminate idle background updater bloatware and distractions
+                // 2. Terminate idle background updater bloatware and distractions
                 int killedCount = 0;
                 var targetsToKill = new List<string>(BloatProcessNames);
                 if (profile == BoostProfile.StudyMode)
@@ -183,7 +159,7 @@ namespace NovaOptimizer.Services
                     OnLogMessage?.Invoke($"🧹 Terminated {killedCount} {label}");
                 }
 
-                // 4. Heavy RAM Deep Clean
+                // 3. Heavy RAM Deep Clean
                 long freedBytes = _ramOptimizer.DeepCleanRam();
                 double freedMB = (double)freedBytes / (1024 * 1024);
                 OnLogMessage?.Invoke($"🚀 Deep RAM Purge complete: {freedMB:F1} MB recovered!");
@@ -216,71 +192,12 @@ namespace NovaOptimizer.Services
                     catch { }
                 }
                 _temporarilyStoppedServices.Clear();
-
-                // 2. Restore power plan
-                if (!string.IsNullOrEmpty(_previousPowerPlanGuid))
-                {
-                    try
-                    {
-                        SetPowerPlan(_previousPowerPlanGuid);
-                        OnLogMessage?.Invoke("⚡ Restored original Windows Power Scheme");
-                    }
-                    catch { }
-                }
             });
 
             ActiveProfile = BoostProfile.None;
             OnProfileChanged?.Invoke(BoostProfile.None);
             OnLogMessage?.Invoke("Standard mode restored.");
             return true;
-        }
-
-        private string? GetActivePowerPlan()
-        {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "powercfg.exe",
-                    Arguments = "/getactivescheme",
-                    RedirectStandardOutput = true,
-                    UseShellExecute = false,
-                    CreateNoWindow = true
-                };
-                using var p = Process.Start(psi);
-                if (p != null)
-                {
-                    string output = p.StandardOutput.ReadToEnd();
-                    p.WaitForExit(2000);
-                    // Output format: "Power Scheme GUID: 381b4222-f694-41f0-9685-ff5bb260df2e  (Balanced)"
-                    int guidIndex = output.IndexOf("GUID: ", StringComparison.OrdinalIgnoreCase);
-                    if (guidIndex != -1)
-                    {
-                        string sub = output.Substring(guidIndex + 6).Trim();
-                        string guid = sub.Split(' ')[0];
-                        return guid;
-                    }
-                }
-            }
-            catch { }
-            return null;
-        }
-
-        private void SetPowerPlan(string guid)
-        {
-            try
-            {
-                var psi = new ProcessStartInfo
-                {
-                    FileName = "powercfg.exe",
-                    Arguments = $"/setactive {guid}",
-                    CreateNoWindow = true,
-                    UseShellExecute = false
-                };
-                using var p = Process.Start(psi);
-                p?.WaitForExit(2000);
-            }
-            catch { }
         }
     }
 }

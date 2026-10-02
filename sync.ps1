@@ -226,10 +226,37 @@ try {
     Write-Status -Message "NovaOptimizer Repository: $RepoPath"
     Write-Status -Message "Active Branch: $currentBranch"
 
-    # 1. Pull latest changes if remote origin exists
+    # 0. Verification Gate
+    $verifyScript = Join-Path $RepoPath "scripts\verify.py"
+    if (Test-Path $verifyScript) {
+        Write-Status -Message "Running scripts/verify.py..."
+        python $verifyScript
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "Verification failed. Commit aborted."
+            exit 1
+        }
+    }
+
+    # 1. Pull latest changes if remote origin exists and branch exists on remote
     if ($hasOrigin) {
-        Write-Status -Message "Pulling latest changes from origin/$currentBranch..."
-        git pull --rebase --autostash origin $currentBranch
+        $remoteBranchExists = $false
+        try {
+            $lsRemote = git ls-remote --heads origin $currentBranch 2>$null
+            if ($lsRemote -and $lsRemote.Trim().Length -gt 0) {
+                $remoteBranchExists = $true
+            }
+        }
+        catch {
+            $remoteBranchExists = $false
+        }
+
+        if ($remoteBranchExists) {
+            Write-Status -Message "Pulling latest changes from origin/$currentBranch..."
+            git pull --rebase --autostash origin $currentBranch
+        }
+        else {
+            Write-Notice -Message "Branch '$currentBranch' does not exist on origin yet; skipping initial pull."
+        }
     }
     else {
         Write-Notice -Message "No 'origin' remote configured; skipping pull step."

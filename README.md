@@ -69,26 +69,41 @@ Standard tools only terminate processes. NovaOptimizer directly interfaces with 
 
 ---
 
+## 📥 Download Standalone Executable (.exe)
+
+Direct standalone zero-dependency portable executable for **Windows 10 & Windows 11 (64-bit)**:
+
+[![Download NovaOptimizer.exe](https://img.shields.io/badge/Download-NovaOptimizer.exe-0ea5e9?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe)
+
+* **Direct Binary Download**: [**NovaOptimizer.exe (v1.0.0)**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe) (~70 MB, fully self-contained single file)
+* **Latest GitHub Release**: [GitHub Releases](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/tag/v1.0.0)
+* **Compatibility**: Windows 10 (Version 1607+ / Build 14393+) and Windows 11 (all versions, 64-bit). No .NET runtime installation required.
+
+---
+
 ## 🛠️ How to Run
 
-### Option 1: Run Pre-Built Executable (Recommended)
-The ready-to-run optimized executable is located in:
+### Option 1: Direct Download Standalone (.exe)
+Download [**`NovaOptimizer.exe`**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe) from GitHub Releases or from `bin/Publish/win-x64/NovaOptimizer.exe`.
+> **Note**: Right-click `NovaOptimizer.exe` and select **Run as administrator** (or accept the UAC prompt) to enable full NT kernel memory purging and Windows service suppression.
+
+### Option 2: Run Pre-Built Local Executable
+The locally compiled executable is available at:
 ```powershell
 publish\NovaOptimizer.exe
 ```
-> **Note**: Right-click `NovaOptimizer.exe` and select **Run as administrator** (or accept the UAC prompt) to enable full NT kernel memory purging and Windows service suppression.
 
-### Option 2: Run via .NET CLI
+### Option 3: Run via .NET CLI
 ```powershell
 dotnet run -c Release
 ```
 
-### Option 3: Universal Standalone Portable Release (Windows 10 & 11)
+### Option 4: Universal Standalone Portable Publisher
 Double-click **`Publish-Release.bat`** or run:
 ```powershell
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./bin/Publish/win-x64
 ```
-This produces a zero-dependency, self-contained `NovaOptimizer.exe` that runs out-of-the-box on **any** Windows 10 (1607+) or Windows 11 64-bit machine without installing any .NET runtimes.
+This produces a zero-dependency, self-contained `NovaOptimizer.exe` in `bin\Publish\win-x64\` that runs out-of-the-box on **any** Windows 10 or Windows 11 64-bit machine.
 
 ---
 

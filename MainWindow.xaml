@@ -7,8 +7,8 @@
         Title="WinGovernor — System Optimizer" 
         Icon="Assets/icon.png"
         Height="760" Width="1180" MinHeight="640" MinWidth="980"
-        Background="{StaticResource BgDark}" WindowStartupLocation="CenterScreen"
-        BorderBrush="{StaticResource BorderCard}" BorderThickness="1">
+        Background="{DynamicResource BgDark}" WindowStartupLocation="CenterScreen"
+        BorderBrush="{DynamicResource BorderCard}" BorderThickness="1">
 
     <WindowChrome.WindowChrome>
         <WindowChrome CaptionHeight="52" CornerRadius="0" GlassFrameThickness="0" ResizeBorderThickness="6" UseAeroCaptionButtons="False"/>
@@ -21,7 +21,7 @@
         </Grid.RowDefinitions>
 
         <!-- Top Header & Custom Titlebar -->
-        <Border Grid.Row="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,0,1" Padding="16,0,0,0">
+        <Border Grid.Row="0" Background="{DynamicResource BgSidebar}" BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,0,0,1" Padding="16,0,0,0">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto"/>
@@ -32,31 +32,31 @@
                 <!-- App Branding -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Image Source="Assets/icon.png" Width="24" Height="24" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock Text="WIN-GOVERNOR" FontSize="14" FontWeight="Black" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
-                    <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
-                        <TextBlock Text="PRO v1.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
+                    <TextBlock Text="WIN-GOVERNOR" FontSize="14" FontWeight="Black" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
+                    <Border CornerRadius="4" Background="{DynamicResource BadgeBgPrimary}" BorderBrush="{DynamicResource BadgeBorderPrimary}" BorderThickness="1" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
+                        <TextBlock Text="PRO v1.0" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource AccentPrimary}"/>
                     </Border>
                 </StackPanel>
 
                 <!-- Central Floating Toast Notification Banner -->
                 <Border x:Name="ToastBanner" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"
-                        Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource AccentPrimary}" BorderThickness="1"
+                        Background="{DynamicResource BadgeBgPrimary}" BorderBrush="{DynamicResource AccentPrimary}" BorderThickness="1"
                         CornerRadius="20" Padding="14,5" Opacity="0" IsHitTestVisible="False">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock x:Name="TxtToastIcon" Text="⚡" FontSize="12" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                        <TextBlock x:Name="TxtNotification" Text="System Ready" FontSize="12.5" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtNotification" Text="System Ready" FontSize="12.5" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                     </StackPanel>
                 </Border>
 
                 <!-- Header Actions & Window Controls -->
                 <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" WindowChrome.IsHitTestVisibleInChrome="True">
                     <!-- Live CPU & RAM Indicator Badge -->
-                    <Border CornerRadius="6" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
+                    <Border CornerRadius="6" Background="{DynamicResource BgCardSubtle}" BorderBrush="{DynamicResource BorderCard}" BorderThickness="1" Padding="10,5" Margin="0,0,10,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                             <TextBlock Text="⚡ " FontSize="11" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtHeaderCpu" Text="CPU: 0%" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource AccentCyan}" VerticalAlignment="Center"/>
-                            <TextBlock Text="  |  💾 " FontSize="11" Foreground="{StaticResource TextMuted}" VerticalAlignment="Center"/>
-                            <TextBlock x:Name="TxtHeaderRam" Text="RAM: 0%" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtHeaderCpu" Text="CPU: 0%" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource AccentCyan}" VerticalAlignment="Center"/>
+                            <TextBlock Text="  |  💾 " FontSize="11" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Center"/>
+                            <TextBlock x:Name="TxtHeaderRam" Text="RAM: 0%" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource TextPrimary}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
 
@@ -69,15 +69,15 @@
                             Padding="12,5" FontSize="11.5" Margin="0,0,10,0" Click="BtnQuickClean_Click"/>
 
                     <!-- Active Mode Badge -->
-                    <Border x:Name="BadgeMode" CornerRadius="6" Background="{StaticResource BadgeBgDefault}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="8,5" Margin="0,0,10,0">
-                        <TextBlock x:Name="TxtBadgeMode" Text="🚀 Standard" FontSize="11.5" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                    <Border x:Name="BadgeMode" CornerRadius="6" Background="{DynamicResource BadgeBgDefault}" BorderBrush="{DynamicResource BorderCard}" BorderThickness="1" Padding="8,5" Margin="0,0,10,0">
+                        <TextBlock x:Name="TxtBadgeMode" Text="🚀 Standard" FontSize="11.5" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}"/>
                     </Border>
 
                     <!-- Admin Badge -->
-                    <Border CornerRadius="6" Background="{StaticResource BadgeBgDefault}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" Padding="8,4" Margin="0,0,14,0">
+                    <Border CornerRadius="6" Background="{DynamicResource BadgeBgDefault}" BorderBrush="{DynamicResource BorderCard}" BorderThickness="1" Padding="8,4" Margin="0,0,14,0">
                         <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
-                            <Border Width="6" Height="6" CornerRadius="3" Background="{StaticResource AccentGreen}" Margin="0,0,6,0" VerticalAlignment="Center"/>
-                            <TextBlock Text="Admin" FontSize="11" FontWeight="SemiBold" Foreground="{StaticResource TextSecondary}"/>
+                            <Border Width="6" Height="6" CornerRadius="3" Background="{DynamicResource AccentGreen}" Margin="0,0,6,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Admin" FontSize="11" FontWeight="SemiBold" Foreground="{DynamicResource TextSecondary}"/>
                         </StackPanel>
                     </Border>
 
@@ -97,7 +97,7 @@
             </Grid.ColumnDefinitions>
 
             <!-- Sidebar -->
-            <Border Grid.Column="0" Background="{StaticResource BgSidebar}" BorderBrush="{StaticResource BorderCard}" BorderThickness="0,0,1,0">
+            <Border Grid.Column="0" Background="{DynamicResource BgSidebar}" BorderBrush="{DynamicResource BorderCard}" BorderThickness="0,0,1,0">
                 <Grid Margin="12,16">
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto"/>
@@ -105,7 +105,7 @@
                         <RowDefinition Height="Auto"/>
                     </Grid.RowDefinitions>
 
-                    <TextBlock Grid.Row="0" Text="NAVIGATION" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="8,0,0,10"/>
+                    <TextBlock Grid.Row="0" Text="NAVIGATION" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="8,0,0,10"/>
 
                     <!-- Navigation Items -->
                     <StackPanel Grid.Row="1">
@@ -118,7 +118,7 @@
                         <RadioButton x:Name="NavHungLog" Style="{StaticResource NavRadioButton}" Click="Nav_Click" Tag="HungLog">
                             <Grid HorizontalAlignment="Stretch">
                                 <TextBlock Text="🔍 Hung Log" VerticalAlignment="Center"/>
-                                <Border x:Name="BadgeHungCount" CornerRadius="8" Background="{StaticResource AccentRed}" Padding="5,1" 
+                                <Border x:Name="BadgeHungCount" CornerRadius="8" Background="{DynamicResource AccentRed}" Padding="5,1" 
                                         HorizontalAlignment="Right" Margin="0,0,4,0" Visibility="Collapsed">
                                     <TextBlock x:Name="TxtHungBadge" Text="0" FontSize="10" FontWeight="Bold" Foreground="White"/>
                                 </Border>
@@ -127,16 +127,16 @@
                     </StackPanel>
 
                     <!-- Bottom Pinned Telemetry & Tray Card -->
-                    <Border Grid.Row="2" Background="{StaticResource BgCardSubtle}" BorderBrush="{StaticResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
+                    <Border Grid.Row="2" Background="{DynamicResource BgCardSubtle}" BorderBrush="{DynamicResource BorderCard}" BorderThickness="1" CornerRadius="8" Padding="12">
                         <StackPanel>
                             <StackPanel Orientation="Horizontal" Margin="0,0,0,4">
-                                <Border Width="6" Height="6" CornerRadius="3" Background="{StaticResource AccentGreen}" VerticalAlignment="Center" Margin="0,0,6,0"/>
-                                <TextBlock Text="Zero Latency Active" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextPrimary}"/>
+                                <Border Width="6" Height="6" CornerRadius="3" Background="{DynamicResource AccentGreen}" VerticalAlignment="Center" Margin="0,0,6,0"/>
+                                <TextBlock Text="Zero Latency Active" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextPrimary}"/>
                             </StackPanel>
-                            <TextBlock Text="Kernel Standby Cleaner &amp; Watchdog actively protecting framerates." FontSize="10.5" Foreground="{StaticResource TextMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
-                            <CheckBox x:Name="ChkMinimizeToTray" Content="Minimize to tray" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                            <TextBlock Text="Kernel Standby Cleaner &amp; Watchdog actively protecting framerates." FontSize="10.5" Foreground="{DynamicResource TextMuted}" TextWrapping="Wrap" Margin="0,0,0,8"/>
+                            <CheckBox x:Name="ChkMinimizeToTray" Content="Minimize to tray" FontSize="11" Foreground="{DynamicResource TextSecondary}"
                                       IsChecked="True"/>
-                            <CheckBox x:Name="ChkStartWithWindows" Content="Start with Windows" FontSize="11" Foreground="{StaticResource TextSecondary}"
+                            <CheckBox x:Name="ChkStartWithWindows" Content="Start with Windows" FontSize="11" Foreground="{DynamicResource TextSecondary}"
                                       Margin="0,6,0,0" Checked="ChkStartWithWindows_Changed" Unchecked="ChkStartWithWindows_Changed"/>
                         </StackPanel>
                     </Border>
@@ -144,7 +144,7 @@
             </Border>
 
             <!-- Main Content Area -->
-            <ContentControl x:Name="MainContent" Grid.Column="1" Background="{StaticResource BgDark}"/>
+            <ContentControl x:Name="MainContent" Grid.Column="1" Background="{DynamicResource BgDark}"/>
         </Grid>
     </Grid>
 </Window>

@@ -220,6 +220,9 @@ namespace WinGovernor.Native
                 Foreground = Application.Current.TryFindResource("TextPrimary") as System.Windows.Media.Brush ?? System.Windows.Media.Brushes.White,
                 BorderBrush = Application.Current.TryFindResource("BorderCard") as System.Windows.Media.Brush ?? System.Windows.Media.Brushes.Gray
             };
+            menu.SetResourceReference(System.Windows.Controls.Control.BackgroundProperty, "BgCard");
+            menu.SetResourceReference(System.Windows.Controls.Control.ForegroundProperty, "TextPrimary");
+            menu.SetResourceReference(System.Windows.Controls.Control.BorderBrushProperty, "BorderCard");
 
             var itemOpen = new MenuItem { Header = "🌌 Open WinGovernor", FontWeight = FontWeights.Bold };
             itemOpen.Click += (s, e) => ShowWindow();

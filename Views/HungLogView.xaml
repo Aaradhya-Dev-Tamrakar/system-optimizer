@@ -17,10 +17,10 @@
         </Grid.RowDefinitions>
 
         <!-- Header -->
-        <TextBlock Grid.Row="0" Text="CRASH &amp; FREEZE FORENSICS" FontSize="11" FontWeight="Bold" Foreground="{StaticResource TextMuted}" Margin="0,0,0,4"/>
+        <TextBlock Grid.Row="0" Text="CRASH &amp; FREEZE FORENSICS" FontSize="11" FontWeight="Bold" Foreground="{DynamicResource TextMuted}" Margin="0,0,0,4"/>
         <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="0,0,0,18">
-            <TextBlock Text="Hung Process Detector" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}"/>
-            <TextBlock Text="  —  audits non-responsive apps and repeat freeze offenders" FontSize="13" Foreground="{StaticResource TextMuted}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
+            <TextBlock Text="Hung Process Detector" FontSize="26" FontWeight="Black" Foreground="{DynamicResource TextPrimary}"/>
+            <TextBlock Text="  —  audits non-responsive apps and repeat freeze offenders" FontSize="13" Foreground="{DynamicResource TextMuted}" VerticalAlignment="Bottom" Margin="0,0,0,3"/>
         </StackPanel>
 
         <!-- Summary Cards Row -->
@@ -38,34 +38,34 @@
             <!-- Total Events (24h) -->
             <Border Grid.Column="0" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
-                    <TextBlock Text="HANGS (24h)" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtHangs24h" Text="0" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentOrange}" Margin="0,4,0,0"/>
+                    <TextBlock Text="HANGS (24h)" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
+                    <TextBlock x:Name="TxtHangs24h" Text="0" FontSize="26" FontWeight="Black" Foreground="{DynamicResource AccentOrange}" Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
 
             <!-- Total Events (All Time) -->
             <Border Grid.Column="2" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
-                    <TextBlock Text="TOTAL EVENTS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtTotalEvents" Text="0" FontSize="26" FontWeight="Black" Foreground="{StaticResource TextPrimary}" Margin="0,4,0,0"/>
+                    <TextBlock Text="TOTAL EVENTS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
+                    <TextBlock x:Name="TxtTotalEvents" Text="0" FontSize="26" FontWeight="Black" Foreground="{DynamicResource TextPrimary}" Margin="0,4,0,0"/>
                 </StackPanel>
             </Border>
 
             <!-- Top Offender -->
             <Border Grid.Column="4" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
-                    <TextBlock Text="TOP OFFENDER" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
-                    <TextBlock x:Name="TxtTopOffender" Text="—" FontSize="15" FontWeight="Bold" Foreground="{StaticResource AccentRed}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock x:Name="TxtTopOffenderCount" Text="None logged" FontSize="11" Foreground="{StaticResource TextSecondary}"/>
+                    <TextBlock Text="TOP OFFENDER" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
+                    <TextBlock x:Name="TxtTopOffender" Text="—" FontSize="15" FontWeight="Bold" Foreground="{DynamicResource AccentRed}" Margin="0,4,0,0" TextTrimming="CharacterEllipsis"/>
+                    <TextBlock x:Name="TxtTopOffenderCount" Text="None logged" FontSize="11" Foreground="{DynamicResource TextSecondary}"/>
                 </StackPanel>
             </Border>
 
             <!-- Currently Hung -->
             <Border Grid.Column="6" Style="{StaticResource CardPanel}" Padding="14,12">
                 <StackPanel>
-                    <TextBlock Text="ACTIVE HANGS" FontSize="10" FontWeight="Bold" Foreground="{StaticResource TextMuted}"/>
+                    <TextBlock Text="ACTIVE HANGS" FontSize="10" FontWeight="Bold" Foreground="{DynamicResource TextMuted}"/>
                     <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
-                        <TextBlock x:Name="TxtActiveHangs" Text="0" FontSize="26" FontWeight="Black" Foreground="{StaticResource AccentGreen}" VerticalAlignment="Center"/>
+                        <TextBlock x:Name="TxtActiveHangs" Text="0" FontSize="26" FontWeight="Black" Foreground="{DynamicResource AccentGreen}" VerticalAlignment="Center"/>
                         <Button x:Name="BtnEndAllHangs" Content="⚡ End All" Style="{StaticResource DangerButton}" 
                                 Click="BtnEndAllHangs_Click" Padding="8,3" Margin="10,0,0,0" FontSize="11"
                                 VerticalAlignment="Center" Visibility="Collapsed"/>
@@ -94,7 +94,7 @@
             <!-- Auto-Kill Toggle -->
             <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
                 <CheckBox x:Name="ChkAutoKill" Content="Auto-end frozen apps after" 
-                          Foreground="{StaticResource TextSecondary}" FontSize="12" VerticalAlignment="Center"
+                          Foreground="{DynamicResource TextSecondary}" FontSize="12" VerticalAlignment="Center"
                           Checked="ChkAutoKill_Changed" Unchecked="ChkAutoKill_Changed"/>
                 <ComboBox x:Name="CmbAutoKillTimeout" Width="65" Margin="6,0,0,0" FontSize="12" VerticalAlignment="Center"
                           SelectionChanged="CmbAutoKillTimeout_Changed">
@@ -120,19 +120,19 @@
         <!-- Repeat Offenders Table -->
         <Border x:Name="PanelOffenders" Grid.Row="4" Style="{StaticResource CardPanel}" Padding="0">
             <DataGrid x:Name="DgOffenders" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
-                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
-                      Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
+                      Background="Transparent" BorderThickness="0" RowBackground="{DynamicResource BgCard}" AlternatingRowBackground="{DynamicResource BgCardSubtle}"
+                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderCard}"
+                      Foreground="{DynamicResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
-                        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                        <Setter Property="Background" Value="{DynamicResource BgSidebar}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
                         <Setter Property="Padding" Value="12,10"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource BorderCard}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource BorderCard}"/>
                         <Setter Property="BorderThickness" Value="0,0,0,1"/>
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
@@ -141,9 +141,14 @@
                     <Style TargetType="DataGridRow">
                         <Setter Property="Height" Value="36"/>
                         <Setter Property="FontSize" Value="12.5"/>
+                        <Setter Property="Background" Value="{DynamicResource BgCard}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                         <Style.Triggers>
+                            <Trigger Property="AlternationIndex" Value="1">
+                                <Setter Property="Background" Value="{DynamicResource BgCardSubtle}"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
+                                <Setter Property="Background" Value="{DynamicResource BgCardHover}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -175,19 +180,19 @@
         <!-- Full Event Log Table (hidden by default) -->
         <Border x:Name="PanelFullLog" Grid.Row="4" Style="{StaticResource CardPanel}" Padding="0" Visibility="Collapsed">
             <DataGrid x:Name="DgFullLog" AutoGenerateColumns="False" IsReadOnly="True"
-                      Background="Transparent" BorderThickness="0" RowBackground="{StaticResource BgCard}" AlternatingRowBackground="{StaticResource BgCardSubtle}"
-                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{StaticResource BorderCard}"
-                      Foreground="{StaticResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
+                      Background="Transparent" BorderThickness="0" RowBackground="{DynamicResource BgCard}" AlternatingRowBackground="{DynamicResource BgCardSubtle}"
+                      GridLinesVisibility="Horizontal" HorizontalGridLinesBrush="{DynamicResource BorderCard}"
+                      Foreground="{DynamicResource TextPrimary}" HeadersVisibility="Column" SelectionMode="Single"
                       CanUserSortColumns="True">
 
                 <DataGrid.ColumnHeaderStyle>
                     <Style TargetType="DataGridColumnHeader">
-                        <Setter Property="Background" Value="{StaticResource BgSidebar}"/>
-                        <Setter Property="Foreground" Value="{StaticResource TextSecondary}"/>
+                        <Setter Property="Background" Value="{DynamicResource BgSidebar}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextSecondary}"/>
                         <Setter Property="FontWeight" Value="SemiBold"/>
                         <Setter Property="FontSize" Value="12"/>
                         <Setter Property="Padding" Value="12,10"/>
-                        <Setter Property="BorderBrush" Value="{StaticResource BorderCard}"/>
+                        <Setter Property="BorderBrush" Value="{DynamicResource BorderCard}"/>
                         <Setter Property="BorderThickness" Value="0,0,0,1"/>
                     </Style>
                 </DataGrid.ColumnHeaderStyle>
@@ -196,9 +201,14 @@
                     <Style TargetType="DataGridRow">
                         <Setter Property="Height" Value="36"/>
                         <Setter Property="FontSize" Value="12.5"/>
+                        <Setter Property="Background" Value="{DynamicResource BgCard}"/>
+                        <Setter Property="Foreground" Value="{DynamicResource TextPrimary}"/>
                         <Style.Triggers>
+                            <Trigger Property="AlternationIndex" Value="1">
+                                <Setter Property="Background" Value="{DynamicResource BgCardSubtle}"/>
+                            </Trigger>
                             <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="{StaticResource BgCardHover}"/>
+                                <Setter Property="Background" Value="{DynamicResource BgCardHover}"/>
                             </Trigger>
                         </Style.Triggers>
                     </Style>
@@ -232,17 +242,17 @@
                                 <Border CornerRadius="4" Padding="6,2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="6,0">
                                     <Border.Style>
                                         <Style TargetType="Border">
-                                            <Setter Property="Background" Value="{StaticResource BadgeBgDanger}"/>
-                                            <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderDanger}"/>
+                                            <Setter Property="Background" Value="{DynamicResource BadgeBgDanger}"/>
+                                            <Setter Property="BorderBrush" Value="{DynamicResource BadgeBorderDanger}"/>
                                             <Setter Property="BorderThickness" Value="1"/>
                                             <Style.Triggers>
                                                 <DataTrigger Binding="{Binding Recovered}" Value="True">
-                                                    <Setter Property="Background" Value="{StaticResource BadgeBgSuccess}"/>
-                                                    <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderSuccess}"/>
+                                                    <Setter Property="Background" Value="{DynamicResource BadgeBgSuccess}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource BadgeBorderSuccess}"/>
                                                 </DataTrigger>
                                                 <DataTrigger Binding="{Binding KilledByUser}" Value="True">
-                                                    <Setter Property="Background" Value="{StaticResource BadgeBgWarning}"/>
-                                                    <Setter Property="BorderBrush" Value="{StaticResource BadgeBorderWarning}"/>
+                                                    <Setter Property="Background" Value="{DynamicResource BadgeBgWarning}"/>
+                                                    <Setter Property="BorderBrush" Value="{DynamicResource BadgeBorderWarning}"/>
                                                 </DataTrigger>
                                             </Style.Triggers>
                                         </Style>
@@ -250,13 +260,13 @@
                                     <TextBlock Text="{Binding DisplayStatus}" FontSize="11" FontWeight="Bold">
                                         <TextBlock.Style>
                                             <Style TargetType="TextBlock">
-                                                <Setter Property="Foreground" Value="{StaticResource AccentRed}"/>
+                                                <Setter Property="Foreground" Value="{DynamicResource AccentRed}"/>
                                                 <Style.Triggers>
                                                     <DataTrigger Binding="{Binding Recovered}" Value="True">
-                                                        <Setter Property="Foreground" Value="{StaticResource AccentGreen}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentGreen}"/>
                                                     </DataTrigger>
                                                     <DataTrigger Binding="{Binding KilledByUser}" Value="True">
-                                                        <Setter Property="Foreground" Value="{StaticResource AccentOrange}"/>
+                                                        <Setter Property="Foreground" Value="{DynamicResource AccentOrange}"/>
                                                     </DataTrigger>
                                                 </Style.Triggers>
                                             </Style>
@@ -292,8 +302,8 @@
 
         <!-- Footer -->
         <Grid Grid.Row="5" Margin="0,12,0,0">
-            <TextBlock x:Name="TxtFooter" Text="Watchdog active — monitoring every 3s" FontSize="12" Foreground="{StaticResource TextMuted}"/>
-            <TextBlock x:Name="TxtLogPath" HorizontalAlignment="Right" FontSize="11" Foreground="{StaticResource TextMuted}" Cursor="Hand"
+            <TextBlock x:Name="TxtFooter" Text="Watchdog active — monitoring every 3s" FontSize="12" Foreground="{DynamicResource TextMuted}"/>
+            <TextBlock x:Name="TxtLogPath" HorizontalAlignment="Right" FontSize="11" Foreground="{DynamicResource TextMuted}" Cursor="Hand"
                        MouseLeftButtonUp="TxtLogPath_Click" TextDecorations="Underline"/>
         </Grid>
     </Grid>

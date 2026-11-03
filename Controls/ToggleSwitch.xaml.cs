@@ -28,7 +28,7 @@ namespace WinGovernor.Controls
                 nameof(AccentBrush),
                 typeof(Brush),
                 typeof(ToggleSwitch),
-                new PropertyMetadata(new SolidColorBrush(Color.FromRgb(0x3B, 0x82, 0xF6))));
+                new PropertyMetadata(null, OnAccentBrushChanged));
 
         public event RoutedPropertyChangedEventHandler<bool>? CheckedChanged;
 
@@ -44,16 +44,33 @@ namespace WinGovernor.Controls
             set => SetValue(HeaderProperty, value);
         }
 
-        public Brush AccentBrush
+        public Brush? AccentBrush
         {
-            get => (Brush)GetValue(AccentBrushProperty);
+            get => (Brush?)GetValue(AccentBrushProperty);
             set => SetValue(AccentBrushProperty, value);
         }
 
         public ToggleSwitch()
         {
             InitializeComponent();
+            Loaded += (s, e) =>
+            {
+                Services.ThemeService.ThemeChanged -= OnThemeChanged;
+                Services.ThemeService.ThemeChanged += OnThemeChanged;
+                UpdateVisualState(false);
+            };
+            Unloaded += (s, e) => Services.ThemeService.ThemeChanged -= OnThemeChanged;
             UpdateVisualState(false);
+        }
+
+        private void OnThemeChanged(Services.AppTheme _)
+        {
+            Dispatcher.Invoke(() => UpdateVisualState(false));
+        }
+
+        private static void OnAccentBrushChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
+        {
+            if (d is ToggleSwitch ts) ts.UpdateVisualState(false);
         }
 
         private static void OnIsCheckedChanged(DependencyObject d, DependencyPropertyChangedEventArgs e)
@@ -120,8 +137,9 @@ namespace WinGovernor.Controls
         private void UpdateVisualState(bool animate)
         {
             double targetLeft = IsChecked ? 23.0 : 3.0;
-            var targetTrackBg = IsChecked ? AccentBrush : OffTrackBg;
-            var targetTrackBorder = IsChecked ? AccentBrush : OffTrackBorder;
+            var activeAccent = AccentBrush ?? ThemeBrush("AccentPrimary", Brushes.DodgerBlue);
+            var targetTrackBg = IsChecked ? activeAccent : OffTrackBg;
+            var targetTrackBorder = IsChecked ? activeAccent : OffTrackBorder;
             var targetThumbColor = IsChecked ? Brushes.White : OffThumbColor;
 
             if (animate)

@@ -144,14 +144,9 @@ namespace WinGovernor.Services
             foreach (var kv in palette)
             {
                 var color = (Color)ColorConverter.ConvertFromString(kv.Value);
-                if (app.Resources[kv.Key] is SolidColorBrush brush && !brush.IsFrozen)
-                {
-                    brush.Color = color;
-                }
-                else
-                {
-                    app.Resources[kv.Key] = new SolidColorBrush(color);
-                }
+                var brush = new SolidColorBrush(color);
+                brush.Freeze();
+                app.Resources[kv.Key] = brush;
             }
 
             Current = theme;

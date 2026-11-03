@@ -64,6 +64,12 @@ namespace WinGovernor.Views
             UpdateMemoryUi();
             UpdateCpuUi();
 
+            ThemeService.ThemeChanged += _ =>
+            {
+                ProfileChanged(_turboBoost.ActiveProfile);
+                UpdateCpuUi();
+            };
+
             Loaded += (s, e) => { RootScrollViewer.ScrollToTop(); _ = RefreshPowerPlansAsync(); };
         }
 

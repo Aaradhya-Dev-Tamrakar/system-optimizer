@@ -17,6 +17,7 @@ namespace WinGovernor
                 return;
             }
 
+            StopStaleInstancesAndCleanBak();
             MigrateLegacyData();
             Services.ThemeService.Initialize();
 
@@ -100,6 +101,42 @@ namespace WinGovernor
                 Debug.WriteLine($"[App] Newest-build check error: {ex.Message}");
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Terminates any older running instances of WinGovernor or legacy NovaOptimizer and removes .bak build artifacts.
+        /// </summary>
+        private static void StopStaleInstancesAndCleanBak()
+        {
+            int selfPid = Environment.ProcessId;
+            foreach (var name in new[] { "NovaOptimizer", "WinGovernor" })
+            {
+                try
+                {
+                    foreach (var proc in Process.GetProcessesByName(name))
+                    {
+                        using (proc)
+                        {
+                            if (proc.Id == selfPid) continue;
+                            try { proc.Kill(); proc.WaitForExit(1500); } catch { }
+                        }
+                    }
+                }
+                catch { }
+            }
+
+            try
+            {
+                string? dir = Path.GetDirectoryName(Environment.ProcessPath);
+                if (!string.IsNullOrEmpty(dir) && Directory.Exists(dir))
+                {
+                    foreach (var bak in Directory.GetFiles(dir, "*.bak"))
+                    {
+                        try { File.Delete(bak); } catch { }
+                    }
+                }
+            }
+            catch { }
         }
 
         /// <summary>One-time carry-over of preferences and logs saved under the previous NovaOptimizer name.</summary>

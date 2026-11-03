@@ -271,6 +271,14 @@ try {
     $csprojFile = Join-Path $RepoPath "WinGovernor.csproj"
     if ((-not $SkipBuild) -and (Test-Path $csprojFile) -and (Get-Command dotnet -ErrorAction SilentlyContinue)) {
         Write-Status -Message "Running build verification via dotnet build..."
+        $relDir = Join-Path $RepoPath "bin\Release\net8.0-windows"
+        if (Test-Path $relDir) {
+            Get-ChildItem -Path $relDir -Filter "*.bak" -ErrorAction SilentlyContinue | Remove-Item -Force -ErrorAction SilentlyContinue
+            foreach ($f in @("WinGovernor.exe", "WinGovernor.dll")) {
+                $fp = Join-Path $relDir $f
+                if (Test-Path $fp) { Rename-Item -Path $fp -NewName "$f.bak" -Force -ErrorAction SilentlyContinue }
+            }
+        }
         $buildOutput = & dotnet build $csprojFile --nologo -c Release 2>&1
         if ($LASTEXITCODE -ne 0) {
             Write-Error "Build verification failed. Commit aborted to prevent pushing broken code:`n$buildOutput"

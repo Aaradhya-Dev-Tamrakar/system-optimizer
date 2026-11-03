@@ -67,15 +67,22 @@ Standard tools only terminate processes. WinGovernor directly interfaces with th
 - Logs timestamped hung events, recovery durations, and crash/force-kill actions.
 - Real-time toast notifications alerting users when processes freeze or recover.
 
+### 6. ☀️/🌙 Dual Dynamic Theme Engine & ⚡ Decoupled Power Profiles
+- **Real-Time Light/Dark Switching**: In-place instant theme toggle (☀️ Light / 🌙 Dark) with zero application restart required.
+  - **Dark Mode**: Precision dark canvas (`#272822`), elevated cards (`#1E1F1C`), high-contrast text (`#F8F8F2`), neon pink accent (`#F92672`).
+  - **Light Mode**: Clean daylight canvas (`#F0F0F0`), crisp white cards (`#FFFFFF`), charcoal text (`#101010`), electric blue accent (`#007ACC`).
+  - Automatically matches system preference on first launch and persists choices across restarts in the Windows Registry (`HKCU\Software\WinGovernor`).
+- **Decoupled Power Performance Profiles**: Power plan switching is decoupled from boost toggles, giving you dedicated one-click control over native Windows Power Plans (`Balanced`, `High Performance`, `Ultimate Performance`).
+
 ---
 
 ## 📥 Download Standalone Executable (.exe)
 
 Direct standalone zero-dependency portable executable for **Windows 10 & Windows 11 (64-bit)**:
 
-[![Download NovaOptimizer.exe](https://img.shields.io/badge/Download-NovaOptimizer.exe-0ea5e9?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe)
+[![Download WinGovernor.exe](https://img.shields.io/badge/Download-WinGovernor.exe-0ea5e9?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/WinGovernor.exe)
 
-* **Direct Binary Download**: [**NovaOptimizer.exe (v1.0.0)**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe) (~70 MB, fully self-contained single file)
+* **Direct Binary Download**: [**WinGovernor.exe**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/WinGovernor.exe) (~70 MB, fully self-contained single file)
 * **Latest GitHub Release**: [GitHub Releases](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/tag/v1.0.0)
 * **Compatibility**: Windows 10 (Version 1607+ / Build 14393+) and Windows 11 (all versions, 64-bit). No .NET runtime installation required.
 
@@ -84,13 +91,13 @@ Direct standalone zero-dependency portable executable for **Windows 10 & Windows
 ## 🛠️ How to Run
 
 ### Option 1: Direct Download Standalone (.exe)
-Download [**`NovaOptimizer.exe`**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe) from GitHub Releases or from `bin/Publish/win-x64/NovaOptimizer.exe`.
+Download [**`WinGovernor.exe`**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/WinGovernor.exe) from GitHub Releases or compile via `Publish-Release.bat`.
 > **Note**: Right-click `WinGovernor.exe` and select **Run as administrator** (or accept the UAC prompt) to enable full NT kernel memory purging and Windows service suppression.
 
 ### Option 2: Run Pre-Built Local Executable
-The locally compiled executable is available at:
+The locally compiled standalone executable is available at:
 ```powershell
-publish\WinGovernor.exe
+bin\Publish\win-x64\WinGovernor.exe
 ```
 
 ### Option 3: Run via .NET CLI
@@ -111,13 +118,14 @@ This produces a zero-dependency, self-contained `WinGovernor.exe` in `bin\Publis
 
 ```
 system-optimizer/
-├── App.xaml                   # Global WPF resource dictionary, fluent dark theme
-├── App.xaml.cs                # Application entry point
+├── App.xaml                   # Global WPF resource dictionary & dynamic theme definitions
+├── App.xaml.cs                # Application entry point & theme initialization
 ├── app.manifest               # Administrator elevation & PerMonitorV2 DPI manifest
-├── MainWindow.xaml            # Main shell with sidebar navigation & top status bar
+├── MainWindow.xaml            # Main shell with sidebar navigation, theme toggle & top status bar
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
-├── WinGovernor.csproj       # Project configuration (.NET 8 LTS WPF Windows)
-├── sync.ps1                   # Automated build verification, secret scanning & git sync
+├── WinGovernor.csproj         # Project configuration (.NET 8 LTS WPF Windows)
+├── sync.bat                   # Wrapper for automated build verification, secret scan & git sync
+├── sync.ps1                   # Core build verification, secret scanning & git sync engine
 ├── Run.bat                    # One-click launcher for the WPF application
 ├── Publish-Release.bat        # One-click standalone zero-dependency release publisher
 ├── Run-Optimization.bat       # One-click administrator launcher for Windows service debloat
@@ -134,9 +142,11 @@ system-optimizer/
 ├── Services/
 │   ├── CpuOptimizerService.cs # Background CPU hog detector & EcoQoS tamer
 │   ├── HungProcessWatchdogService.cs # IsHungAppWindow polling watchdog & event dispatch
+│   ├── PowerPlanService.cs    # Windows power plan enumerator & active scheme switcher
 │   ├── RamOptimizerService.cs # Working Set trimmer, NT Standby cleaner, Watchdog
-│   ├── StartupManagerService.cs # WinGovernor logon autostart manager
+│   ├── StartupManagerService.cs # WinGovernor logon autostart manager & self-healing
 │   ├── SystemTweakService.cs  # Windows Registry latency & debloat tweaks
+│   ├── ThemeService.cs        # Dynamic Light/Dark palette manager & registry persistence
 │   └── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, RAM purge
 └── Views/
     ├── HungLogView.xaml       # Real-time event log for hung/frozen process incidents

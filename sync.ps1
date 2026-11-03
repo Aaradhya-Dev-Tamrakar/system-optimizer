@@ -1,9 +1,9 @@
 <#
 .SYNOPSIS
-Safely sync the NovaOptimizer repository, verify build, detect secrets, and commit with smart conventional messaging.
+Safely sync the WinGovernor repository, verify build, detect secrets, and commit with smart conventional messaging.
 
 .DESCRIPTION
-Automated synchronization workflow for system-optimizer (NovaOptimizer):
+Automated synchronization workflow for system-optimizer (WinGovernor):
 1. Verifies Git repository and active branch.
 2. Pulls remote updates with --rebase and --autostash if remote origin exists.
 3. Optionally verifies project build via dotnet build --nologo.
@@ -106,7 +106,7 @@ function Find-StagedSecrets {
     return @($hits)
 }
 
-function Get-NovaOptimizerScope {
+function Get-WinGovernorScope {
     param([string[]]$ChangedFiles)
 
     if ($ChangedFiles | Where-Object { $_ -match '^Views/|MainWindow\.xaml' }) { return "views" }
@@ -145,7 +145,7 @@ function Get-AutoCommitMessage {
     $allChanged = @($addedFiles + $modifiedFiles + $deletedFiles)
     if (@($allChanged).Count -eq 0) { return $null }
 
-    $scope = Get-NovaOptimizerScope -ChangedFiles $allRelativePaths
+    $scope = Get-WinGovernorScope -ChangedFiles $allRelativePaths
     $type = "chore"
 
     if (@($addedFiles).Count -gt 0) {
@@ -223,7 +223,7 @@ try {
         $hasOrigin = $false
     }
 
-    Write-Status -Message "NovaOptimizer Repository: $RepoPath"
+    Write-Status -Message "WinGovernor Repository: $RepoPath"
     Write-Status -Message "Active Branch: $currentBranch"
 
     # 0. Verification Gate
@@ -268,7 +268,7 @@ try {
     }
 
     # 2. Build verification gate
-    $csprojFile = Join-Path $RepoPath "NovaOptimizer.csproj"
+    $csprojFile = Join-Path $RepoPath "WinGovernor.csproj"
     if ((-not $SkipBuild) -and (Test-Path $csprojFile) -and (Get-Command dotnet -ErrorAction SilentlyContinue)) {
         Write-Status -Message "Running build verification via dotnet build..."
         $buildOutput = & dotnet build $csprojFile --nologo -c Release 2>&1
@@ -341,7 +341,7 @@ try {
             Write-Notice -Message "Commit created locally, but no 'origin' remote is configured."
         }
 
-        Write-Success -Message "NovaOptimizer repository synced successfully."
+        Write-Success -Message "WinGovernor repository synced successfully."
     }
     else {
         Write-Success -Message "No changes to commit."

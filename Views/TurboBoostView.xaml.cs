@@ -2,16 +2,17 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
-using NovaOptimizer.Models;
-using NovaOptimizer.Services;
+using WinGovernor.Models;
+using WinGovernor.Services;
 
-namespace NovaOptimizer.Views
+namespace WinGovernor.Views
 {
     public partial class TurboBoostView : UserControl
     {
         private readonly RamOptimizerService _ramOptimizer;
         private readonly TurboBoostService _turboBoost;
         private readonly CpuOptimizerService _cpuOptimizer;
+        private readonly PowerPlanService _powerPlans = new();
         private readonly DispatcherTimer _timer;
         private int _uiTickCount = 0;
 
@@ -63,7 +64,41 @@ namespace NovaOptimizer.Views
             UpdateMemoryUi();
             UpdateCpuUi();
 
-            Loaded += (s, e) => RootScrollViewer.ScrollToTop();
+            Loaded += (s, e) => { RootScrollViewer.ScrollToTop(); _ = RefreshPowerPlansAsync(); };
+        }
+
+        private async System.Threading.Tasks.Task RefreshPowerPlansAsync()
+        {
+            try
+            {
+                var plans = await System.Threading.Tasks.Task.Run(() => _powerPlans.GetPlans());
+                IcPowerPlans.ItemsSource = plans;
+                var active = plans.Find(p => p.IsActive);
+                TxtActivePowerPlan.Text = active != null ? $"Active: {active.Name}" : "Active: unknown";
+            }
+            catch
+            {
+                TxtActivePowerPlan.Text = "Active: unavailable";
+            }
+        }
+
+        private async void PowerPlan_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is FrameworkElement fe && fe.Tag is Guid id)
+            {
+                bool ok = await System.Threading.Tasks.Task.Run(() => _powerPlans.SetActivePlan(id));
+                await RefreshPowerPlansAsync();
+                if (ok)
+                {
+                    string name = TxtActivePowerPlan.Text.Replace("Active: ", "");
+                    LogMessage($"⚡ Power plan switched to {name}.");
+                    OnStatusNotification?.Invoke($"⚡ Power plan: {name}");
+                }
+                else
+                {
+                    OnStatusNotification?.Invoke("⚠️ Could not switch power plan.");
+                }
+            }
         }
 
         private void ScrollViewer_RequestBringIntoView(object sender, RequestBringIntoViewEventArgs e)
@@ -325,7 +360,7 @@ namespace NovaOptimizer.Views
                     BtnGameBoost.Background = dangerBrush;
                     BadgeGameActive.Visibility = Visibility.Visible;
                     CardGame.BorderBrush = dangerBrush;
-                    CardGame.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#1C1522")!;
+                    CardGame.Background = GetBrush("BgCardActive");
 
                     BtnWorkBoost.Content = "Activate Work Boost";
                     BtnWorkBoost.Background = primaryBrush;
@@ -339,7 +374,7 @@ namespace NovaOptimizer.Views
                     BtnWorkBoost.Background = dangerBrush;
                     BadgeWorkActive.Visibility = Visibility.Visible;
                     CardWork.BorderBrush = primaryBrush;
-                    CardWork.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#101726")!;
+                    CardWork.Background = GetBrush("BgCardActive");
 
                     BtnGameBoost.Content = "Activate Game Boost";
                     BtnGameBoost.Background = primaryBrush;
@@ -353,7 +388,7 @@ namespace NovaOptimizer.Views
                     BtnStudyMode.Background = dangerBrush;
                     BadgeStudyActive.Visibility = Visibility.Visible;
                     CardStudy.BorderBrush = primaryBrush;
-                    CardStudy.Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#10162B")!;
+                    CardStudy.Background = GetBrush("BgCardActive");
 
                     BtnGameBoost.Content = "Activate Game Boost";
                     BtnGameBoost.Background = primaryBrush;

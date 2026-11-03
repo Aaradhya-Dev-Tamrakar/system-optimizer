@@ -7,7 +7,7 @@ using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 
-namespace NovaOptimizer.Native
+namespace WinGovernor.Native
 {
     public static class IconHelper
     {

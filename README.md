@@ -1,25 +1,25 @@
 <p align="center">
-  <img src="Assets/icon.png" width="128" height="128" alt="NovaOptimizer Logo" />
+  <img src="Assets/icon.png" width="128" height="128" alt="WinGovernor Logo" />
 </p>
 
-# 🌌 NovaOptimizer — High-Efficiency Windows System Optimizer
+# 🌌 WinGovernor — High-Efficiency Windows System Optimizer
 
 > Built with **C# / .NET 8 LTS** and **WPF** with **universal compatibility for Windows 10 & 11**. Engineered for zero overhead, instant response, and maximum system optimization before gaming or intensive work.
 
 ---
 
-## ⚡ What is NovaOptimizer?
+## ⚡ What is WinGovernor?
 
-NovaOptimizer is a native, ultra-lightweight Windows System Optimizer designed strictly to complement—not duplicate—default factory Windows and OEM tools. Rather than cloning built-in utilities like Windows Task Manager, Windows Clock Focus Sessions, or OEM thermal utilities (like Acer Sense), NovaOptimizer focuses exclusively on advanced NT kernel optimizations that default factory apps cannot perform.
+WinGovernor is a native, ultra-lightweight Windows System Optimizer designed strictly to complement—not duplicate—default factory Windows and OEM tools. Rather than cloning built-in utilities like Windows Task Manager, Windows Clock Focus Sessions, or OEM thermal utilities (like Acer Sense), WinGovernor focuses exclusively on advanced NT kernel optimizations that default factory apps cannot perform.
 
-NovaOptimizer runs with a micro-footprint (~25 MB RAM), launches in milliseconds, and directly manipulates native Windows NT kernel APIs to unlock maximum performance from your hardware.
+WinGovernor runs with a micro-footprint (~25 MB RAM), launches in milliseconds, and directly manipulates native Windows NT kernel APIs to unlock maximum performance from your hardware.
 
 ---
 
 ## 🚀 Core Features (Retained & Optimized)
 
 ### 1. 🧹 Deep Physical RAM Purge (ISLC & Sysinternals RAMMap Level)
-Standard tools only terminate processes. NovaOptimizer directly interfaces with the Windows NT memory manager:
+Standard tools only terminate processes. WinGovernor directly interfaces with the Windows NT memory manager:
 - **Process Working Set Trimming**: Iterates active user and background processes (whitelisting protected system processes) and flushes dormant memory pages using `EmptyWorkingSet` and `SetProcessWorkingSetSize(-1, -1)`.
 - **Kernel Standby List Purging**: Invokes undocumented kernel calls via `NtSetSystemInformation(SystemMemoryListInformation = 80)` with commands `MemoryPurgeStandbyList (4)` and `MemoryPurgeLowPriorityStandbyList (5)`. This instantly cleans gigabytes of cached standby RAM that cause micro-stutters and frame drops in modern games.
 - **System Working Set Purge**: Flushes system-level cache using `MemoryEmptyWorkingSets (2)`.
@@ -52,7 +52,7 @@ Standard tools only terminate processes. NovaOptimizer directly interfaces with 
 - **EcoQoS Efficiency Mode & Auto-Tamer**: Enabled by default at startup. Continuously and automatically throttles rogue background hogs using Windows EcoQoS (`PROCESS_POWER_THROTTLING_EXECUTION_SPEED`) and Idle priority. User toggle state is persisted across boots.
 
 ### 4. ⚙️ System Latency & Debloat Registry Tweaks
-- **Nova Auto-Start**: Launches NovaOptimizer minimized to the system notification tray at logon with highest privileges to maintain standby memory cleaning silently.
+- **Governor Auto-Start**: Launches WinGovernor minimized to the system notification tray at logon with highest privileges to maintain standby memory cleaning silently.
 - **System Performance & Service Debloat Tweaks**:
   - **Disable Game DVR / Background Captures**: Stops Windows from background-recording 3D viewports, fixing input latency.
   - **Disable Network Throttling Index**: Sets `NetworkThrottlingIndex = 0xFFFFFFFF` to eliminate network latency packet caps.
@@ -85,12 +85,12 @@ Direct standalone zero-dependency portable executable for **Windows 10 & Windows
 
 ### Option 1: Direct Download Standalone (.exe)
 Download [**`NovaOptimizer.exe`**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/NovaOptimizer.exe) from GitHub Releases or from `bin/Publish/win-x64/NovaOptimizer.exe`.
-> **Note**: Right-click `NovaOptimizer.exe` and select **Run as administrator** (or accept the UAC prompt) to enable full NT kernel memory purging and Windows service suppression.
+> **Note**: Right-click `WinGovernor.exe` and select **Run as administrator** (or accept the UAC prompt) to enable full NT kernel memory purging and Windows service suppression.
 
 ### Option 2: Run Pre-Built Local Executable
 The locally compiled executable is available at:
 ```powershell
-publish\NovaOptimizer.exe
+publish\WinGovernor.exe
 ```
 
 ### Option 3: Run via .NET CLI
@@ -103,7 +103,7 @@ Double-click **`Publish-Release.bat`** or run:
 ```powershell
 dotnet publish -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -o ./bin/Publish/win-x64
 ```
-This produces a zero-dependency, self-contained `NovaOptimizer.exe` in `bin\Publish\win-x64\` that runs out-of-the-box on **any** Windows 10 or Windows 11 64-bit machine.
+This produces a zero-dependency, self-contained `WinGovernor.exe` in `bin\Publish\win-x64\` that runs out-of-the-box on **any** Windows 10 or Windows 11 64-bit machine.
 
 ---
 
@@ -116,7 +116,7 @@ system-optimizer/
 ├── app.manifest               # Administrator elevation & PerMonitorV2 DPI manifest
 ├── MainWindow.xaml            # Main shell with sidebar navigation & top status bar
 ├── MainWindow.xaml.cs         # Navigation controller & notification engine
-├── NovaOptimizer.csproj       # Project configuration (.NET 8 LTS WPF Windows)
+├── WinGovernor.csproj       # Project configuration (.NET 8 LTS WPF Windows)
 ├── sync.ps1                   # Automated build verification, secret scanning & git sync
 ├── Run.bat                    # One-click launcher for the WPF application
 ├── Publish-Release.bat        # One-click standalone zero-dependency release publisher
@@ -135,7 +135,7 @@ system-optimizer/
 │   ├── CpuOptimizerService.cs # Background CPU hog detector & EcoQoS tamer
 │   ├── HungProcessWatchdogService.cs # IsHungAppWindow polling watchdog & event dispatch
 │   ├── RamOptimizerService.cs # Working Set trimmer, NT Standby cleaner, Watchdog
-│   ├── StartupManagerService.cs # NovaOptimizer logon autostart manager
+│   ├── StartupManagerService.cs # WinGovernor logon autostart manager
 │   ├── SystemTweakService.cs  # Windows Registry latency & debloat tweaks
 │   └── TurboBoostService.cs   # Game/Work/Study boost manager, service suspension, RAM purge
 └── Views/

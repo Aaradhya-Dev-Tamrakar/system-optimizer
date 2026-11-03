@@ -1,9 +1,9 @@
 @echo off
-title NovaOptimizer - Universal Release Publisher
+title WinGovernor - Universal Release Publisher
 cd /d "%~dp0"
 
 echo ======================================================================
-echo    NovaOptimizer — Universal Standalone Release Publisher
+echo    WinGovernor — Universal Standalone Release Publisher
 echo    Target: Windows 10 ^& Windows 11 (64-bit, Zero-Dependency)
 echo ======================================================================
 echo.
@@ -20,7 +20,7 @@ if %errorlevel% neq 0 (
 echo.
 echo ======================================================================
 echo  [SUCCESS] Universal Windows 10 / 11 executable ready:
-echo  "%~dp0bin\Publish\win-x64\NovaOptimizer.exe"
+echo  "%~dp0bin\Publish\win-x64\WinGovernor.exe"
 echo ======================================================================
 echo.
 echo This standalone binary can be copied to ANY Windows 10 or 11 PC and run

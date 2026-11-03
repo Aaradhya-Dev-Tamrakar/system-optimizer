@@ -3,11 +3,11 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Animation;
 using System.Windows.Threading;
-using NovaOptimizer.Native;
-using NovaOptimizer.Services;
-using NovaOptimizer.Views;
+using WinGovernor.Native;
+using WinGovernor.Services;
+using WinGovernor.Views;
 
-namespace NovaOptimizer
+namespace WinGovernor
 {
     public partial class MainWindow : Window
     {
@@ -123,7 +123,7 @@ namespace NovaOptimizer
                 var metrics = _ramOptimizer.GetMemoryMetrics();
                 TxtHeaderCpu.Text = $"CPU: {cpu:F0}%";
                 TxtHeaderRam.Text = $"RAM: {metrics.InUsePercent:F0}%";
-                _trayManager?.UpdateTooltip($"NovaOptimizer — CPU: {cpu:F0}% | RAM: {metrics.InUsePercent:F0}%");
+                _trayManager?.UpdateTooltip($"WinGovernor — CPU: {cpu:F0}% | RAM: {metrics.InUsePercent:F0}%");
             };
             _headerTimer.Start();
 
@@ -149,8 +149,22 @@ namespace NovaOptimizer
             return (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom(fallbackHex)!;
         }
 
+        private void BtnTheme_Click(object sender, RoutedEventArgs e)
+        {
+            ThemeService.Toggle();
+            ShowNotification(ThemeService.Current == AppTheme.Dark ? "Dark theme enabled." : "Light theme enabled.", "🎨");
+        }
+
+        private void UpdateThemeButton()
+        {
+            // Button shows the theme you will switch TO.
+            BtnTheme.Content = ThemeService.Current == AppTheme.Dark ? "☀" : "🌙";
+        }
+
         private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
+            UpdateThemeButton();
+            ThemeService.ThemeChanged += _ => UpdateThemeButton();
             try
             {
                 _trayManager = new TrayIconManager(this);
@@ -171,7 +185,7 @@ namespace NovaOptimizer
             UpdateHungBadge();
 
             // Sync Start with Windows checkbox
-            _startupManager.OnNovaStartupChanged += (enabled) =>
+            _startupManager.OnGovernorStartupChanged += (enabled) =>
             {
                 Dispatcher.Invoke(() =>
                 {
@@ -182,14 +196,24 @@ namespace NovaOptimizer
             };
 
             _isSyncingStartupCheck = true;
-            ChkStartWithWindows.IsChecked = _startupManager.IsNovaStartupEnabled();
+            System.Threading.Tasks.Task.Run(() =>
+            {
+                _startupManager.MigrateAndHealAutostart();
+                bool enabledNow = _startupManager.IsGovernorStartupEnabled();
+                Dispatcher.Invoke(() =>
+                {
+                    _isSyncingStartupCheck = true;
+                    ChkStartWithWindows.IsChecked = enabledNow;
+                    _isSyncingStartupCheck = false;
+                });
+            });
             _isSyncingStartupCheck = false;
 
             // If launched at boot with --autostart, hide window into tray
             if (System.Linq.Enumerable.Any(Environment.GetCommandLineArgs(), a => a.Equals("--autostart", StringComparison.OrdinalIgnoreCase)))
             {
                 Hide();
-                _trayManager?.UpdateTooltip("NovaOptimizer — Running in background");
+                _trayManager?.UpdateTooltip("WinGovernor — Running in background");
             }
         }
 
@@ -197,10 +221,10 @@ namespace NovaOptimizer
         {
             if (_isSyncingStartupCheck) return;
             bool enable = ChkStartWithWindows.IsChecked == true;
-            _startupManager.SetNovaStartup(enable);
+            _startupManager.SetGovernorStartup(enable);
             ShowNotification(enable 
-                ? "NovaOptimizer registered to start with Windows." 
-                : "NovaOptimizer removed from Windows startup.", "🚀");
+                ? "WinGovernor registered to start with Windows." 
+                : "WinGovernor removed from Windows startup.", "🚀");
         }
 
         private void MainWindow_Closing(object? sender, System.ComponentModel.CancelEventArgs e)
@@ -209,7 +233,7 @@ namespace NovaOptimizer
             {
                 e.Cancel = true;
                 Hide();
-                ShowNotification("NovaOptimizer is still running in background.", "ℹ️");
+                ShowNotification("WinGovernor is still running in background.", "ℹ️");
             }
             else
             {

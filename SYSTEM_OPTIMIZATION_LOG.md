@@ -154,3 +154,20 @@
   * **Unbounded Log Memory Capping:** Capped in-memory log cache in `HungProcessWatchdogService` to the latest 1,000 entries. Removed unused `System.Management` dependency from project and codebase.
   * **Handle Cleanup:** Ensured all `Process` instances retrieved during service suppression in `SystemTweakService` and `TurboBoostService` are properly disposed via `try/finally` blocks.
 
+---
+
+## 11. Rebranding to Win-Governor, Dual Theme Engine & Decoupled Power Architecture
+* **Date:** November 3, 2026
+* **Scope:** Architectural rebranding to `Win-Governor`, integration of runtime Light / Dark theme engine, standalone Windows Power Plan governance, startup self-healing, and neon icon modernization.
+* **Key Enhancements & Architectural Updates:**
+  * **Ecosystem Rebranding (`Win-Governor`):** Rebranded project from `NovaOptimizer` to `Win-Governor`. Refactored root namespace, assembly identity, build targets (`WinGovernor.csproj`), build scripts (`Publish-Release.bat`, `Run.bat`, `sync.ps1`), and registration across central ecosystem registry (`schemas/ecosystem.registry.json`).
+  * **Backward Compatibility & Data Migration:** Automated one-time migration of existing user registry settings (`HKCU\Software\NovaOptimizer` -> `HKCU\Software\WinGovernor`) and local app data logs (`%LocalAppData%\NovaOptimizer` -> `%LocalAppData%\WinGovernor`).
+  * **Dual-Theme Engine (`ThemeService`):** Implemented runtime dynamic theme switching (☀️ / 🌙) in custom window titlebar with immediate in-place resource mutation:
+    * **Light Mode:** Canvas `#F0F0F0`, cards `#FFFFFF`, borders `#D4D4D4`, text `#101010`, accent `#007ACC`.
+    * **Dark Mode (Monokai Charcoal):** Canvas `#272822`, cards `#1E1F1C`, borders `#3E3D32`, text `#F8F8F2`, accent `#F92672`.
+    * Theme preferences persist in HKCU registry and automatically follow Windows system theme on first launch.
+  * **Standalone Decoupled Power Plan Governance:** Added `PowerPlanService` wrapping native `powercfg` to discover and switch power plans directly from Turbo Boost view. Power plan switching is strictly decoupled from Game/Work/Study boosts to preserve acoustic thermal fan envelopes and avoid conflicting with factory Acer Sense.
+  * **Startup Self-Healing & Stale Binary Elimination:** Resolved boot target obsolescence where Windows logon launched older build targets. On launch, `WinGovernor` checks whether a newer compiled binary exists under project `bin/` or `publish/` outputs and relaunches into the latest build (`TryRelaunchNewestBuild`). `StartupManagerService.MigrateAndHealAutostart()` migrates legacy tasks and ensures `WinGovernor_Autostart` and HKCU Run keys point directly to the current executable.
+  * **Modernized Visual Asset:** Generated transparent-alpha high-resolution assets (`icon.png`, `icon-256.png`, `icon-32.png`, multi-resolution `icon.ico`) from high-contrast neon control governor brief.
+
+

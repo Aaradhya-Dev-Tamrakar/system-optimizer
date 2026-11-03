@@ -6,16 +6,16 @@ using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Threading;
-using NovaOptimizer.Models;
-using NovaOptimizer.Native;
+using WinGovernor.Models;
+using WinGovernor.Native;
 
-namespace NovaOptimizer.Services
+namespace WinGovernor.Services
 {
     public class HungProcessWatchdogService : IDisposable
     {
         private const int MaxCachedRecords = 1000;
         private static readonly string LogDirectory =
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "NovaOptimizer");
+            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "WinGovernor");
         private static readonly string LogFilePath =
             Path.Combine(LogDirectory, "hung_process_log.jsonl");
 
@@ -40,7 +40,7 @@ namespace NovaOptimizer.Services
                 {
                     try
                     {
-                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\WinGovernor");
                         var val = key?.GetValue("AutoKillHungEnabled");
                         _autoKillEnabled = val is int i && i != 0;
                     }
@@ -53,7 +53,7 @@ namespace NovaOptimizer.Services
                 _autoKillEnabled = value;
                 try
                 {
-                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\WinGovernor");
                     key?.SetValue("AutoKillHungEnabled", value ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
                 }
                 catch { }
@@ -71,7 +71,7 @@ namespace NovaOptimizer.Services
                 {
                     try
                     {
-                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\WinGovernor");
                         var val = key?.GetValue("AutoKillHungTimeout");
                         _autoKillTimeoutSeconds = val is int i && i >= 5 ? i : 30;
                     }
@@ -85,7 +85,7 @@ namespace NovaOptimizer.Services
                 _autoKillTimeoutSeconds = clamped;
                 try
                 {
-                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\WinGovernor");
                     key?.SetValue("AutoKillHungTimeout", clamped, Microsoft.Win32.RegistryValueKind.DWord);
                 }
                 catch { }

@@ -1,5 +1,5 @@
 # =====================================================================
-# NovaOptimizer - Windows Services Optimization Script
+# WinGovernor - Windows Services Optimization Script
 # =====================================================================
 
 # Check if running as Administrator

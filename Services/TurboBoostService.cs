@@ -5,7 +5,7 @@ using System.ServiceProcess;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace NovaOptimizer.Services
+namespace WinGovernor.Services
 {
     public enum BoostProfile
     {

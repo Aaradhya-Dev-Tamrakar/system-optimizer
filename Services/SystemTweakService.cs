@@ -3,10 +3,10 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.ServiceProcess;
 using Microsoft.Win32;
-using NovaOptimizer.Models;
-using NovaOptimizer.Native;
+using WinGovernor.Models;
+using WinGovernor.Native;
 
-namespace NovaOptimizer.Services
+namespace WinGovernor.Services
 {
     public class SystemTweakService
     {

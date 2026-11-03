@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
 
-namespace NovaOptimizer.Models
+namespace WinGovernor.Models
 {
     public class HungProcessRecord
     {

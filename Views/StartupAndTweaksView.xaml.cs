@@ -2,11 +2,11 @@ using System;
 using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
-using NovaOptimizer.Controls;
-using NovaOptimizer.Models;
-using NovaOptimizer.Services;
+using WinGovernor.Controls;
+using WinGovernor.Models;
+using WinGovernor.Services;
 
-namespace NovaOptimizer.Views
+namespace WinGovernor.Views
 {
     public partial class StartupAndTweaksView : UserControl
     {
@@ -23,12 +23,12 @@ namespace NovaOptimizer.Views
             _startupManager = startupManager;
             _systemTweaks = systemTweaks;
 
-            _startupManager.OnNovaStartupChanged += (enabled) =>
+            _startupManager.OnGovernorStartupChanged += (enabled) =>
             {
                 Dispatcher.Invoke(() =>
                 {
                     _isSyncingNovaToggle = true;
-                    ToggleNovaStartup.IsChecked = enabled;
+                    ToggleGovernorStartup.IsChecked = enabled;
                     _isSyncingNovaToggle = false;
                 });
             };
@@ -42,7 +42,7 @@ namespace NovaOptimizer.Views
             IcTweaks.ItemsSource = _tweaks;
 
             _isSyncingNovaToggle = true;
-            ToggleNovaStartup.IsChecked = _startupManager.IsNovaStartupEnabled();
+            ToggleGovernorStartup.IsChecked = _startupManager.IsGovernorStartupEnabled();
             _isSyncingNovaToggle = false;
         }
 
@@ -113,15 +113,15 @@ namespace NovaOptimizer.Views
             OnStatusNotification?.Invoke($"↺ Reverted {reverted} tweaks back to Windows defaults.");
         }
 
-        private void ToggleNovaStartup_CheckedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
+        private void ToggleGovernorStartup_CheckedChanged(object sender, RoutedPropertyChangedEventArgs<bool> e)
         {
             if (_isSyncingNovaToggle) return;
-            if (_startupManager.IsNovaStartupEnabled() != e.NewValue)
+            if (_startupManager.IsGovernorStartupEnabled() != e.NewValue)
             {
-                _startupManager.SetNovaStartup(e.NewValue);
+                _startupManager.SetGovernorStartup(e.NewValue);
                 OnStatusNotification?.Invoke(e.NewValue
-                    ? "🚀 NovaOptimizer registered to start with Windows."
-                    : "NovaOptimizer removed from Windows startup.");
+                    ? "🚀 WinGovernor registered to start with Windows."
+                    : "WinGovernor removed from Windows startup.");
             }
         }
     }

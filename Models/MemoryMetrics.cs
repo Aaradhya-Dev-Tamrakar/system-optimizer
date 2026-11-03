@@ -1,4 +1,4 @@
-namespace NovaOptimizer.Models
+namespace WinGovernor.Models
 {
     public class MemoryMetrics
     {

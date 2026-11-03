@@ -5,7 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Interop;
 
-namespace NovaOptimizer.Native
+namespace WinGovernor.Native
 {
     public class TrayIconManager : IDisposable
     {
@@ -129,7 +129,7 @@ namespace NovaOptimizer.Native
                     var sri = Application.GetResourceStream(new Uri("pack://application:,,,/Assets/icon.ico"));
                     if (sri != null)
                     {
-                        string tempFile = Path.Combine(Path.GetTempPath(), $"NovaTray_{Guid.NewGuid():N}.ico");
+                        string tempFile = Path.Combine(Path.GetTempPath(), $"GovernorTray_{Guid.NewGuid():N}.ico");
                         try
                         {
                             using (var src = sri.Stream)
@@ -192,7 +192,7 @@ namespace NovaOptimizer.Native
                 uFlags = flags,
                 uCallbackMessage = WM_TRAYICON,
                 hIcon = _hIcon,
-                szTip = "NovaOptimizer — High-Perf System Optimizer"
+                szTip = "WinGovernor — High-Perf System Optimizer"
             };
 
             _isAdded = Shell_NotifyIcon(NIM_ADD, ref data);
@@ -216,12 +216,12 @@ namespace NovaOptimizer.Native
         {
             var menu = new ContextMenu
             {
-                Background = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#131926")!,
-                Foreground = System.Windows.Media.Brushes.White,
-                BorderBrush = (System.Windows.Media.Brush)new System.Windows.Media.BrushConverter().ConvertFrom("#1E293B")!
+                Background = Application.Current.TryFindResource("BgCard") as System.Windows.Media.Brush ?? System.Windows.Media.Brushes.Black,
+                Foreground = Application.Current.TryFindResource("TextPrimary") as System.Windows.Media.Brush ?? System.Windows.Media.Brushes.White,
+                BorderBrush = Application.Current.TryFindResource("BorderCard") as System.Windows.Media.Brush ?? System.Windows.Media.Brushes.Gray
             };
 
-            var itemOpen = new MenuItem { Header = "🌌 Open NovaOptimizer", FontWeight = FontWeights.Bold };
+            var itemOpen = new MenuItem { Header = "🌌 Open WinGovernor", FontWeight = FontWeights.Bold };
             itemOpen.Click += (s, e) => ShowWindow();
 
             var itemClean = new MenuItem { Header = "⚡ Quick RAM Clean" };

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-scripts/verify.py - Deterministic Verification Gate for system-optimizer (NovaOptimizer)
+scripts/verify.py - Deterministic Verification Gate for system-optimizer (Win-Governor)
 Verifies C#/WPF project files, sync wrappers, synthetic SHA invariants, and workflows.
 """
 
@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parent.parent
 def check_structure():
     print("[1/4] Checking project structure and core files...")
     required = [
-        "NovaOptimizer.csproj",
+        "WinGovernor.csproj",
         "README.md",
         "sync.ps1",
         "sync.bat",

@@ -1,5 +1,5 @@
 @echo off
-title NovaOptimizer - Service Optimization
+title WinGovernor - Service Optimization
 cd /d "%~dp0"
 
 :: Check for admin rights

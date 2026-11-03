@@ -4,10 +4,10 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 using System.Threading.Tasks;
-using NovaOptimizer.Models;
-using NovaOptimizer.Native;
+using WinGovernor.Models;
+using WinGovernor.Native;
 
-namespace NovaOptimizer.Services
+namespace WinGovernor.Services
 {
     public class RamOptimizerService : IDisposable
     {
@@ -22,7 +22,7 @@ namespace NovaOptimizer.Services
                 {
                     try
                     {
-                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                        using var key = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\WinGovernor");
                         var val = key?.GetValue("AutoCleanEnabled");
                         _autoCleanEnabled = val is int i ? (i != 0) : true;
                     }
@@ -38,7 +38,7 @@ namespace NovaOptimizer.Services
                 _autoCleanEnabled = value;
                 try
                 {
-                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\NovaOptimizer");
+                    using var key = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\WinGovernor");
                     key?.SetValue("AutoCleanEnabled", value ? 1 : 0, Microsoft.Win32.RegistryValueKind.DWord);
                 }
                 catch { }

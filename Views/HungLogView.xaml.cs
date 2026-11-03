@@ -9,10 +9,10 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Threading;
 using Microsoft.Win32;
-using NovaOptimizer.Models;
-using NovaOptimizer.Services;
+using WinGovernor.Models;
+using WinGovernor.Services;
 
-namespace NovaOptimizer.Views
+namespace WinGovernor.Views
 {
     /// <summary>
     /// MultiValueConverter: shows End Task button only when NOT recovered AND NOT already killed.
@@ -54,7 +54,7 @@ namespace NovaOptimizer.Views
             // Show the log file path in the footer
             string logPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "NovaOptimizer", "hung_process_log.jsonl");
+                "WinGovernor", "hung_process_log.jsonl");
             TxtLogPath.Text = $"Log: {logPath}";
 
             // Initialize auto-kill UI from persisted settings
@@ -308,7 +308,7 @@ namespace NovaOptimizer.Views
         {
             string logPath = Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "NovaOptimizer", "hung_process_log.jsonl");
+                "WinGovernor", "hung_process_log.jsonl");
 
             if (File.Exists(logPath))
             {

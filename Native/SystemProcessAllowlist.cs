@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
 
-namespace NovaOptimizer.Native
+namespace WinGovernor.Native
 {
     public static class SystemProcessAllowlist
     {

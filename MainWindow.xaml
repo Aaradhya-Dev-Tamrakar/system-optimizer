@@ -1,10 +1,10 @@
-<Window x:Class="NovaOptimizer.MainWindow"
+<Window x:Class="WinGovernor.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Title="NovaOptimizer — System Optimizer" 
+        Title="WinGovernor — System Optimizer" 
         Icon="Assets/icon.png"
         Height="760" Width="1180" MinHeight="640" MinWidth="980"
         Background="{StaticResource BgDark}" WindowStartupLocation="CenterScreen"
@@ -32,7 +32,7 @@
                 <!-- App Branding -->
                 <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
                     <Image Source="Assets/icon.png" Width="24" Height="24" Margin="0,0,10,0" RenderOptions.BitmapScalingMode="HighQuality"/>
-                    <TextBlock Text="NOVA OPTIMIZER" FontSize="14" FontWeight="Black" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
+                    <TextBlock Text="WIN-GOVERNOR" FontSize="14" FontWeight="Black" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                     <Border CornerRadius="4" Background="{StaticResource BadgeBgPrimary}" BorderBrush="{StaticResource BadgeBorderPrimary}" BorderThickness="1" Margin="10,0,0,0" Padding="6,2" VerticalAlignment="Center">
                         <TextBlock Text="PRO v1.0" FontSize="10" FontWeight="Bold" Foreground="{StaticResource AccentPrimary}"/>
                     </Border>
@@ -59,6 +59,10 @@
                             <TextBlock x:Name="TxtHeaderRam" Text="RAM: 0%" FontSize="12" FontWeight="SemiBold" Foreground="{StaticResource TextPrimary}" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Border>
+
+                    <!-- Light / Dark Theme Toggle -->
+                    <Button x:Name="BtnTheme" Content="☀" Style="{StaticResource SecondaryButton}" Padding="9,4" FontSize="13" Margin="0,0,10,0"
+                            Click="BtnTheme_Click" ToolTip="Switch Light / Dark theme"/>
 
                     <!-- Instant Quick Clean Button -->
                     <Button x:Name="BtnQuickClean" Content="⚡ Quick Clean" Style="{StaticResource PrimaryButton}" 

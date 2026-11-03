@@ -5,7 +5,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
-namespace NovaOptimizer.Controls
+namespace WinGovernor.Controls
 {
     public partial class ToggleSwitch : UserControl
     {
@@ -84,9 +84,13 @@ namespace NovaOptimizer.Controls
             }
         }
 
-        private static readonly SolidColorBrush OffTrackBg = new(Color.FromRgb(0x0D, 0x12, 0x1B));
-        private static readonly SolidColorBrush OffTrackBorder = new(Color.FromRgb(0x1E, 0x29, 0x3B));
-        private static readonly SolidColorBrush OffThumbColor = new(Color.FromRgb(0x94, 0xA3, 0xB8));
+        // Off-state brushes resolve to the shared themed brushes so Light/Dark switching recolors them live.
+        private static Brush ThemeBrush(string key, Brush fallback) =>
+            Application.Current?.TryFindResource(key) as Brush ?? fallback;
+
+        private static Brush OffTrackBg => ThemeBrush("BgCardSubtle", Brushes.DimGray);
+        private static Brush OffTrackBorder => ThemeBrush("BorderCardHover", Brushes.Gray);
+        private static Brush OffThumbColor => ThemeBrush("TextSecondary", Brushes.LightGray);
 
         private static readonly DoubleAnimation CheckAnim = new()
         {
@@ -104,9 +108,6 @@ namespace NovaOptimizer.Controls
 
         static ToggleSwitch()
         {
-            OffTrackBg.Freeze();
-            OffTrackBorder.Freeze();
-            OffThumbColor.Freeze();
             CheckAnim.Freeze();
             UncheckAnim.Freeze();
         }

@@ -4,12 +4,22 @@ using System.IO;
 using System.Linq;
 using System.Windows;
 
-namespace NovaOptimizer
+namespace WinGovernor
 {
     public partial class App : Application
     {
         protected override void OnStartup(StartupEventArgs e)
         {
+            // Always prefer the newest build of this app over a stale binary (e.g. an old autostart target).
+            if (TryRelaunchNewestBuild(e.Args))
+            {
+                Environment.Exit(0);
+                return;
+            }
+
+            MigrateLegacyData();
+            Services.ThemeService.Initialize();
+
             DispatcherUnhandledException += (s, args) =>
             {
                 Debug.WriteLine($"[Unhandled UI Exception] {args.Exception}");
@@ -35,6 +45,90 @@ namespace NovaOptimizer
             base.OnStartup(e);
         }
 
+        private static string? FindProjectDir(string exePath)
+        {
+            string? dir = Path.GetDirectoryName(exePath);
+            for (int i = 0; i < 7 && dir != null; i++)
+            {
+                if (File.Exists(Path.Combine(dir, "WinGovernor.csproj"))) return dir;
+                dir = Directory.GetParent(dir)?.FullName;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// If a newer WinGovernor.exe exists in this project's bin/publish outputs, launch it and tell the caller to exit.
+        /// Prevents boot/autostart from running a stale build.
+        /// </summary>
+        private static bool TryRelaunchNewestBuild(string[] args)
+        {
+            try
+            {
+                if (args.Contains("--no-newer-check", StringComparer.OrdinalIgnoreCase)) return false;
+
+                string? current = Environment.ProcessPath;
+                if (string.IsNullOrEmpty(current) || !File.Exists(current)) return false;
+
+                string? projectDir = FindProjectDir(current);
+                if (projectDir == null) return false;
+
+                var roots = new[] { Path.Combine(projectDir, "bin"), Path.Combine(projectDir, "publish") };
+                var enumOpts = new EnumerationOptions { RecurseSubdirectories = true, IgnoreInaccessible = true };
+
+                string? newest = roots
+                    .Where(Directory.Exists)
+                    .SelectMany(r => Directory.EnumerateFiles(r, "WinGovernor.exe", enumOpts))
+                    .Where(f => f.IndexOf(Path.DirectorySeparatorChar + "Debug" + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase) < 0)
+                    .OrderByDescending(File.GetLastWriteTimeUtc)
+                    .FirstOrDefault();
+
+                if (newest == null || string.Equals(newest, current, StringComparison.OrdinalIgnoreCase)) return false;
+                if (File.GetLastWriteTimeUtc(newest) <= File.GetLastWriteTimeUtc(current).AddSeconds(2)) return false;
+
+                var psi = new ProcessStartInfo
+                {
+                    FileName = newest,
+                    Arguments = string.Join(" ", args.Select(a => a.Contains(' ') ? $"\"{a}\"" : a).Append("--no-newer-check")),
+                    WorkingDirectory = Path.GetDirectoryName(newest)!,
+                    UseShellExecute = true
+                };
+                Process.Start(psi);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"[App] Newest-build check error: {ex.Message}");
+                return false;
+            }
+        }
+
+        /// <summary>One-time carry-over of preferences and logs saved under the previous NovaOptimizer name.</summary>
+        private static void MigrateLegacyData()
+        {
+            try
+            {
+                using var legacy = Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\NovaOptimizer");
+                if (legacy != null && Microsoft.Win32.Registry.CurrentUser.OpenSubKey(@"Software\WinGovernor") == null)
+                {
+                    using var target = Microsoft.Win32.Registry.CurrentUser.CreateSubKey(@"Software\WinGovernor");
+                    foreach (var name in legacy.GetValueNames())
+                    {
+                        target.SetValue(name, legacy.GetValue(name)!, legacy.GetValueKind(name));
+                    }
+                }
+            }
+            catch { }
+
+            try
+            {
+                string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                string oldDir = Path.Combine(local, "NovaOptimizer");
+                string newDir = Path.Combine(local, "WinGovernor");
+                if (Directory.Exists(oldDir) && !Directory.Exists(newDir)) Directory.Move(oldDir, newDir);
+            }
+            catch { }
+        }
+
         private static void CheckAndPerformSourceAutoUpdate(string[] args)
         {
             // Prevent recursive loop if this instance was just launched by an auto-rebuild
@@ -51,7 +145,7 @@ namespace NovaOptimizer
 
                 for (int i = 0; i < 4 && searchDir != null; i++)
                 {
-                    if (File.Exists(Path.Combine(searchDir, "NovaOptimizer.csproj")))
+                    if (File.Exists(Path.Combine(searchDir, "WinGovernor.csproj")))
                     {
                         projectDir = searchDir;
                         break;
@@ -93,7 +187,7 @@ namespace NovaOptimizer
                 // Check top-level root files (App.xaml, MainWindow.xaml, .csproj)
                 if (!hasNewerSource)
                 {
-                    string[] rootFiles = new[] { "App.xaml", "App.xaml.cs", "MainWindow.xaml", "MainWindow.xaml.cs", "NovaOptimizer.csproj" };
+                    string[] rootFiles = new[] { "App.xaml", "App.xaml.cs", "MainWindow.xaml", "MainWindow.xaml.cs", "WinGovernor.csproj" };
                     foreach (var rf in rootFiles)
                     {
                         string p = Path.Combine(projectDir, rf);
@@ -111,7 +205,7 @@ namespace NovaOptimizer
                     var psi = new ProcessStartInfo
                     {
                         FileName = "dotnet",
-                        Arguments = $"build \"{Path.Combine(projectDir, "NovaOptimizer.csproj")}\" -c Release --nologo -v q",
+                        Arguments = $"build \"{Path.Combine(projectDir, "WinGovernor.csproj")}\" -c Release --nologo -v q",
                         WorkingDirectory = projectDir,
                         CreateNoWindow = true,
                         UseShellExecute = false
@@ -129,7 +223,7 @@ namespace NovaOptimizer
 
                             if (Directory.Exists(releaseBinDir))
                             {
-                                var candidates = Directory.GetFiles(releaseBinDir, "NovaOptimizer.exe", SearchOption.AllDirectories);
+                                var candidates = Directory.GetFiles(releaseBinDir, "WinGovernor.exe", SearchOption.AllDirectories);
                                 newBinaryPath = candidates.OrderByDescending(File.GetLastWriteTimeUtc).FirstOrDefault();
                             }
 

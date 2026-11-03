@@ -7,8 +7,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
     <ApplicationManifest>app.manifest</ApplicationManifest>
-    <AssemblyName>NovaOptimizer</AssemblyName>
-    <RootNamespace>NovaOptimizer</RootNamespace>
+    <AssemblyName>WinGovernor</AssemblyName>
+    <RootNamespace>WinGovernor</RootNamespace>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <ApplicationIcon>Assets\icon.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>

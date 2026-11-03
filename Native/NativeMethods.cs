@@ -3,7 +3,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Security.Principal;
 
-namespace NovaOptimizer.Native
+namespace WinGovernor.Native
 {
     public static class NativeMethods
     {

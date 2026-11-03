@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace NovaOptimizer.Models
+namespace WinGovernor.Models
 {
     public class TweakItem : INotifyPropertyChanged
     {

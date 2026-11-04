@@ -80,10 +80,10 @@ Standard tools only terminate processes. WinGovernor directly interfaces with th
 
 Direct standalone zero-dependency portable executable for **Windows 10 & Windows 11 (64-bit)**:
 
-[![Download WinGovernor.exe](https://img.shields.io/badge/Download-WinGovernor.exe-0ea5e9?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/WinGovernor.exe)
+[![Download WinGovernor.exe](https://img.shields.io/badge/Download-WinGovernor.exe-0ea5e9?style=for-the-badge&logo=windows&logoColor=white)](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v2.0.0/WinGovernor.exe)
 
-* **Direct Binary Download**: [**WinGovernor.exe**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/WinGovernor.exe) (~70 MB, fully self-contained single file)
-* **Latest GitHub Release**: [GitHub Releases](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/tag/v1.0.0)
+* **Direct Binary Download**: [**WinGovernor.exe**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v2.0.0/WinGovernor.exe) (~72 MB, fully self-contained single file)
+* **Latest GitHub Release**: [GitHub Releases (v2.0.0)](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/tag/v2.0.0)
 * **Compatibility**: Windows 10 (Version 1607+ / Build 14393+) and Windows 11 (all versions, 64-bit). No .NET runtime installation required.
 
 ---
@@ -91,7 +91,7 @@ Direct standalone zero-dependency portable executable for **Windows 10 & Windows
 ## 🛠️ How to Run
 
 ### Option 1: Direct Download Standalone (.exe)
-Download [**`WinGovernor.exe`**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v1.0.0/WinGovernor.exe) from GitHub Releases or compile via `Publish-Release.bat`.
+Download [**`WinGovernor.exe`**](https://github.com/Aaradhya-Dev-Tamrakar/system-optimizer/releases/download/v2.0.0/WinGovernor.exe) from GitHub Releases or compile via `Publish-Release.bat`.
 > **Note**: Right-click `WinGovernor.exe` and select **Run as administrator** (or accept the UAC prompt) to enable full NT kernel memory purging and Windows service suppression.
 
 ### Option 2: Run Pre-Built Local Executable
